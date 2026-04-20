@@ -1,14 +1,13 @@
 import * as React from "react";
 import PropTypes from "prop-types";
-import Header from "./Header";
-import HeroList from "./HeroList";
-import TextInsertion from "./TextInsertion";
+import Header from "./components/Header";
+import HeroList from "./components/HeroList";
+import TextInsertion from "./components/TextInsertion";
 import { makeStyles } from "@fluentui/react-components";
-import { Ribbon24Regular, LockOpen24Regular, DesignIdeas24Regular } from "@fluentui/react-icons";
-import { insertText, logSelectedData, getFirstSelectedNumericColumn } from "../taskpane";
-import { insertStatsToExcel } from "../write";
+
 import { Button } from "@fluentui/react-components";
-import { calculateDescriptiveStats } from "../../utils/math";
+import { calculateDescriptiveStats } from "../utils/math";
+import { getFirstSelectedNumericColumn, insertStatsToExcel } from "./api";
 
 const useStyles = makeStyles({
   root: {
@@ -29,9 +28,7 @@ const App = (props) => {
     console.log("Indicatorii calculați:", stats);
     await insertStatsToExcel(stats);
   };
-  const handleLogSelectedDataClick = () => {
-    logSelectedData(); // Apelează funcția care extrage și afișează datele selectate în Excel
-  };
+
   return (
     <div className={styles.root}>
       <Button style={{ margin: "20px" }} appearance="primary" onClick={handleClick}>
