@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <title>Regresie Liniară Simplă - Interactiv</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px; background-color: #f9f9f9; }
+        .dashboard { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,00,0.1); margin-bottom: 20px; }
+        canvas { background: white; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); cursor: pointer; }
+        .stats { display: flex; gap: 20px; font-size: 1.1em; font-weight: bold; color: #333; }
+        h2 { margin-top: 0; color: #0078D4; }
+    </style>
+</head>
+<body>
+
+    <div class="dashboard">
+        <h2>📊 Trage de puncte pentru a recalcula regresia!</h2>
+        <div class="stats">
+            <div id="eqDisplay">Ecuația: Y = 0 + 0*X</div>
+            <div id="r2Display" style="color: #107C10;">R² (Acuratețe): 0%</div>
+        </div>
+    </div>
+
+    <canvas id="chart" width="800" height="500"></canvas>
+
+    <script>
+        const canvas = document.getElementById('chart');
+        const ctx = canvas.getContext('2d');
+        const eqDisplay = document.getElementById('eqDisplay');
+        const r2Display = document.getElementById('r2Display');
+
+        // Datele inițiale (extrase din cursul tău)
+        let points = [
+            { x: 80, y: 70 },
+            { x: 100, y: 65 },
+            { x: 140, y: 95 },
+            { x: 200, y: 120 },
+            { x: 240, y: 155 }
+        ];
+
+        // Mapare coordonate: din date reale în pixeli pe ecran
+        const scaleX = canvas.width / 300; 
+        const scaleY = canvas.height / 200; 
+        
+        let draggingPoint = null;
+
+        function getRealX(canvasX) { return canvasX / scaleX; }
+        function getRealY(canvasY) { return (canvas.height - canvasY) / scaleY; }
+        function getCanvasX(realX) { return realX * scaleX; }
+        function getCanvasY(realY) { return canvas.height - (realY * scaleY); }
+
+        // Algoritmul de regresie OLS (la fel ca în add-in-ul tău)
+        function calculateRegression() {
+            const n = points.length;
+            let sumX = 0, sumY = 0, sumXY = 0, sumX2 = 0;
+
+            points.forEach(p => {
+                sumX += p.x; sumY += p.y;
+                sumXY += p.x * p.y; sumX2 += p.x * p.x;
+            });
+
+            const meanX = sumX / n;
+            const meanY = sumY / n;
+            const b1 = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
+            const b0 = meanY - b1 * meanX;
+
+            // Calcul R^2
+            let ssRes = 0, ssTotal = 0;
+            points.forEach(p => {
+                const yPred = b0 + b1 * p.x;
+                ssRes += Math.pow(p.y - yPred, 2);
+                ssTotal += Math.pow(p.y - meanY, 2);
+            });
+            const rSquared = 1 - (ssRes / ssTotal);
+
+            return { b0, b1, rSquared };
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const reg = calculateRegression();
+
+            // Actualizare Dashboard
+            eqDisplay.innerText = `Ecuația: Y = ${reg.b0.toFixed(2)} + ${reg.b1.toFixed(2)}*X`;
+            r2Display.innerText = `R² (Acuratețe): ${(reg.rSquared * 100).toFixed(2)}%`;
+
+            // Desenăm linia de regresie
+            const startY = reg.b0 + reg.b1 * 0;
+            const endY = reg.b0 + reg.b1 * 300;
+            
+            ctx.beginPath();
+            ctx.moveTo(getCanvasX(0), getCanvasY(startY));
+            ctx.lineTo(getCanvasX(300), getCanvasY(endY));
+            ctx.strokeStyle = '#0078D4';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+
+            // Desenăm liniile de eroare (reziduurile) și punctele
+            points.forEach(p => {
+                const yPred = reg.b0 + reg.b1 * p.x;
+                
+                // Eroarea (linia punctată)
+                ctx.beginPath();
+                ctx.setLineDash([5, 5]);
+                ctx.moveTo(getCanvasX(p.x), getCanvasY(p.y));
+                ctx.lineTo(getCanvasX(p.x), getCanvasY(yPred));
+                ctx.strokeStyle = 'red';
+                ctx.lineWidth = 1;
+                ctx.stroke();
+                ctx.setLineDash([]);
+
+                // Punctul
+                ctx.beginPath();
+                ctx.arc(getCanvasX(p.x), getCanvasY(p.y), 8, 0, Math.PI * 2);
+                ctx.fillStyle = '#107C10';
+                ctx.fill();
+                ctx.stroke();
+            });
+        }
+
+        // Evenimente de mouse pentru a trage de puncte
+        canvas.addEventListener('mousedown', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const mouseX = e.clientX - rect.left;
+            const mouseY = e.clientY - rect.top;
+
+            points.forEach(p => {
+                const cx = getCanvasX(p.x);
+                const cy = getCanvasY(p.y);
+                if (Math.hypot(cx - mouseX, cy - mouseY) < 10) {
+                    draggingPoint = p;
+                }
+            });
+        });
+
+        canvas.addEventListener('mousemove', (e) => {
+            if (!draggingPoint) return;
+            const rect = canvas.getBoundingClientRect();
+            draggingPoint.x = getRealX(e.clientX - rect.left);
+            draggingPoint.y = getRealY(e.clientY - rect.top);
+            draw();
+        });
+
+        canvas.addEventListener('mouseup', () => draggingPoint = null);
+        canvas.addEventListener('mouseleave', () => draggingPoint = null);
+
+        // Prima desenare
+        draw();
+    </script>
+</body>
+</html>

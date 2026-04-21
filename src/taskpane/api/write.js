@@ -1,3 +1,18 @@
+export async function insertColumn(array, positions) {
+  try {
+    await Excel.run(async (context) => {
+      const sheet = context.workbook.worksheets.getActiveWorksheet();
+      const valuesToInsert = [].push(...array.map((val) => [val]));
+
+      sheet.getRange(positions).values = valuesToInsert;
+      await context.sync();
+      console.log("Datele au fost inserate cu succes în tabel.");
+    });
+  } catch (error) {
+    console.error("Eroare la inserarea datelor în Excel:", error);
+  }
+}
+
 export async function insertStatsToExcel(stats) {
   try {
     await Excel.run(async (context) => {
