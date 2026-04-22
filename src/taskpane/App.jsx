@@ -14,6 +14,7 @@ import Header from "./components/Header";
 import HeroList from "./components/HeroList";
 import TextInsertion from "./components/TextInsertion";
 import ModalDescriptiveStats from "./components/ModalDescriptiveStats";
+import ModalSimpleRegression from "./components/ModalSimpleRegression";
 import { makeStyles } from "@fluentui/react-components";
 import { calculateDescriptiveStats, calculateSimpleRegression } from "../utils/math";
 import {
@@ -73,6 +74,7 @@ const App = (props) => {
         Regresie simplă
       </Button>
       <ModalDescriptiveStats />
+      <ModalSimpleRegression />
     </div>
   );
 };

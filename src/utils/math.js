@@ -132,6 +132,6 @@ export const calculateSimpleRegression = (xData, yData, alpha = 0.05) => {
     sb1: sb1.toNumber(),
     tStat: tStat.toNumber(),
     pValue,
-    isSignificant: pValue < alpha, // Decizia de respingere a ipotezei nule H0: B1=0 [cite: 335, 394]
+    isSignificant: pValue / 2 < alpha, // Decizia de respingere a ipotezei nule H0: B1=0 [cite: 335, 394]
   };
 };
