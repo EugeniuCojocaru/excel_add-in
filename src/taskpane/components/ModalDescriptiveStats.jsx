@@ -9,44 +9,60 @@ import {
   DialogContent,
   Button,
 } from "@fluentui/react-components";
+import RangeSelector from "./RangeSelector";
+
+import { getSelectedNumericColumn, insertColumn } from "../api";
+import { calculateDescriptiveStats } from "../../utils/math";
 
 const ModalDescriptiveStats = () => {
   const [open, setOpen] = React.useState(false);
+  const [adresaX, setAdresaX] = useState("");
+  const [adresaY, setAdresaY] = useState("");
+
+  const handleClick = async () => {
+    const values = await getSelectedNumericColumn(adresaX);
+    console.log("Valorile numerice extrase din prima coloană selectată:", values);
+    const stats = calculateDescriptiveStats(values);
+    console.log("Indicatorii calculați:", stats);
+
+    const dataToWrite = [
+      ["Volum eșantion (n):", stats.n],
+      ["Media (mean):", stats.mean],
+      ["Abaterea standard (stdDev):", stats.stdDev],
+      ["Eroarea standard:", stats.standardError],
+      ["Nivel încredere (95%):", stats.confidenceLevel],
+      ["Limita inferioară:", stats.lowerBound],
+      ["Limita superioară:", stats.upperBound],
+    ];
+    console.log("Data to write to Excel:", dataToWrite);
+    await insertColumn(dataToWrite, adresaY);
+  };
 
   return (
-    <div style={{ padding: "20px", height: "100vh" }}>
+    <div style={{ padding: "20px" }}>
       <Dialog open={open} onOpenChange={(event, data) => setOpen(data.open)}>
         <DialogTrigger disableButtonEnhancement>
-          <Button>Open dialog</Button>
+          <Button>Statistici descriptive</Button>
         </DialogTrigger>
+
         <DialogSurface>
           <DialogBody>
-            <DialogTitle>Rezultate Regresie Liniară</DialogTitle>
+            <DialogTitle>Statistici descriptive</DialogTitle>
 
             <DialogContent>
-              <p>Aici poți afișa rezultatele pe care le-ai calculat anterior:</p>
-              <ul>
-                <li>
-                  <strong>R² (Acuratețe):</strong> 96.20%
-                </li>
-                <li>
-                  <strong>Panta (b1):</strong> 0.51
-                </li>
-                <li>
-                  <strong>Intercept (b0):</strong> 24.45
-                </li>
-              </ul>
-              <p>
-                Verdict: <em>Variabila X influențează semnificativ variabila Y.</em>
-              </p>
+              <RangeSelector label="Selectează Variabila X (Venit):" onRangeChanged={setAdresaX} />
+              <RangeSelector
+                label="Selectează unde sa inserez raspunsul:"
+                placeholder="Ex: A1"
+                onRangeChanged={setAdresaY}
+              />
             </DialogContent>
 
             <DialogActions>
-              {/* DialogTrigger închide automat fereastra când se dă click pe elementul din interior */}
               <DialogTrigger disableButtonEnhancement>
                 <Button appearance="secondary">Închide</Button>
               </DialogTrigger>
-              <Button appearance="primary" onClick={() => console.log("Inserează în Excel...")}>
+              <Button appearance="primary" onClick={handleClick}>
                 Inserează în Tabel
               </Button>
             </DialogActions>
