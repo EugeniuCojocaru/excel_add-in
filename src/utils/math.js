@@ -2,7 +2,7 @@ import Decimal from "decimal.js";
 import math from "./mathConfig"; // Instanța configurată de mathjs
 import { jStat } from "jstat";
 import { OPERATIONS } from "./basicMath"; // Presupunând că le-ai exportat de aici
-
+import { interpretationSimpleRegression } from "./econometrics"; // Funcția de interpretare pentru regresia simplă
 /**
  * Calculează indicatorii statistici de bază și intervalul de încredere.
  * @param {number[]} data - Array cu valorile eșantionului (ex: Număr angajați).
@@ -57,7 +57,7 @@ export const calculateDescriptiveStats = (data, alpha = 0.05) => {
  * @param {number[]} xData - Variabila independentă (ex: Venit)[cite: 262].
  * @param {number[]} yData - Variabila dependentă (ex: Cheltuieli)[cite: 262].
  */
-export const calculateSimpleRegression = (xData, yData, alpha = 0.05) => {
+export const calculateSimpleRegression = (xData, yData, alpha = 0.05, onlyValues = false) => {
   // Convertim seturile de date în Decimal
   const xDec = xData.map((val) => new Decimal(val));
   const yDec = yData.map((val) => new Decimal(val));
@@ -90,7 +90,7 @@ export const calculateSimpleRegression = (xData, yData, alpha = 0.05) => {
   const b0 = meanY.sub(b1.mul(meanX));
 
   // 3. Calculăm reziduurile (epsilon) și Suma Pătratelor Reziduurilor (SSR) [cite: 326, 327]
-  let ssRes = new Decimal(0);
+  let ssRes = new Decimal(0); // s-ar putea sa am nevoie de el
   let ssTotal = new Decimal(0);
   let sumSqDevX = new Decimal(0);
 
@@ -132,6 +132,15 @@ export const calculateSimpleRegression = (xData, yData, alpha = 0.05) => {
     sb1: sb1.toNumber(),
     tStat: tStat.toNumber(),
     pValue,
-    isSignificant: pValue / 2 < alpha, // Decizia de respingere a ipotezei nule H0: B1=0 [cite: 335, 394]
+    isSignificant: pValue < alpha, // Decizia de respingere a ipotezei nule H0: B1=0 [cite: 335, 394]
+    interpretation: onlyValues
+      ? null
+      : interpretationSimpleRegression({
+          b0: b0.toNumber(),
+          b1: b1.toNumber(),
+          pValue,
+          alpha,
+          rSquared,
+        }), // Dacă utilizatorul a ales să vadă doar valorile, nu returnăm interpretarea detaliată
   };
 };

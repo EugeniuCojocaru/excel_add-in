@@ -8,6 +8,7 @@ import {
   DialogActions,
   DialogContent,
   Button,
+  Checkbox,
 } from "@fluentui/react-components";
 import RangeSelector from "./RangeSelector";
 
@@ -19,24 +20,31 @@ const ModalSimpleRegression = () => {
   const [adresaX, setAdresaX] = useState("");
   const [adresaY, setAdresaY] = useState("");
   const [adresaZ, setAdresaZ] = useState("");
+  const [onlyValues, setOnlyValues] = useState(false);
 
+  const handleCheckboxChange = (event, data) => {
+    // În Fluent UI v9, noul status (true/false) vine în 'data.checked'
+    setOnlyValues(data.checked);
+  };
   const handleClick = async () => {
     const xData = await getSelectedNumericColumn(adresaX);
     console.log("Valorile numerice extrase din prima coloană selectată:", xData);
     const yData = await getSelectedNumericColumn(adresaY);
     console.log("Valorile numerice extrase din a doua coloană selectată:", yData);
-    const stats = calculateSimpleRegression(xData, yData);
+    const stats = calculateSimpleRegression(xData, yData, 0.05, onlyValues);
     console.log("Indicatorii calculați:", stats);
 
+    const intrepretation = stats.interpretation || [["", ""]];
     const dataToWrite = [
-      ["Intercept:", stats.intercept],
-      ["Panta (slope):", stats.slope],
+      ["Intercept (b0):", stats.intercept],
+      ["Panta (b1):", stats.slope],
       ["R²:", stats.rSquared],
       ["Eroarea Standard a Estimării (ESE)", stats.ese],
       ["eroarea standard a parametrului b1 (sb1)", stats.sb1],
       ["Statistica t pentru b1:", stats.tStat],
       ["P-valoarea pentru b1:", stats.pValue],
       ["Este semnificativ la nivelul de 0.05?", stats.isSignificant],
+      ...intrepretation,
     ];
     console.log("Data to write to Excel:", dataToWrite);
     await insertColumn(dataToWrite, adresaZ);
@@ -60,6 +68,11 @@ const ModalSimpleRegression = () => {
                 label="Selectează unde sa inserez raspunsul:"
                 placeholder="Ex: A1"
                 onRangeChanged={setAdresaZ}
+              />
+              <Checkbox
+                label="Vreau doar valorile calculate"
+                checked={onlyValues}
+                onChange={handleCheckboxChange}
               />
             </DialogContent>
 
