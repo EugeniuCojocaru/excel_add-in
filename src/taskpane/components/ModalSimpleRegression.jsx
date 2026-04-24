@@ -13,7 +13,7 @@ import {
 import RangeSelector from "./RangeSelector";
 
 import { getColumnMatrix, getSelectedNumericColumn, insertColumn } from "../api";
-import { calculateSimpleRegression, calculateRegression } from "../../utils/math";
+import { calculateRegression } from "../../utils/math";
 import { generateSummaryOutput } from "../../utils/summaryOutput";
 
 const ModalSimpleRegression = () => {
@@ -24,7 +24,6 @@ const ModalSimpleRegression = () => {
   const [onlyValues, setOnlyValues] = useState(false);
 
   const handleCheckboxChange = (event, data) => {
-    // În Fluent UI v9, noul status (true/false) vine în 'data.checked'
     setOnlyValues(data.checked);
   };
   const handleClick = async () => {
