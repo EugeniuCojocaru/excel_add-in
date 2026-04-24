@@ -43,12 +43,12 @@ const ModalSimpleRegression = () => {
     <div style={{ padding: "20px" }}>
       <Dialog open={open} onOpenChange={(event, data) => setOpen(data.open)}>
         <DialogTrigger disableButtonEnhancement>
-          <Button>Regresie simpla</Button>
+          <Button>Regresie</Button>
         </DialogTrigger>
 
         <DialogSurface>
           <DialogBody>
-            <DialogTitle>Regresie simpla</DialogTitle>
+            <DialogTitle>Regresie</DialogTitle>
 
             <DialogContent>
               <RangeSelector
