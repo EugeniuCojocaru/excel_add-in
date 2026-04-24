@@ -113,3 +113,60 @@ export async function getSelectedNumericColumn(addressRange) {
     return [];
   }
 }
+
+export async function getColumnMatrix(addressRange) {
+  try {
+    return await Excel.run(async (context) => {
+      const sheet = context.workbook.worksheets.getActiveWorksheet();
+      const range = sheet.getRange(addressRange);
+
+      range.load("values");
+      await context.sync();
+
+      const values = range.values;
+      const dataByColumn = [];
+
+      // 3. Dacă nu s-a selectat nimic, ne oprim
+      if (!values || values.length === 0) {
+        console.warn("Selecția este goală.");
+        return [];
+      }
+
+      // for (let i = 0; i < values.length; i++) {
+      //   for (let j = 0; j < values[i].length; j++) {
+      //     const cellValue = values[i][j];
+
+      //     if (typeof cellValue === "number" && !isNaN(cellValue)) {
+      //       if (!dataByColumn[j]) {
+      //         dataByColumn[j] = [cellValue];
+      //       } else {
+      //         dataByColumn[j].push(cellValue);
+      //       }
+      //     }
+      //   }
+      // }
+      // Parcurgem fiecare rând din matricea brută returnată de Excel
+      for (let i = 0; i < values.length; i++) {
+        const currentRow = values[i]; // Acesta este un array de tipul [20, 120] sau ["Angajati", "Capital"]
+
+        // Verificăm dacă TOATE celulele de pe acest rând sunt numere valide
+        const isRowValid = currentRow.every(
+          (cellValue) => typeof cellValue === "number" && !isNaN(cellValue)
+        );
+
+        if (isRowValid) {
+          // Dacă absolut toate elementele de pe rând sunt numere, îl păstrăm INTACT
+          dataByColumn.push(currentRow);
+        } else {
+          // Dacă am găsit text (ex: antetul) sau celule goale, ignorăm COMPLET rândul
+          console.log(`Rândul ${i + 1} a fost ignorat (conține text sau date lipsă).`);
+        }
+      }
+      console.log("Date extrase (curățate):", dataByColumn);
+      return dataByColumn;
+    });
+  } catch (error) {
+    console.error("A apărut o eroare la extragerea datelor:", error);
+    return [];
+  }
+}

@@ -3,6 +3,7 @@ import math from "./mathConfig"; // Instanța configurată de mathjs
 import { jStat } from "jstat";
 import { OPERATIONS } from "./basicMath"; // Presupunând că le-ai exportat de aici
 import { interpretationSimpleRegression } from "./econometrics"; // Funcția de interpretare pentru regresia simplă
+
 /**
  * Calculează indicatorii statistici de bază și intervalul de încredere.
  * @param {number[]} data - Array cu valorile eșantionului (ex: Număr angajați).
@@ -142,5 +143,132 @@ export const calculateSimpleRegression = (xData, yData, alpha = 0.05, onlyValues
           alpha,
           rSquared,
         }), // Dacă utilizatorul a ales să vadă doar valorile, nu returnăm interpretarea detaliată
+  };
+};
+
+/**
+ * Execută regresia liniară (Simplă sau Multiplă) prin OLS folosind algebră matriceală.
+ * @param {number[]} yData - Variabila dependentă (ex: Cheltuieli, Venit).
+ * @param {number[][]} xData - Variabilele independente (Matrice 2D pentru multiplă, Array 1D pentru simplă).
+ * @param {number} alpha - Pragul de semnificație (implicit 0.05).
+ * @param {boolean} onlyValues - Flag pentru a suprima generarea textului de interpretare.
+ */
+export const calculateRegression = (yData, xData, alpha = 0.05, onlyValues = false) => {
+  const n = yData.length;
+  console.log("AAAAA", { xData, yData });
+  // 1. Verificăm dacă xData are mai multe coloane (Multiplă) sau doar una (Simplă)
+  const k = xData[0].length;
+  const isSimple = k === 1;
+
+  // Grade de libertate pentru reziduuri (n - k - 1) [cite: 159, 166]
+  const df = n - k - 1;
+
+  // 2. Construim Matricea Y (vector coloană n x 1)
+  const Y = yData.map((val) => [math.bignumber(val)]);
+
+  // 3. Construim Matricea X (Adăugăm o coloană de 1 la început pentru intercept - b0)
+  const X = xData.map((row) => {
+    return [1, ...row].map((val) => math.bignumber(val));
+  });
+
+  console.log({ Y, X });
+  // 4. Algebra Matriceală: Beta = (X^T * X)^-1 * X^T * Y
+  const X_T = math.transpose(X);
+  console.log({ X_T });
+  const X_T_X = math.multiply(X_T, X);
+  const X_T_X_inv = math.inv(X_T_X);
+  const X_T_Y = math.multiply(X_T, Y);
+
+  // Vectorul coeficienților (matrice k+1 x 1)
+  const Beta = math.multiply(X_T_X_inv, X_T_Y);
+
+  // Extragem coeficienții pentru a lucra mai ușor cu ei
+  const coefficients = Beta.map((row) => row[0]);
+  const b0 = coefficients[0]; // Termenul liber [cite: 102]
+  const slopes = coefficients.slice(1); // Parametrii de regresie parțială (b1, b2... bk) [cite: 101]
+
+  // 5. Calculăm Valorile Prezise (Y_pred) și Reziduurile
+  // y_i = b_0 + b_1 * x_1i + ... + b_k * x_ki + e_i [cite: 99]
+  const Y_pred = math.multiply(X, Beta);
+
+  let ssRes = math.bignumber(0); // Suma Pătratelor Reziduurilor (SSR)
+  let ssTotal = math.bignumber(0); // Suma Pătratelor Totală (SST)
+  const meanY = math.mean(Y.map((row) => row[0]));
+
+  for (let i = 0; i < n; i++) {
+    const resid = math.subtract(Y[i][0], Y_pred[i][0]);
+    ssRes = math.add(ssRes, math.square(resid));
+
+    const devY = math.subtract(Y[i][0], meanY);
+    ssTotal = math.add(ssTotal, math.square(devY));
+  }
+
+  // 6. Eroarea Standard a Estimării (ESE)
+  const ese = math.sqrt(math.divide(ssRes, math.bignumber(df)));
+
+  // 7. Erorile Standard ale Coeficienților (sb)
+  // Se găsesc pe diagonala principală a matricei de varianță-covarianță: ESE^2 * (X^T * X)^-1
+  const varianceMatrix = math.multiply(math.square(ese), X_T_X_inv);
+
+  const standardErrors = [];
+  for (let i = 0; i < k + 1; i++) {
+    standardErrors.push(math.sqrt(varianceMatrix[i][i]));
+  }
+
+  // 8. Statistica t și p-value pentru FIECARE coeficient
+  const tStats = coefficients.map((b, i) => math.divide(b, standardErrors[i]));
+  const pValues = tStats.map((t) => {
+    const tPrimitive = Math.abs(Number(t));
+    return 2 * (1 - jStat.studentt.cdf(tPrimitive, df)); // Test bilateral
+  });
+
+  // 9. Coeficientul de Determinație (R-squared) [cite: 202]
+  const rSquared = math.subtract(math.bignumber(1), math.divide(ssRes, ssTotal));
+
+  // 10. Coeficientul de Determinație Ajustat (Adjusted R-squared) [cite: 209]
+  // Formula: 1 - (1 - R^2) * (n - 1) / (n - k - 1)
+  const rSqAdjPart1 = math.subtract(math.bignumber(1), rSquared);
+  const rSqAdjPart2 = math.divide(math.bignumber(n - 1), math.bignumber(df));
+  const adjustedRSquared = math.subtract(
+    math.bignumber(1),
+    math.multiply(rSqAdjPart1, rSqAdjPart2)
+  );
+
+  // 11. Testul ANOVA (F-Statistic) pentru întregul model [cite: 157]
+  const fNumerator = math.divide(rSquared, math.bignumber(k));
+  const fDenominator = math.divide(math.subtract(math.bignumber(1), rSquared), math.bignumber(df));
+  const fStat = math.divide(fNumerator, fDenominator);
+
+  // p-value pentru testul F
+  const fSignificance = 1 - jStat.centralF.cdf(Number(fStat), k, df);
+
+  // 12. Returnăm rezultatele standardizate (convertite înapoi în numere primitive pentru UI)
+  const interpretation = onlyValues
+    ? null
+    : isSimple
+      ? interpretationSimpleRegression({
+          b0: b0.toNumber(),
+          b1: slopes[0].toNumber(),
+          pValue: pValues[1], // p-value pentru b1
+          alpha,
+          rSquared,
+        })
+      : console.log("No intepretation yet");
+  console.log("AAAAAA2");
+  return {
+    k, // Numărul de variabile independente
+    df, // Grade de libertate pentru reziduuri
+    intercept: Number(b0),
+    slopes: slopes.map((b) => Number(b)), // Array cu b1, b2, ..., bk
+    rSquared: Number(rSquared),
+    adjustedRSquared: Number(adjustedRSquared), // NOU: Esențial pentru regresia multiplă
+    ese: Number(ese),
+    standardErrors: standardErrors.map((se) => Number(se)), // Array cu sb0, sb1, ..., sbk
+    tStats: tStats.map((t) => Number(t)), // Array cu scorurile t
+    pValues, // Array cu probabilitățile pentru intercept și fiecare pantă
+    fStat: Number(fStat), // Statistica test F
+    fSignificance, // Significance F (p-value model)
+    isSignificant: fSignificance < alpha, // Decizia pentru ansamblul parametrilor
+    interpretation,
   };
 };

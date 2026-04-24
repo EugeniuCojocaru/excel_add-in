@@ -22,7 +22,7 @@ export const interpretationSimpleRegression = (stats) => {
   const isSignificant = pValue / 2 < alpha;
   interpretation.push([
     ``,
-    `${isSignificant ? "Respingem H0, b1 este semnificativ diferit de 0" : "Nu respingem H0, b1 nu este semnificativ diferit de 0"}`,
+    `${isSignificant ? "Respingem H0, b1 este semnificativ diferit de 0" : "H0 nu poate fi respinsa"}`,
   ]);
   if (isSignificant) {
     interpretation.push([
@@ -40,7 +40,7 @@ export const interpretationSimpleRegression = (stats) => {
   } else {
     interpretation.push([
       `4. Concluzie:`,
-      `Nu avem suficiente dovezi pentru a concluziona ca X influenteaza Y`,
+      `Nu avem suficiente dovezi pentru a concluziona ca X influenteaza in mod semnificativ Y`,
     ]);
   }
 

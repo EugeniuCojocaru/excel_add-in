@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import { Input, Button, Field, Tooltip } from "@fluentui/react-components";
 import { TableRegular } from "@fluentui/react-icons";
 
-const RangeSelector = ({ label, placeholder = "Ex: A1:A10", onRangeChanged }) => {
-  const [rangeAddress, setRangeAddress] = useState("");
+const RangeSelector = ({ label, placeholder = "Ex: A1:A10", onRangeChanged , value }) => {
+  const [rangeAddress, setRangeAddress] = useState(value || "");
 
   // Funcția care ia adresa selecției curente din Excel
   const handleGetSelection = async () => {

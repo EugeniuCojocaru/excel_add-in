@@ -12,14 +12,15 @@ import {
 } from "@fluentui/react-components";
 import RangeSelector from "./RangeSelector";
 
-import { getSelectedNumericColumn, insertColumn } from "../api";
-import { calculateSimpleRegression } from "../../utils/math";
+import { getColumnMatrix, getSelectedNumericColumn, insertColumn } from "../api";
+import { calculateSimpleRegression, calculateRegression } from "../../utils/math";
+import { generateSummaryOutput } from "../../utils/summaryOutput";
 
 const ModalSimpleRegression = () => {
   const [open, setOpen] = React.useState(false);
-  const [adresaX, setAdresaX] = useState("");
-  const [adresaY, setAdresaY] = useState("");
-  const [adresaZ, setAdresaZ] = useState("");
+  const [YColumnAdress, setYColumnAddress] = useState("Sheet3!B2:B11");
+  const [XColumnAdress, setXColumnAddress] = useState("Sheet3!A2:A11");
+  const [resultDestinationAddress, setResultDestinationAddress] = useState("Sheet3!D1");
   const [onlyValues, setOnlyValues] = useState(false);
 
   const handleCheckboxChange = (event, data) => {
@@ -27,27 +28,16 @@ const ModalSimpleRegression = () => {
     setOnlyValues(data.checked);
   };
   const handleClick = async () => {
-    const xData = await getSelectedNumericColumn(adresaX);
+    const xData = await getColumnMatrix(XColumnAdress);
     console.log("Valorile numerice extrase din prima coloană selectată:", xData);
-    const yData = await getSelectedNumericColumn(adresaY);
+    const yData = await getSelectedNumericColumn(YColumnAdress);
     console.log("Valorile numerice extrase din a doua coloană selectată:", yData);
-    const stats = calculateSimpleRegression(xData, yData, 0.05, onlyValues);
+    const stats = calculateRegression(yData, xData, 0.05, onlyValues);
     console.log("Indicatorii calculați:", stats);
 
-    const intrepretation = stats.interpretation || [["", ""]];
-    const dataToWrite = [
-      ["Intercept (b0):", stats.intercept],
-      ["Panta (b1):", stats.slope],
-      ["R²:", stats.rSquared],
-      ["Eroarea Standard a Estimării (ESE)", stats.ese],
-      ["eroarea standard a parametrului b1 (sb1)", stats.sb1],
-      ["Statistica t pentru b1:", stats.tStat],
-      ["P-valoarea pentru b1:", stats.pValue],
-      ["Este semnificativ la nivelul de 0.05?", stats.isSignificant],
-      ...intrepretation,
-    ];
+    const dataToWrite = generateSummaryOutput(stats);
     console.log("Data to write to Excel:", dataToWrite);
-    await insertColumn(dataToWrite, adresaZ);
+    await insertColumn(dataToWrite, resultDestinationAddress);
   };
 
   return (
@@ -62,12 +52,21 @@ const ModalSimpleRegression = () => {
             <DialogTitle>Regresie simpla</DialogTitle>
 
             <DialogContent>
-              <RangeSelector label="Selectează Variabila X:" onRangeChanged={setAdresaX} />
-              <RangeSelector label="Selectează Variabila Y:" onRangeChanged={setAdresaY} />
+              <RangeSelector
+                label="Selectează Variabila Y:"
+                onRangeChanged={setYColumnAddress}
+                value={YColumnAdress}
+              />
+              <RangeSelector
+                label="Selectează Variabila X:"
+                onRangeChanged={setXColumnAddress}
+                value={XColumnAdress}
+              />
               <RangeSelector
                 label="Selectează unde sa inserez raspunsul:"
                 placeholder="Ex: A1"
-                onRangeChanged={setAdresaZ}
+                onRangeChanged={setResultDestinationAddress}
+                value={resultDestinationAddress}
               />
               <Checkbox
                 label="Vreau doar valorile calculate"
