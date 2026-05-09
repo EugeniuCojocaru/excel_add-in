@@ -12,7 +12,7 @@ import {
 } from "@fluentui/react-components";
 import RangeSelector from "./RangeSelector";
 
-import { getColumnMatrix, getSelectedNumericColumn, insertColumn } from "../api";
+import { getColumnMatrix, insertColumn } from "../api";
 import { calculateRegression } from "../../utils/math";
 import { generateSummaryOutput } from "../../utils/summaryOutput";
 
