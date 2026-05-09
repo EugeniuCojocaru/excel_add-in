@@ -29,7 +29,7 @@ const ModalSimpleRegression = () => {
   const handleClick = async () => {
     const xData = await getColumnMatrix(XColumnAdress);
     console.log("Valorile numerice extrase din prima coloană selectată:", xData);
-    const yData = await getSelectedNumericColumn(YColumnAdress);
+    const yData = await getColumnMatrix(YColumnAdress);
     console.log("Valorile numerice extrase din a doua coloană selectată:", yData);
     const stats = calculateRegression(yData, xData, 0.05, onlyValues);
     console.log("Indicatorii calculați:", stats);

@@ -32,6 +32,24 @@ export async function getSelectedNumericColumn(addressRange) {
   }
 }
 
+function parseUnitString(input) {
+  // Regex explanation:
+  // ^(.+?)     -> Match the start of the string and capture everything (lazily)
+  // \s*        -> Match any optional whitespace
+  // <(.+?)>    -> Match literal '<', capture the inside, then match '>'
+  const regex = /^(.+?)\s*<(.+?)>/;
+  const match = input.match(regex);
+
+  if (!match) {
+    return { name: input.trim(), unit: null };
+  }
+
+  return {
+    name: match[1].trim(),
+    unit: match[2].trim(),
+  };
+}
+
 export async function getColumnMatrix(addressRange) {
   try {
     return await Excel.run(async (context) => {
@@ -43,15 +61,25 @@ export async function getColumnMatrix(addressRange) {
 
       const values = range.values;
       const dataByColumn = [];
+      const columnMeta = []; // data type: { names: "", unit: "" }
 
       if (!values || values.length === 0) {
         console.warn("Selecția este goală.");
         return [];
       }
 
+      const isFirstRowHeader = values[0].every((cellValue) => typeof cellValue === "string");
+      if (isFirstRowHeader) {
+        columnMeta.push(
+          ...values[0].map((header) => {
+            const { name, unit } = parseUnitString(header);
+            return { name, unit };
+          })
+        );
+        values.shift();
+      }
       for (let i = 0; i < values.length; i++) {
         const currentRow = values[i];
-
         const isRowValid = currentRow.every(
           (cellValue) => typeof cellValue === "number" && !isNaN(cellValue)
         );
@@ -62,8 +90,7 @@ export async function getColumnMatrix(addressRange) {
           console.log(`Rândul ${i + 1} a fost ignorat (conține text sau date lipsă).`);
         }
       }
-      console.log("Date extrase (curățate):", dataByColumn);
-      return dataByColumn;
+      return { data: dataByColumn, meta: columnMeta };
     });
   } catch (error) {
     console.error("A apărut o eroare la extragerea datelor:", error);

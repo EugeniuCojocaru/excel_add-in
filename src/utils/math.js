@@ -153,20 +153,20 @@ export const calculateSimpleRegression = (xData, yData, alpha = 0.05, onlyValues
  * @param {boolean} onlyValues - Flag pentru a suprima generarea textului de interpretare.
  */
 export const calculateRegression = (yData, xData, alpha = 0.05, onlyValues = false) => {
-  const n = yData.length;
+  const n = yData.data.length;
   // console.log("AAAAA", { xData, yData });
   // 1. Verificăm dacă xData are mai multe coloane (Multiplă) sau doar una (Simplă)
-  const k = xData[0].length;
+  const k = xData.data[0].length;
   const isSimple = k === 1;
 
   // Grade de libertate pentru reziduuri (n - k - 1)
   const df = n - k - 1;
 
   // 2. Construim Matricea Y (vector coloană n x 1)
-  const Y = yData.map((val) => [math.bignumber(val)]);
+  const Y = yData.data.map((val) => [math.bignumber(val[0])]);
 
   // 3. Construim Matricea X (Adăugăm o coloană de 1 la început pentru intercept - b0)
-  const X = xData.map((row) => {
+  const X = xData.data.map((row) => {
     return [1, ...row].map((val) => math.bignumber(val));
   });
 
