@@ -2,7 +2,8 @@ import Decimal from "decimal.js";
 import math from "./mathConfig";
 import { jStat } from "jstat";
 import { OPERATIONS } from "./basicMath";
-import { interpretationSimpleRegression } from "./econometrics";
+import { interpretationSimpleRegression, interpretationMultipleRegression } from "./econometrics";
+import { toUINumber } from "./ui";
 
 /**
  * Calculează indicatorii statistici de bază și intervalul de încredere.
@@ -245,26 +246,36 @@ export const calculateRegression = (yData, xData, alpha = 0.05, onlyValues = fal
     ? null
     : isSimple
       ? interpretationSimpleRegression({
+          k,
           b0: b0.toNumber(),
           b1: slopes[0].toNumber(),
           pValue: pValues[1], // p-value pentru b1
           alpha,
           rSquared,
         })
-      : console.log("No intepretation yet");
+      : interpretationMultipleRegression({
+          k,
+          b0: toUINumber(b0),
+          slopes: slopes.map((s) => toUINumber(s)),
+          pValues,
+          fSignificance,
+          rSquared: toUINumber(rSquared),
+          adjustedRSquared: toUINumber(adjustedRSquared),
+          alpha,
+        });
   console.log("AAAAAA2");
   return {
     k, // Numărul de variabile independente
     df, // Grade de libertate pentru reziduuri
-    intercept: Number(b0),
-    slopes: slopes.map((b) => Number(b)), // Array cu b1, b2, ..., bk
-    rSquared: Number(rSquared),
-    adjustedRSquared: Number(adjustedRSquared),
-    ese: Number(ese),
-    standardErrors: standardErrors.map((se) => Number(se)), // Array cu sb0, sb1, ..., sbk
-    tStats: tStats.map((t) => Number(t)), // Array cu scorurile t
-    pValues, // Array cu probabilitățile pentru intercept și fiecare pantă
-    fStat: Number(fStat), // Statistica test F
+    intercept: toUINumber(b0),
+    slopes: slopes.map((b) => toUINumber(b)), // Array cu b1, b2, ..., bk
+    rSquared: toUINumber(rSquared),
+    adjustedRSquared: toUINumber(adjustedRSquared),
+    ese: toUINumber(ese),
+    standardErrors: standardErrors.map((se) => toUINumber(se)), // Array cu sb0, sb1, ..., sbk
+    tStats: tStats.map((t) => toUINumber(t)), // Array cu scorurile t
+    pValues, // Array cu probabilitățile pentru intercept și fiecare pantă (generate deja de jStat)
+    fStat: toUINumber(fStat), // Statistica test F
     fSignificance, // Significance F (p-value model)
     isSignificant: fSignificance < alpha, // Decizia pentru ansamblul parametrilor
     interpretation,

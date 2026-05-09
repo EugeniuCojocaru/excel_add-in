@@ -18,9 +18,9 @@ import { generateSummaryOutput } from "../../utils/summaryOutput";
 
 const ModalSimpleRegression = () => {
   const [open, setOpen] = React.useState(false);
-  const [YColumnAdress, setYColumnAddress] = useState("Sheet3!B2:B11");
-  const [XColumnAdress, setXColumnAddress] = useState("Sheet3!A2:A11");
-  const [resultDestinationAddress, setResultDestinationAddress] = useState("Sheet3!D1");
+  const [YColumnAdress, setYColumnAddress] = useState("Sheet1!B2:B23");
+  const [XColumnAdress, setXColumnAddress] = useState("Sheet1!C2:D23");
+  const [resultDestinationAddress, setResultDestinationAddress] = useState("Sheet1!B26");
   const [onlyValues, setOnlyValues] = useState(false);
 
   const handleCheckboxChange = (event, data) => {

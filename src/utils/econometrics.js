@@ -1,5 +1,12 @@
+import {
+  getEquation,
+  getModel,
+  getMultipleRegressionSignificance,
+  getInterpretation,
+} from "./interpretation";
+
 export const interpretationSimpleRegression = (stats) => {
-  const { b0, b1, pValue, alpha, rSquared } = stats;
+  const { b0, b1, pValue, alpha, rSquared, k } = stats;
   const interpretation = [["", ""]];
 
   interpretation.push([`1. Ecuația regresiei:`, `Y = ${b0.toFixed(4)} + ${b1.toFixed(4)} * X`]);
@@ -43,6 +50,28 @@ export const interpretationSimpleRegression = (stats) => {
       `Nu avem suficiente dovezi pentru a concluziona ca X influenteaza in mod semnificativ Y`,
     ]);
   }
+
+  return interpretation;
+};
+
+export const interpretationMultipleRegression = (stats) => {
+  const { k, b0, slopes, pValues, fSignificance, rSquared, adjustedRSquared, alpha } = stats;
+  const interpretation = [["", ""]];
+  console.log("in interpretationMultipleRegression", stats);
+  interpretation.push([`1. Model`, ""]);
+  const equation = getEquation(k, b0, slopes);
+  interpretation.push(["Ecuatia regresiei", equation]);
+  const model = getModel(k, pValues, fSignificance, rSquared, adjustedRSquared);
+  model.forEach((value) => interpretation.push(value));
+
+  interpretation.push([`2. Semnificatia modelului`, ""]);
+  const significance = getMultipleRegressionSignificance(slopes, pValues, fSignificance, alpha);
+  significance.forEach((value) => interpretation.push(value));
+
+  interpretation.push(["", ""]);
+  interpretation.push([`3. Interpretarea modelului`, ""]);
+  const interpretationSlopes = getInterpretation(slopes, adjustedRSquared);
+  interpretationSlopes.forEach((value) => interpretation.push(value));
 
   return interpretation;
 };
