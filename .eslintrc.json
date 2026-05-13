@@ -11,5 +11,8 @@
     "plugin:import/react",
     "plugin:react/recommended"
   ],
-  "settings": { "react": { "version": "detect" } }
+  "settings": { "react": { "version": "detect" } },
+  "rules": {
+    "no-unused-vars": "warn"
+  }
 }

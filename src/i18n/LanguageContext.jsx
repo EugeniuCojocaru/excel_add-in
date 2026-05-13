@@ -1,6 +1,5 @@
 import React, { createContext, useState, useContext } from "react";
-import { translations } from "./translations";
-
+import * as dictionary from "./dictionary.json";
 const LanguageContext = createContext();
 
 export const LanguageProvider = ({ children }) => {
@@ -17,7 +16,7 @@ export const LanguageProvider = ({ children }) => {
   const t = (path) => {
     const translation = path.split(".").reduce((obj, key) => {
       return obj && obj[key];
-    }, translations[lang]);
+    }, dictionary[lang]);
 
     return translation || path;
   };

@@ -1,0 +1,40 @@
+{
+  "en": {
+    "welcomePage": {
+      "welcome": "Welcome to the Add-in"
+    },
+    "descriptiveStats": {
+      "n": "Sample size (n):",
+      "mean": "Mean:",
+      "stdDev": "Standard deviation (stdDev):",
+      "standardError": "Standard error:",
+      "confidenceLevel": "Confidence level:",
+      "lowerBound": "Lower bound:",
+      "upperBound": "Upper bound:",
+      "title": "Descriptive Statistics",
+      "button__cancel": "Cancel",
+      "button__submit": "Insert into Excel",
+      "label__x_input": "Select X values range:",
+      "label__output": "Select results cell:"
+    }
+  },
+  "ro": {
+    "welcomePage": {
+      "welcome": "Bun venit în Add-in"
+    },
+    "descriptiveStats": {
+      "n": "Volum eșantion (n):",
+      "mean": "Media (mean):",
+      "stdDev": "Abaterea standard (stdDev):",
+      "standardError": "Eroarea standard:",
+      "confidenceLevel": "Nivel încredere:",
+      "lowerBound": "Limita inferioară:",
+      "upperBound": "Limita superioară:",
+      "title": "Statistici descriptive",
+      "button__cancel": "Anulează",
+      "button__submit": "Inserează în Excel",
+      "label__x_input": "Selectează variabila X:",
+      "label__output": "Selectează celula de început pentru rezultate:"
+    }
+  }
+}

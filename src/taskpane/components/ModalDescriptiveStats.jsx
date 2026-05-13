@@ -25,20 +25,18 @@ const ModalDescriptiveStats = () => {
 
   const handleClick = async () => {
     const values = await getSelectedNumericColumn(adresaX);
-    console.log("Valorile numerice extrase din prima coloană selectată:", values);
     const stats = calculateDescriptiveStats(values);
-    console.log("Indicatorii calculați:", stats);
 
     const dataToWrite = [
-      ["Volum eșantion (n):", stats.n],
-      ["Media (mean):", stats.mean],
-      ["Abaterea standard (stdDev):", stats.stdDev],
-      ["Eroarea standard:", stats.standardError],
-      ["Nivel încredere (95%):", stats.confidenceLevel],
-      ["Limita inferioară:", stats.lowerBound],
-      ["Limita superioară:", stats.upperBound],
+      [t("descriptiveStats.n"), stats.n],
+      [t("descriptiveStats.mean"), stats.mean],
+      [t("descriptiveStats.stdDev"), stats.stdDev],
+      [t("descriptiveStats.standardError"), stats.standardError],
+      [t("descriptiveStats.confidenceLevel"), stats.confidenceLevel],
+      [t("descriptiveStats.lowerBound"), stats.lowerBound],
+      [t("descriptiveStats.upperBound"), stats.upperBound],
     ];
-    console.log("Data to write to Excel:", dataToWrite);
+
     await insertColumn(dataToWrite, adresaY);
   };
 
@@ -46,17 +44,20 @@ const ModalDescriptiveStats = () => {
     <div style={{ padding: "20px" }}>
       <Dialog open={open} onOpenChange={(event, data) => setOpen(data.open)}>
         <DialogTrigger disableButtonEnhancement>
-          <Button>Statistici descriptive</Button>
+          <Button>{t("descriptiveStats.title")}</Button>
         </DialogTrigger>
 
         <DialogSurface>
           <DialogBody>
-            <DialogTitle>Statistici descriptive</DialogTitle>
+            <DialogTitle>{t("descriptiveStats.title")}</DialogTitle>
 
             <DialogContent>
-              <RangeSelector label="Selectează Variabila X (Venit):" onRangeChanged={setAdresaX} />
               <RangeSelector
-                label="Selectează unde sa inserez raspunsul:"
+                label={t("descriptiveStats.label__x_input")}
+                onRangeChanged={setAdresaX}
+              />
+              <RangeSelector
+                label={t("descriptiveStats.label__output")}
                 placeholder="Ex: A1"
                 onRangeChanged={setAdresaY}
               />
@@ -64,10 +65,10 @@ const ModalDescriptiveStats = () => {
 
             <DialogActions>
               <DialogTrigger disableButtonEnhancement>
-                <Button appearance="secondary">Închide</Button>
+                <Button appearance="secondary">{t("descriptiveStats.button__cancel")}</Button>
               </DialogTrigger>
               <Button appearance="primary" onClick={handleClick}>
-                Inserează în Tabel
+                {t("descriptiveStats.button__submit")}
               </Button>
             </DialogActions>
           </DialogBody>
