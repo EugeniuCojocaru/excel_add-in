@@ -241,28 +241,19 @@ export const calculateRegression = (yData, xData, alpha = 0.05, onlyValues = tru
   // 12. Returnăm rezultatele standardizate (convertite înapoi în numere primitive pentru UI)
   const interpretation = onlyValues
     ? null
-    : isSimple
-      ? interpretationSimpleRegression({
+    : interpretationMultipleRegression(
+        {
           k,
-          b0: b0.toNumber(),
-          b1: slopes[0].toNumber(),
-          pValue: pValues[1], // p-value pentru b1
+          b0: toUINumber(b0),
+          slopes: slopes.map((s) => toUINumber(s)),
+          pValues,
+          fSignificance,
+          rSquared: toUINumber(rSquared),
+          adjustedRSquared: toUINumber(adjustedRSquared),
           alpha,
-          rSquared,
-        })
-      : interpretationMultipleRegression(
-          {
-            k,
-            b0: toUINumber(b0),
-            slopes: slopes.map((s) => toUINumber(s)),
-            pValues,
-            fSignificance,
-            rSquared: toUINumber(rSquared),
-            adjustedRSquared: toUINumber(adjustedRSquared),
-            alpha,
-          },
-          t
-        );
+        },
+        t
+      );
 
   return {
     k, // Numărul de variabile independente

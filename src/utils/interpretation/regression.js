@@ -72,32 +72,34 @@ export const getMultipleRegressionSignificance = (slopes, pValues, fSignificance
     significance.push(["", ""]);
   });
 
-  significance.push([t("regression.interpretation.secondStep.multipleVariableSignificance"), ""]);
-  let nullHypothesis = "H0: ";
-  for (let i = 0; i < slopes.length; i++) {
-    nullHypothesis += `B${i + 1} = `;
+  if (slopes.length > 1) {
+    significance.push([t("regression.interpretation.secondStep.multipleVariableSignificance"), ""]);
+    let nullHypothesis = "H0: ";
+    for (let i = 0; i < slopes.length; i++) {
+      nullHypothesis += `B${i + 1} = `;
+    }
+    nullHypothesis += "0";
+    significance.push(["", nullHypothesis]);
+    significance.push(["", t("regression.interpretation.secondStep.notAllZeroHypothesis")]);
+
+    significance.push([
+      `${t("regression.interpretation.secondStep.pValueText")}${alpha}:`,
+      `pValue = ${fSignificance} ?< α = ${alpha}`,
+    ]);
+
+    const isSignificant = fSignificance < alpha;
+
+    significance.push([
+      "",
+      `${isSignificant ? t("regression.interpretation.secondStep.significantMultipleTrue", { variablesNumber: slopes.length }) : t("regression.interpretation.secondStep.significantMultipleFalse")}`,
+    ]);
+    significance.push(["", ""]);
   }
-  nullHypothesis += "0";
-  significance.push(["", nullHypothesis]);
-  significance.push(["", t("regression.interpretation.secondStep.notAllZeroHypothesis")]);
-
-  significance.push([
-    `${t("regression.interpretation.secondStep.pValueText")}${alpha}:`,
-    `pValue = ${fSignificance} ?< α = ${alpha}`,
-  ]);
-
-  const isSignificant = fSignificance < alpha;
-
-  significance.push([
-    "",
-    `${isSignificant ? t("regression.interpretation.secondStep.significantMultipleTrue", { variablesNumber: slopes.length }) : t("regression.interpretation.secondStep.significantMultipleFalse")}`,
-  ]);
-
   return significance;
 };
 
 export const getInterpretation = (slopes, adjustedRSquared, t) => {
-  const interpretation = [["", ""]];
+  const interpretation = [];
   for (let i = 0; i < slopes.length; i++) {
     interpretation.push([
       `b${i + 1} = ${slopes[i]}`,
