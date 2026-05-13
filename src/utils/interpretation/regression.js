@@ -25,77 +25,64 @@ export const getModel = (k, pValues, fSignificance, rSquared, adjustedRSquared) 
   return model;
 };
 
-const getSignificance = (b, pValue, alpha, bNumber) => {
+const getSignificance = (b, pValue, alpha, bNumber, t) => {
   const significance = [["", `H0: B${bNumber} = 0 `]];
 
   if (b > 0) {
     significance.push([
-      ``,
-      `H1: B${bNumber} > 0 (deoarece b${bNumber} = ${b} > 0 deci rezulta un test unilateral la dreapta`,
+      "",
+      t("regression.interpretation.secondStep.notZeroHypothesisRight", { bNumber, b }),
     ]);
   }
   if (b < 0) {
     significance.push([
-      ``,
-      `H1: B${bNumber} < 0 (deoarece b${bNumber} = ${b} < 0 deci rezulta un test unilateral la stanga`,
+      "",
+      t("regression.interpretation.secondStep.notZeroHypothesisLeft", { bNumber, b }),
     ]);
   }
   significance.push([
-    `! Info:`,
-    `deoarece am calculat p-value bilateral, pentru a testa semnificatia lui b, trebuie sa impartim p-value la 2`,
+    t("regression.interpretation.secondStep.info"),
+    t("regression.interpretation.secondStep.infoText"),
   ]);
   const pValueHalf = pValue / 2;
+
   significance.push([
-    `Comparam pValue cu nivelul de semnificatie α = ${alpha}:`,
+    `${t("regression.interpretation.secondStep.pValueText")}${alpha}:`,
     `pValue/2 = ${pValueHalf} ?< α = ${alpha}`,
   ]);
   const isSignificant = pValueHalf < alpha;
 
   significance.push([
     "",
-    `${isSignificant ? `Respingem H0, b${bNumber} nu este semnificativ diferit de 0` : "H0 nu poate fi respinsa"}`,
+    `${isSignificant ? t("regression.interpretation.secondStep.significantTrue", { bNumber }) : t("regression.interpretation.secondStep.significantFalse")}`,
   ]);
-  significance.push(getConclusion(isSignificant, bNumber, alpha));
+  significance.push(getConclusion(isSignificant, bNumber, alpha, t));
 
   return significance;
 };
 
-const getConclusion = (isSignificant, bNumber, alpha) => {
-  const percentage = (1 - alpha) * 100;
-  if (isSignificant) {
-    return [
-      "Concluzie:",
-      `Cu o probabiliate de ${percentage}%, X${bNumber} influenteaza in mod direct Y`,
-    ];
-  }
-  return [
-    "Concluzie:",
-    `Nu avem suficiente dovezi pentru a concluziona ca X${bNumber} influenteaza in mod semnificativ Y`,
-  ];
-};
-
-export const getMultipleRegressionSignificance = (slopes, pValues, fSignificance, alpha) => {
+export const getMultipleRegressionSignificance = (slopes, pValues, fSignificance, alpha, t) => {
   const significance = [["", ""]];
 
   slopes.forEach((b, index) => {
     const bNumber = index + 1;
     const pValue = pValues[bNumber];
-    const bSignificance = getSignificance(b, pValue, alpha, bNumber);
+    const bSignificance = getSignificance(b, pValue, alpha, bNumber, t);
     bSignificance.forEach((row) => significance.push(row));
     significance.push(["", ""]);
   });
 
-  significance.push(["Semnificatia in raport cu ansamblul variabilelor:", ""]);
+  significance.push([t("regression.interpretation.secondStep.multipleVariableSignificance"), ""]);
   let nullHypothesis = "H0: ";
   for (let i = 0; i < slopes.length; i++) {
     nullHypothesis += `B${i + 1} = `;
   }
   nullHypothesis += "0";
   significance.push(["", nullHypothesis]);
-  significance.push(["", "H1: nu toti parametrii sunt 0"]);
+  significance.push(["", t("regression.interpretation.secondStep.notAllZeroHypothesis")]);
 
   significance.push([
-    `Comparam pValue cu nivelul de semnificatie α = ${alpha}:`,
+    `${t("regression.interpretation.secondStep.pValueText")}${alpha}:`,
     `pValue = ${fSignificance} ?< α = ${alpha}`,
   ]);
 
@@ -103,23 +90,37 @@ export const getMultipleRegressionSignificance = (slopes, pValues, fSignificance
 
   significance.push([
     "",
-    `${isSignificant ? `Respingem H0, cele ${slopes.length} variabile, impreuna, influenteaza in mod semnificativ modelul` : "H0 nu poate fi respinsa"}`,
+    `${isSignificant ? t("regression.interpretation.secondStep.significantMultipleTrue", { variablesNumber: slopes.length }) : t("regression.interpretation.secondStep.significantMultipleFalse")}`,
   ]);
 
   return significance;
 };
 
-export const getInterpretation = (slopes, adjustedRSquared) => {
+export const getInterpretation = (slopes, adjustedRSquared, t) => {
   const interpretation = [["", ""]];
   for (let i = 0; i < slopes.length; i++) {
     interpretation.push([
       `b${i + 1} = ${slopes[i]}`,
-      `Daca X${i + 1} creste cu o unitate, Y creste, in medie, cu ${slopes[i]}`,
+      `${t("regression.interpretation.thirdStep.interpretationVariable", { bNumber: i + 1 })}${slopes[i]}`,
     ]);
   }
   interpretation.push([
-    `R^2 ajustat = ${adjustedRSquared}`,
-    `${(adjustedRSquared * 100).toFixed(2)}% din variatia lui Y este explicata de variatia lui X`,
+    `R^2 ${t("regression.interpretation.thirdStep.r2Adjusted")} = ${adjustedRSquared}`,
+    `${(adjustedRSquared * 100).toFixed(2)}% ${t("regression.interpretation.thirdStep.interpretationR2Adjusted")}`,
   ]);
   return interpretation;
+};
+
+const getConclusion = (isSignificant, bNumber, alpha, t) => {
+  const percentage = (1 - alpha) * 100;
+  if (isSignificant) {
+    return [
+      t("regression.interpretation.secondStep.conclusion"),
+      t("regression.interpretation.secondStep.conclusionSignificant", { percentage, bNumber }),
+    ];
+  }
+  return [
+    t("regression.interpretation.secondStep.conclusion"),
+    t("regression.interpretation.secondStep.conclusionNotSignificant", { bNumber }),
+  ];
 };

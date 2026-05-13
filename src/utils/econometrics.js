@@ -54,23 +54,23 @@ export const interpretationSimpleRegression = (stats) => {
   return interpretation;
 };
 
-export const interpretationMultipleRegression = (stats) => {
+export const interpretationMultipleRegression = (stats, t) => {
   const { k, b0, slopes, pValues, fSignificance, rSquared, adjustedRSquared, alpha } = stats;
   const interpretation = [["", ""]];
-  console.log("in interpretationMultipleRegression", stats);
-  interpretation.push([`1. Model`, ""]);
+
+  interpretation.push([t("regression.interpretation.firstStep.model"), ""]);
   const equation = getEquation(k, b0, slopes);
-  interpretation.push(["Ecuatia regresiei", equation]);
+  interpretation.push([t("regression.interpretation.firstStep.equation"), equation]);
   const model = getModel(k, pValues, fSignificance, rSquared, adjustedRSquared);
   model.forEach((value) => interpretation.push(value));
 
-  interpretation.push([`2. Semnificatia modelului`, ""]);
-  const significance = getMultipleRegressionSignificance(slopes, pValues, fSignificance, alpha);
+  interpretation.push([t("regression.interpretation.secondStep.significance"), ""]);
+  const significance = getMultipleRegressionSignificance(slopes, pValues, fSignificance, alpha, t);
   significance.forEach((value) => interpretation.push(value));
 
   interpretation.push(["", ""]);
-  interpretation.push([`3. Interpretarea modelului`, ""]);
-  const interpretationSlopes = getInterpretation(slopes, adjustedRSquared);
+  interpretation.push([t("regression.interpretation.thirdStep.interpretation"), ""]);
+  const interpretationSlopes = getInterpretation(slopes, adjustedRSquared, t);
   interpretationSlopes.forEach((value) => interpretation.push(value));
 
   return interpretation;

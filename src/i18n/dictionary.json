@@ -11,11 +11,50 @@
       "confidenceLevel": "Confidence level:",
       "lowerBound": "Lower bound:",
       "upperBound": "Upper bound:",
+
       "title": "Descriptive Statistics",
       "button__cancel": "Cancel",
       "button__submit": "Insert into Excel",
       "label__x_input": "Select X values range:",
       "label__output": "Select results cell:"
+    },
+    "regression": {
+      "title": "Regression Analysis",
+      "button__cancel": "Cancel",
+      "button__submit": "Insert into Excel",
+      "label__x_input": "Select X values range:",
+      "label__y_input": "Select Y values range:",
+      "label__output": "Select results cell:",
+      "checkbox__only_values": "No interpretation, just values.",
+      "interpretation": {
+        "firstStep": {
+          "model": "1. Model",
+          "equation": "Regression equation"
+        },
+        "secondStep": {
+          "significance": "2. Model significance",
+          "notZeroHypothesisRight": "H1: B{bNumber} > 0 (because b{bNumber} = {b} > 0 resulting in a right-sided test)",
+          "notZeroHypothesisLeft": "H1: B{bNumber} < 0 (because b{bNumber} = {b} < 0 resulting in a left-sided test)",
+          "info": "! Info: ",
+          "infoText": "because we calculated a two-tailed p-value, to test the significance of b, we must divide the p-value by 2 and compare it with alpha, and to determine the direction of the relationship (positive or negative) we look at the sign of b.",
+          "pValueText": "We compare the pValue with the significance level α = ",
+          "significantTrue": "We reject H0, b{bNumber} is significantly different from 0",
+          "significantFalse": "H0 cannot be rejected",
+          "multipleVariableSignificance": "Overall model significance (all variables):",
+          "notAllZeroHypothesis": "H1: not all parameters are 0",
+          "significantMultipleTrue": "We reject H0, the {variablesNumber} variables, together, significantly influence the model",
+          "significantMultipleFalse": "H0 cannot be rejected",
+          "conclusion": "Conclusion: ",
+          "conclusionSignificant": "With a {percentage}% confidence, X{bNumber} directly influences Y",
+          "conclusionNotSignificant": "We do not have enough evidence to conclude that X{bNumber} significantly influences Y"
+        },
+        "thirdStep": {
+          "interpretation": "3. Model interpretation",
+          "interpretationVariable": "If X{bNumber} increases by one unit, Y increases, on average, by ",
+          "r2Adjusted": "adjusted",
+          "interpretationR2Adjusted": "of the variation in Y is explained by the variation in X"
+        }
+      }
     }
   },
   "ro": {
@@ -35,6 +74,45 @@
       "button__submit": "Inserează în Excel",
       "label__x_input": "Selectează variabila X:",
       "label__output": "Selectează celula de început pentru rezultate:"
+    },
+    "regression": {
+      "title": "Analiza regresiei",
+      "button__cancel": "Anulează",
+      "button__submit": "Inserează în Excel",
+      "label__x_input": "Selectează variabila X:",
+      "label__y_input": "Selectează variabila Y:",
+      "label__output": "Selectează celula de început pentru rezultate:",
+      "checkbox__only_values": "Doar valori, fara interpretare.",
+      "interpretation": {
+        "firstStep": {
+          "model": "1. Model",
+          "equation": "Ecuatia regresiei"
+        },
+        "secondStep": {
+          "significance": "2. Semnificația modelului",
+          "notZeroHypothesisRight": "H1: B{bNumber} > 0 (deoarece b{bNumber} = {b} > 0 deci rezultă un test unilateral la dreapta)",
+          "notZeroHypothesisLeft": "H1: B{bNumber} < 0 (deoarece b{bNumber} = {b} < 0 deci rezultă un test unilateral la stanga)",
+          "info": "! Info: ",
+          "infoText": "deoarece am calculat p-value bilateral, pentru a testa semnificatia lui b, trebuie sa impartim p-value la 2 si sa comparam cu alpha, iar pentru a stabili directia relatiei (pozitiva sau negativa) ne uitam la semnul lui b.",
+          "pValueText": "Comparam pValue cu nivelul de semnificatie α = ",
+          "significantTrue": "Respingem H0, b{bNumber} nu este semnificativ diferit de 0",
+          "significantFalse": "H0 nu poate fi respinsa",
+
+          "multipleVariableSignificance": "Semnificatia in raport cu ansamblul variabilelor:",
+          "notAllZeroHypothesis": "H1: nu toti parametrii sunt 0",
+          "significantMultipleTrue": "Respingem H0, cele {variablesNumber} variabile, impreuna, influenteaza in mod semnificativ modelul",
+          "significantMultipleFalse": "H0 nu poate fi respinsa",
+          "conclusion": "Concluzie: ",
+          "conclusionSignificant": "Cu o probabiliate de {percentage}%, X{bNumber} influenteaza in mod direct Y",
+          "conclusionNotSignificant": "Nu avem suficiente dovezi pentru a concluziona ca X{bNumber} influenteaza in mod semnificativ Y"
+        },
+        "thirdStep": {
+          "interpretation": "3. Interpretarea modelului",
+          "interpretationVariable": "Daca X{bNumber} creste cu o unitate, Y creste, in medie, cu ",
+          "r2Adjusted": "ajustat",
+          "interpretationR2Adjusted": "din variatia lui Y este explicata de variatia lui X"
+        }
+      }
     }
   }
 }

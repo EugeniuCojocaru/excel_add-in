@@ -152,9 +152,8 @@ export const calculateSimpleRegression = (xData, yData, alpha = 0.05, onlyValues
  * @param {number} alpha - Pragul de semnificație (implicit 0.05).
  * @param {boolean} onlyValues - Flag pentru a suprima generarea textului de interpretare.
  */
-export const calculateRegression = (yData, xData, alpha = 0.05, onlyValues = false) => {
+export const calculateRegression = (yData, xData, alpha = 0.05, onlyValues = true, t) => {
   const n = yData.data.length;
-  // console.log("AAAAA", { xData, yData });
   // 1. Verificăm dacă xData are mai multe coloane (Multiplă) sau doar una (Simplă)
   const k = xData.data[0].length;
   const isSimple = k === 1;
@@ -170,10 +169,8 @@ export const calculateRegression = (yData, xData, alpha = 0.05, onlyValues = fal
     return [1, ...row].map((val) => math.bignumber(val));
   });
 
-  // console.log({ Y, X });
   // 4. Algebra Matriceală: Beta = (X^T * X)^-1 * X^T * Y
   const X_T = math.transpose(X);
-  // console.log({ X_T });
   const X_T_X = math.multiply(X_T, X);
   const X_T_X_inv = math.inv(X_T_X);
   const X_T_Y = math.multiply(X_T, Y);
@@ -253,17 +250,20 @@ export const calculateRegression = (yData, xData, alpha = 0.05, onlyValues = fal
           alpha,
           rSquared,
         })
-      : interpretationMultipleRegression({
-          k,
-          b0: toUINumber(b0),
-          slopes: slopes.map((s) => toUINumber(s)),
-          pValues,
-          fSignificance,
-          rSquared: toUINumber(rSquared),
-          adjustedRSquared: toUINumber(adjustedRSquared),
-          alpha,
-        });
-  console.log("AAAAAA2");
+      : interpretationMultipleRegression(
+          {
+            k,
+            b0: toUINumber(b0),
+            slopes: slopes.map((s) => toUINumber(s)),
+            pValues,
+            fSignificance,
+            rSquared: toUINumber(rSquared),
+            adjustedRSquared: toUINumber(adjustedRSquared),
+            alpha,
+          },
+          t
+        );
+
   return {
     k, // Numărul de variabile independente
     df, // Grade de libertate pentru reziduuri

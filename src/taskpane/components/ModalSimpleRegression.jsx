@@ -13,29 +13,31 @@ import {
 import RangeSelector from "./RangeSelector";
 
 import { getColumnMatrix, insertColumn } from "../api";
-import { calculateRegression } from "../../utils/math";
-import { generateSummaryOutput } from "../../utils/summaryOutput";
+import { calculateRegression } from "@utils/math";
+import { generateSummaryOutput } from "@utils/summaryOutput";
+
+import { useLanguage } from "@i18n";
 
 const ModalSimpleRegression = () => {
-  const [open, setOpen] = React.useState(false);
+  const { t } = useLanguage();
+  const [open, setOpen] = useState(false);
   const [YColumnAdress, setYColumnAddress] = useState("Sheet1!B2:B23");
   const [XColumnAdress, setXColumnAddress] = useState("Sheet1!C2:D23");
   const [resultDestinationAddress, setResultDestinationAddress] = useState("Sheet1!B26");
-  const [onlyValues, setOnlyValues] = useState(false);
+  const [onlyValues, setOnlyValues] = useState(true);
 
   const handleCheckboxChange = (event, data) => {
     setOnlyValues(data.checked);
   };
   const handleClick = async () => {
     const xData = await getColumnMatrix(XColumnAdress);
-    console.log("Valorile numerice extrase din prima coloană selectată:", xData);
+
     const yData = await getColumnMatrix(YColumnAdress);
-    console.log("Valorile numerice extrase din a doua coloană selectată:", yData);
-    const stats = calculateRegression(yData, xData, 0.05, onlyValues);
-    console.log("Indicatorii calculați:", stats);
+
+    const stats = calculateRegression(yData, xData, 0.05, onlyValues, t);
 
     const dataToWrite = generateSummaryOutput(stats);
-    console.log("Data to write to Excel:", dataToWrite);
+
     await insertColumn(dataToWrite, resultDestinationAddress);
   };
 
@@ -43,32 +45,32 @@ const ModalSimpleRegression = () => {
     <div style={{ padding: "20px" }}>
       <Dialog open={open} onOpenChange={(event, data) => setOpen(data.open)}>
         <DialogTrigger disableButtonEnhancement>
-          <Button>Regresie</Button>
+          <Button>{t("regression.title")}</Button>
         </DialogTrigger>
 
         <DialogSurface>
           <DialogBody>
-            <DialogTitle>Regresie</DialogTitle>
+            <DialogTitle>{t("regression.title")}</DialogTitle>
 
             <DialogContent>
               <RangeSelector
-                label="Selectează Variabila Y:"
+                label={t("regression.label__y_input")}
                 onRangeChanged={setYColumnAddress}
                 value={YColumnAdress}
               />
               <RangeSelector
-                label="Selectează Variabila X:"
+                label={t("regression.label__x_input")}
                 onRangeChanged={setXColumnAddress}
                 value={XColumnAdress}
               />
               <RangeSelector
-                label="Selectează unde sa inserez raspunsul:"
+                label={t("regression.label__output")}
                 placeholder="Ex: A1"
                 onRangeChanged={setResultDestinationAddress}
                 value={resultDestinationAddress}
               />
               <Checkbox
-                label="Vreau doar valorile calculate"
+                label={t("regression.checkbox__only_values")}
                 checked={onlyValues}
                 onChange={handleCheckboxChange}
               />
@@ -76,10 +78,10 @@ const ModalSimpleRegression = () => {
 
             <DialogActions>
               <DialogTrigger disableButtonEnhancement>
-                <Button appearance="secondary">Închide</Button>
+                <Button appearance="secondary">{t("regression.button__cancel")}</Button>
               </DialogTrigger>
               <Button appearance="primary" onClick={handleClick}>
-                Inserează în Tabel
+                {t("regression.button__submit")}
               </Button>
             </DialogActions>
           </DialogBody>
