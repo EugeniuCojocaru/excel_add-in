@@ -12,10 +12,14 @@ import {
 import RangeSelector from "./RangeSelector";
 
 import { getSelectedNumericColumn, insertColumn } from "../api";
-import { calculateDescriptiveStats } from "../../utils/math";
+import { calculateDescriptiveStats } from "@utils/math";
+
+import { useLanguage } from "@i18n";
 
 const ModalDescriptiveStats = () => {
-  const [open, setOpen] = React.useState(false);
+  const { t } = useLanguage();
+
+  const [open, setOpen] = useState(false);
   const [adresaX, setAdresaX] = useState("");
   const [adresaY, setAdresaY] = useState("");
 

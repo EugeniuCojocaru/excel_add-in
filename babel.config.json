@@ -8,6 +8,20 @@
         }
       }
     ],
-     ["@babel/preset-react", { "runtime": "automatic" }]
+    ["@babel/preset-react", { "runtime": "automatic" }]
+  ],
+  "plugins": [
+    [
+      "module-resolver",
+      {
+        "root": ["./src"],
+        "alias": {
+          "@components": "./src/components",
+          "@utils": "./src/utils",
+          "@i18n": "./src/i18n"
+        }
+      }
+    ],
+    "@babel/plugin-proposal-export-namespace-from"
   ]
 }

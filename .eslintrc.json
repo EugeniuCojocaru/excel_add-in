@@ -1,8 +1,15 @@
 {
-  "plugins": [
-    "office-addins"
-  ],
+  "root": true,
+  "plugins": ["office-addins", "react", "react-hooks", "jsx-a11y", "prettier", "import"],
   "extends": [
-    "plugin:office-addins/react"
-  ]
+    "plugin:office-addins/react",
+    "plugin:react-hooks/recommended",
+    "plugin:jsx-a11y/recommended",
+    "plugin:prettier/recommended",
+    "plugin:import/errors",
+    "plugin:import/warnings",
+    "plugin:import/react",
+    "plugin:react/recommended"
+  ],
+  "settings": { "react": { "version": "detect" } }
 }

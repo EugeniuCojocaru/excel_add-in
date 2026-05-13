@@ -1,3 +1,3 @@
-import { LanguageProvider, useLanguage } from "./languageContext";
+import { LanguageProvider, useLanguage } from "./LanguageContext";
 export default LanguageProvider;
 export { useLanguage };
