@@ -61,7 +61,7 @@ export async function getColumnMatrix(addressRange) {
 
       const values = range.values;
       const dataByColumn = [];
-      const columnMeta = []; // data type: { names: "", unit: "" }
+      const columnMeta = []; // data type: { name: "", unit: "" }
 
       if (!values || values.length === 0) {
         console.warn("Selecția este goală.");

@@ -3,6 +3,7 @@ import { REGRESSION_INTEPRETATION } from "./interpretation";
 const { getEquation, getModel, getMultipleRegressionSignificance, getInterpretation } =
   REGRESSION_INTEPRETATION;
 
+//OBSOLETE, se pastreaza pentru a nu strica interpretarea regresiei simple, care este diferita de cea a regresiei multiple
 export const interpretationSimpleRegression = (stats) => {
   const { b0, b1, pValue, alpha, rSquared, k } = stats;
   const interpretation = [["", ""]];
@@ -52,23 +53,31 @@ export const interpretationSimpleRegression = (stats) => {
   return interpretation;
 };
 
-export const interpretationRegression = (stats, t) => {
+export const interpretationRegression = (stats, yMeta, xMeta, t) => {
   const { k, b0, slopes, pValues, fSignificance, rSquared, adjustedRSquared, alpha } = stats;
   const interpretation = [["", ""]];
 
   interpretation.push([t("regression.interpretation.firstStep.model"), ""]);
-  const equation = getEquation(k, b0, slopes);
+  const equation = getEquation(k, b0, slopes, yMeta, xMeta);
   interpretation.push([t("regression.interpretation.firstStep.equation"), equation]);
   const model = getModel(k, pValues, fSignificance, rSquared, adjustedRSquared);
   model.forEach((value) => interpretation.push(value));
 
   interpretation.push([t("regression.interpretation.secondStep.significance"), ""]);
-  const significance = getMultipleRegressionSignificance(slopes, pValues, fSignificance, alpha, t);
+  const significance = getMultipleRegressionSignificance(
+    slopes,
+    pValues,
+    fSignificance,
+    alpha,
+    yMeta,
+    xMeta,
+    t
+  );
   significance.forEach((value) => interpretation.push(value));
 
   interpretation.push(["", ""]);
   interpretation.push([t("regression.interpretation.thirdStep.interpretation"), ""]);
-  const interpretationSlopes = getInterpretation(slopes, adjustedRSquared, t);
+  const interpretationSlopes = getInterpretation(slopes, adjustedRSquared, yMeta, xMeta, t);
   interpretationSlopes.forEach((value) => interpretation.push(value));
 
   return interpretation;

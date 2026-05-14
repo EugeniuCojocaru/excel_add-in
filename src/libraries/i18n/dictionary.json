@@ -46,7 +46,9 @@
           "significantMultipleFalse": "H0 cannot be rejected",
           "conclusion": "Conclusion: ",
           "conclusionSignificant": "With a {percentage}% confidence, X{bNumber} directly influences Y",
-          "conclusionNotSignificant": "We do not have enough evidence to conclude that X{bNumber} significantly influences Y"
+          "conclusionNotSignificant": "We do not have enough evidence to conclude that X{bNumber} significantly influences Y",
+          "signicantBasicTrue": "Yes, {pValue} is smaller than α",
+          "signicantBasicFalse": "No, {pValue} is not smaller than α"
         },
         "thirdStep": {
           "interpretation": "3. Model interpretation",
@@ -100,17 +102,21 @@
 
           "multipleVariableSignificance": "Semnificatia in raport cu ansamblul variabilelor:",
           "notAllZeroHypothesis": "H1: nu toti parametrii sunt 0",
-          "significantMultipleTrue": "Respingem H0, cele {variablesNumber} variabile, impreuna, influenteaza in mod semnificativ modelul",
+          "significantMultipleTrue": "Respingem H0, cele {variablesNumber} variabile ({variableNames}), impreuna, influenteaza in mod semnificativ variabila dependenta {yName}",
           "significantMultipleFalse": "H0 nu poate fi respinsa",
           "conclusion": "Concluzie: ",
-          "conclusionSignificant": "Cu o probabiliate de {percentage}%, X{bNumber} influenteaza in mod direct Y",
-          "conclusionNotSignificant": "Nu avem suficiente dovezi pentru a concluziona ca X{bNumber} influenteaza in mod semnificativ Y"
+          "conclusionSignificant": "Cu o probabiliate de {percentage}%, {xName} influenteaza in mod direct {yName}",
+          "conclusionNotSignificant": "Nu avem suficiente dovezi pentru a concluziona ca {xName} influenteaza in mod semnificativ {yName}",
+          "signicantBasicTrue": "Da, {pValue} este mai mic decat nivelul de semnificatie α",
+          "signicantBasicFalse": "Nu, {pValue} nu este mai mic decat nivelul de semnificatie α"
         },
         "thirdStep": {
           "interpretation": "3. Interpretarea modelului",
-          "interpretationVariable": "Daca X{bNumber} creste cu o unitate, Y creste, in medie, cu ",
+          "interpretationVariable": "Daca {xName} creste cu {xUnit}, {yName} creste, in medie, cu ",
           "r2Adjusted": "ajustat",
-          "interpretationR2Adjusted": "din variatia lui Y este explicata de variatia lui X"
+          "interpretationR2Adjusted": "din variatia lui {yName} este explicata de variatia ansamblului {variableNames}",
+          "unit": "o unitate",
+          "units": "unitati"
         }
       }
     }

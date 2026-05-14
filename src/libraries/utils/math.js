@@ -147,16 +147,16 @@ export const calculateSimpleRegression = (xData, yData, alpha = 0.05, onlyValues
 
 /**
  * Execută regresia liniară (Simplă sau Multiplă) prin OLS folosind algebră matriceală.
- * @param {number[]} yData - Variabila dependentă (în format vector coloană).
- * @param {number[][]} xData - Variabilele independente (Matrice 2D pentru multiplă.
+ * @param {{number[][], meta: { name: string, unit: string }[]}} yData - Variabila dependentă
+ * @param {{number[][], meta: { name: string, unit: string }[]}} xData - Variabilele independente
  * @param {number} alpha - Pragul de semnificație (implicit 0.05).
  * @param {boolean} onlyValues - Flag pentru a suprima generarea textului de interpretare.
+ * @param {function} t - Functie pentru traduceri
  */
 export const calculateRegression = (yData, xData, alpha = 0.05, onlyValues = true, t) => {
   const n = yData.data.length;
   // 1. Verificăm dacă xData are mai multe coloane (Multiplă) sau doar una (Simplă)
   const k = xData.data[0].length;
-  const isSimple = k === 1;
 
   // Grade de libertate pentru reziduuri (n - k - 1)
   const df = n - k - 1;
@@ -252,6 +252,8 @@ export const calculateRegression = (yData, xData, alpha = 0.05, onlyValues = tru
           adjustedRSquared: toUINumber(adjustedRSquared),
           alpha,
         },
+        yData.meta,
+        xData.meta,
         t
       );
 

@@ -21,9 +21,9 @@ import { useLanguage } from "@i18n";
 const ModalSimpleRegression = () => {
   const { t } = useLanguage();
   const [open, setOpen] = useState(false);
-  const [YColumnAdress, setYColumnAddress] = useState("Sheet1!B2:B23");
-  const [XColumnAdress, setXColumnAddress] = useState("Sheet1!C2:D23");
-  const [resultDestinationAddress, setResultDestinationAddress] = useState("Sheet1!B26");
+  const [YColumnAdress, setYColumnAddress] = useState("Sheet1!B1:B23");
+  const [XColumnAdress, setXColumnAddress] = useState("Sheet1!C1:D23");
+  const [resultDestinationAddress, setResultDestinationAddress] = useState("Sheet1!H1");
   const [onlyValues, setOnlyValues] = useState(true);
 
   const handleCheckboxChange = (event, data) => {
