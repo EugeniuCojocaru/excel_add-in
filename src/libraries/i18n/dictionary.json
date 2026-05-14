@@ -93,6 +93,7 @@
         },
         "secondStep": {
           "significance": "2. Semnificația modelului",
+          "significanceBasedOnVariable": "Semnificația în raport cu variabila {xName}:",
           "notZeroHypothesisRight": "H1: B{bNumber} > 0 (deoarece b{bNumber} = {b} > 0 deci rezultă un test unilateral la dreapta)",
           "notZeroHypothesisLeft": "H1: B{bNumber} < 0 (deoarece b{bNumber} = {b} < 0 deci rezultă un test unilateral la stanga)",
           "info": "! Info: ",
@@ -118,6 +119,30 @@
           "unit": "o unitate",
           "units": "unitati"
         }
+      },
+      "summaryOutput": {
+        "summary": "REZUMAT REGRESIE - Statistici esențiale",
+        "n": "Număr de observații (n):",
+        "rSquared": "Coeficientul de determinație (R²):",
+        "adjustedRSquared": "Coeficientul de determinație ajustat (R² adj):",
+        "standardError": "Eroarea standard a estimării (ESE):",
+
+        "anova": "Analiza Varianței (ANOVA)",
+        "df": "Grade de libertate (df)",
+        "f": "Statistica testului Fisher (F)",
+        "significanceF": "Semnificația F (p-value model)",
+        "regression": "Regresie",
+        "residual": "Reziduuri (Erori)",
+        "total": "Total",
+
+        "coefficients": "Coeficienți (b)",
+        "standardErrorCoef": "Eroare standard (sb)",
+        "tStat": "Statistica Student (t Stat)",
+        "pValue": "Probabilitate (P-value)",
+        "intercept": "Termenul liber (Intercept / b0)",
+        "variableX": "Variabila X{index}",
+
+        "interpretation": "Interpretare model:"
       }
     }
   }

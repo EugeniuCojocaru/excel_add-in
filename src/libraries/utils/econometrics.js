@@ -57,13 +57,14 @@ export const interpretationRegression = (stats, yMeta, xMeta, t) => {
   const { k, b0, slopes, pValues, fSignificance, rSquared, adjustedRSquared, alpha } = stats;
   const interpretation = [["", ""]];
 
-  interpretation.push([t("regression.interpretation.firstStep.model"), ""]);
+  interpretation.push([t("regression.interpretation.firstStep.model"), ""]); // 1. Model
   const equation = getEquation(k, b0, slopes, yMeta, xMeta);
   interpretation.push([t("regression.interpretation.firstStep.equation"), equation]);
   const model = getModel(k, pValues, fSignificance, rSquared, adjustedRSquared);
   model.forEach((value) => interpretation.push(value));
+  interpretation.push(["", ""]);
 
-  interpretation.push([t("regression.interpretation.secondStep.significance"), ""]);
+  interpretation.push([t("regression.interpretation.secondStep.significance"), ""]); // 2. Semnificatie
   const significance = getMultipleRegressionSignificance(
     slopes,
     pValues,
@@ -75,8 +76,7 @@ export const interpretationRegression = (stats, yMeta, xMeta, t) => {
   );
   significance.forEach((value) => interpretation.push(value));
 
-  interpretation.push(["", ""]);
-  interpretation.push([t("regression.interpretation.thirdStep.interpretation"), ""]);
+  interpretation.push([t("regression.interpretation.thirdStep.interpretation"), ""]); // 3. Interpretare
   const interpretationSlopes = getInterpretation(slopes, adjustedRSquared, yMeta, xMeta, t);
   interpretationSlopes.forEach((value) => interpretation.push(value));
 

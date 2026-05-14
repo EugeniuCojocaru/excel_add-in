@@ -36,7 +36,7 @@ const ModalSimpleRegression = () => {
 
     const stats = calculateRegression(yData, xData, 0.05, onlyValues, t);
 
-    const dataToWrite = generateSummaryOutput(stats);
+    const dataToWrite = generateSummaryOutput(stats, yData.meta, xData.meta, t);
 
     await insertColumn(dataToWrite, resultDestinationAddress);
   };

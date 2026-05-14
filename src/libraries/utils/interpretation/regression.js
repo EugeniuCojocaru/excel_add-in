@@ -28,7 +28,13 @@ const getModel = (k, pValues, fSignificance, rSquared, adjustedRSquared) => {
 };
 
 const getSignificance = (b, pValue, alpha, bNumber, yMeta, xMeta, t) => {
-  const significance = [["", `H0: B${bNumber} = 0 `]];
+  const xName = xMeta[bNumber - 1]?.name || `X${bNumber}`;
+  const significance = [
+    [
+      t("regression.interpretation.secondStep.significanceBasedOnVariable", { xName }),
+      `H0: B${bNumber} = 0 `,
+    ],
+  ];
 
   if (b > 0) {
     significance.push([
@@ -84,13 +90,15 @@ const getMultipleRegressionSignificance = (
   });
 
   if (slopes.length > 1) {
-    significance.push([t("regression.interpretation.secondStep.multipleVariableSignificance"), ""]);
     let nullHypothesis = "H0: ";
     for (let i = 0; i < slopes.length; i++) {
       nullHypothesis += `B${i + 1} = `;
     }
     nullHypothesis += "0";
-    significance.push(["", nullHypothesis]);
+    significance.push([
+      t("regression.interpretation.secondStep.multipleVariableSignificance"),
+      nullHypothesis,
+    ]);
     significance.push(["", t("regression.interpretation.secondStep.notAllZeroHypothesis")]);
 
     const isSignificant = fSignificance < alpha;
