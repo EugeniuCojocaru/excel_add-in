@@ -11,21 +11,20 @@
       "confidenceLevel": "Confidence level:",
       "lowerBound": "Lower bound:",
       "upperBound": "Upper bound:",
-
       "title": "Descriptive Statistics",
       "button__cancel": "Cancel",
       "button__submit": "Insert into Excel",
-      "label__x_input": "Select X values range:",
-      "label__output": "Select results cell:"
+      "label__x_input": "Select X variable:",
+      "label__output": "Select starting cell for results:"
     },
     "regression": {
       "title": "Regression Analysis",
       "button__cancel": "Cancel",
       "button__submit": "Insert into Excel",
-      "label__x_input": "Select X values range:",
-      "label__y_input": "Select Y values range:",
-      "label__output": "Select results cell:",
-      "checkbox__only_values": "No interpretation, just values.",
+      "label__x_input": "Select X variable:",
+      "label__y_input": "Select Y variable:",
+      "label__output": "Select starting cell for results:",
+      "checkbox__only_values": "Only values, no interpretation.",
       "interpretation": {
         "firstStep": {
           "model": "1. Model",
@@ -42,19 +41,21 @@
           "significantFalse": "H0 cannot be rejected",
           "multipleVariableSignificance": "Overall model significance (all variables):",
           "notAllZeroHypothesis": "H1: not all parameters are 0",
-          "significantMultipleTrue": "We reject H0, the {variablesNumber} variables, together, significantly influence the model",
+          "significantMultipleTrue": "We reject H0, the {variablesNumber} variables ({variableNames}), together, significantly influence the dependent variable {yName}",
           "significantMultipleFalse": "H0 cannot be rejected",
           "conclusion": "Conclusion: ",
-          "conclusionSignificant": "With a {percentage}% confidence, X{bNumber} directly influences Y",
-          "conclusionNotSignificant": "We do not have enough evidence to conclude that X{bNumber} significantly influences Y",
-          "signicantBasicTrue": "Yes, {pValue} is smaller than α",
-          "signicantBasicFalse": "No, {pValue} is not smaller than α"
+          "conclusionSignificant": "With a {percentage}% confidence, {xName} directly influences {yName}",
+          "conclusionNotSignificant": "We do not have enough evidence to conclude that {xName} significantly influences {yName}",
+          "signicantBasicTrue": "Yes, {pValue} is smaller than the significance level α",
+          "signicantBasicFalse": "No, {pValue} is not smaller than the significance level α"
         },
         "thirdStep": {
           "interpretation": "3. Model interpretation",
-          "interpretationVariable": "If X{bNumber} increases by one unit, Y increases, on average, by ",
+          "interpretationVariable": "If {xName} increases by {xUnit}, {yName} increases, on average, by ",
           "r2Adjusted": "adjusted",
-          "interpretationR2Adjusted": "of the variation in Y is explained by the variation in X"
+          "interpretationR2Adjusted": "of the variation in {yName} is explained by the variation in the set of {variableNames}",
+          "unit": "one unit",
+          "units": "units"
         }
       }
     }
@@ -99,7 +100,6 @@
           "pValueText": "Comparam pValue cu nivelul de semnificatie α = ",
           "significantTrue": "Respingem H0, b{bNumber} nu este semnificativ diferit de 0",
           "significantFalse": "H0 nu poate fi respinsa",
-
           "multipleVariableSignificance": "Semnificatia in raport cu ansamblul variabilelor:",
           "notAllZeroHypothesis": "H1: nu toti parametrii sunt 0",
           "significantMultipleTrue": "Respingem H0, cele {variablesNumber} variabile ({variableNames}), impreuna, influenteaza in mod semnificativ variabila dependenta {yName}",

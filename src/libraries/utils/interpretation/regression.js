@@ -42,10 +42,11 @@ const getSignificance = (b, pValue, alpha, bNumber, yMeta, xMeta, t) => {
       t("regression.interpretation.secondStep.notZeroHypothesisLeft", { bNumber, b }),
     ]);
   }
-  significance.push([
-    t("regression.interpretation.secondStep.info"),
-    t("regression.interpretation.secondStep.infoText"),
-  ]);
+  //TODO: add info as checkbox in UI and uncomment this!
+  // significance.push([
+  //   t("regression.interpretation.secondStep.info"),
+  //   t("regression.interpretation.secondStep.infoText"),
+  // ]);
   const pValueHalf = pValue / 2;
 
   significance.push([
