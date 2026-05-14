@@ -32,6 +32,7 @@
         },
         "secondStep": {
           "significance": "2. Model significance",
+          "significanceBasedOnVariable": "Significance of variable {xName}:",
           "notZeroHypothesisRight": "H1: B{bNumber} > 0 (because b{bNumber} = {b} > 0 resulting in a right-sided test)",
           "notZeroHypothesisLeft": "H1: B{bNumber} < 0 (because b{bNumber} = {b} < 0 resulting in a left-sided test)",
           "info": "! Info: ",
@@ -57,6 +58,27 @@
           "unit": "one unit",
           "units": "units"
         }
+      },
+      "summaryOutput": {
+        "summary": "REGRESSION SUMMARY - Essential Statistics",
+        "n": "Number of observations (n):",
+        "rSquared": "Coefficient of determination (R²):",
+        "adjustedRSquared": "Adjusted coefficient of determination (R² adj):",
+        "standardError": "Standard error of the estimate (SEE):",
+        "anova": "Analysis of Variance (ANOVA)",
+        "df": "Degrees of freedom (df)",
+        "f": "Fisher test statistic (F)",
+        "significanceF": "F significance (p-value model)",
+        "regression": "Regression",
+        "residual": "Residuals (Errors)",
+        "total": "Total",
+        "coefficients": "Coefficients (b)",
+        "standardErrorCoef": "Standard error (sb)",
+        "tStat": "Student's t statistic (t Stat)",
+        "pValue": "Probability (P-value)",
+        "intercept": "Intercept (Intercept / b0)",
+        "variableX": "Variable X{index}",
+        "interpretation": "Model interpretation:"
       }
     }
   },
