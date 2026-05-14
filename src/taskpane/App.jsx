@@ -1,7 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
-import ModalDescriptiveStats from "./components/ModalDescriptiveStats";
-import ModalSimpleRegression from "./components/ModalSimpleRegression";
+import ModalDescriptiveStats from "./descriptive_stats/ModalDescriptiveStats";
+import ModalSimpleRegression from "./regression/ModalSimpleRegression";
 import { makeStyles } from "@fluentui/react-components";
 import { useLanguage } from "@i18n";
 

@@ -1,8 +1,8 @@
 import Decimal from "decimal.js";
 import math from "./mathConfig";
 import { jStat } from "jstat";
-import { OPERATIONS } from "./basicMath";
-import { interpretationSimpleRegression, interpretationMultipleRegression } from "./econometrics";
+import OPERATIONS from "./basicMath";
+import { interpretationSimpleRegression, interpretationRegression } from "./econometrics";
 import { toUINumber } from "./ui";
 
 /**
@@ -241,7 +241,7 @@ export const calculateRegression = (yData, xData, alpha = 0.05, onlyValues = tru
   // 12. Returnăm rezultatele standardizate (convertite înapoi în numere primitive pentru UI)
   const interpretation = onlyValues
     ? null
-    : interpretationMultipleRegression(
+    : interpretationRegression(
         {
           k,
           b0: toUINumber(b0),

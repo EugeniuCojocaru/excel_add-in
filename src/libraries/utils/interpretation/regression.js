@@ -1,4 +1,4 @@
-export const getEquation = (k, b0, b) => {
+const getEquation = (k, b0, b) => {
   let equation = `Y = ${b0}`;
 
   for (let i = 0; i < k; i++) {
@@ -11,7 +11,7 @@ export const getEquation = (k, b0, b) => {
   return equation;
 };
 
-export const getModel = (k, pValues, fSignificance, rSquared, adjustedRSquared) => {
+const getModel = (k, pValues, fSignificance, rSquared, adjustedRSquared) => {
   const model = [["pValue = ", k === 1 ? pValues[1] : fSignificance]];
 
   if (k > 1) {
@@ -61,7 +61,7 @@ const getSignificance = (b, pValue, alpha, bNumber, t) => {
   return significance;
 };
 
-export const getMultipleRegressionSignificance = (slopes, pValues, fSignificance, alpha, t) => {
+const getMultipleRegressionSignificance = (slopes, pValues, fSignificance, alpha, t) => {
   const significance = [["", ""]];
 
   slopes.forEach((b, index) => {
@@ -98,7 +98,7 @@ export const getMultipleRegressionSignificance = (slopes, pValues, fSignificance
   return significance;
 };
 
-export const getInterpretation = (slopes, adjustedRSquared, t) => {
+const getInterpretation = (slopes, adjustedRSquared, t) => {
   const interpretation = [];
   for (let i = 0; i < slopes.length; i++) {
     interpretation.push([
@@ -126,3 +126,12 @@ const getConclusion = (isSignificant, bNumber, alpha, t) => {
     t("regression.interpretation.secondStep.conclusionNotSignificant", { bNumber }),
   ];
 };
+
+const REGRESSION_INTEPRETATION = {
+  getEquation,
+  getModel,
+  getMultipleRegressionSignificance,
+  getInterpretation,
+};
+
+export default REGRESSION_INTEPRETATION;

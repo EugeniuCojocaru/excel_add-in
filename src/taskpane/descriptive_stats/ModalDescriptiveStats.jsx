@@ -9,9 +9,9 @@ import {
   DialogContent,
   Button,
 } from "@fluentui/react-components";
-import RangeSelector from "./RangeSelector";
+import RangeSelector from "../components/RangeSelector";
 
-import { getSelectedNumericColumn, insertColumn } from "../api";
+import { getSelectedNumericColumn, insertColumn } from "@api";
 import { calculateDescriptiveStats } from "@utils/math";
 
 import { useLanguage } from "@i18n";

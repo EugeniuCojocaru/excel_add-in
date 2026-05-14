@@ -1,9 +1,7 @@
 import Decimal from "decimal.js";
 import math from "./mathConfig";
-import { jStat } from "jstat";
 
 const NaND = new Decimal(Number.NaN);
-const DEFAULT_ALPHA = new Decimal(0.05);
 
 const getMin = (array) => {
   if (!array || array.length === 0) return NaND;
@@ -65,7 +63,7 @@ const getStandardError = (standardDeviation, numberOfEntries) => {
   return standardDeviation.div(math.sqrt(numberOfEntries));
 };
 
-export const OPERATIONS = {
+const OPERATIONS = {
   getMin,
   getMax,
   getMean,
@@ -74,3 +72,5 @@ export const OPERATIONS = {
   getCoeficientOfVariation,
   getStandardError,
 };
+
+export default OPERATIONS;

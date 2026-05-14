@@ -1,9 +1,7 @@
-import {
-  getEquation,
-  getModel,
-  getMultipleRegressionSignificance,
-  getInterpretation,
-} from "./interpretation";
+import { REGRESSION_INTEPRETATION } from "./interpretation";
+
+const { getEquation, getModel, getMultipleRegressionSignificance, getInterpretation } =
+  REGRESSION_INTEPRETATION;
 
 export const interpretationSimpleRegression = (stats) => {
   const { b0, b1, pValue, alpha, rSquared, k } = stats;
@@ -54,7 +52,7 @@ export const interpretationSimpleRegression = (stats) => {
   return interpretation;
 };
 
-export const interpretationMultipleRegression = (stats, t) => {
+export const interpretationRegression = (stats, t) => {
   const { k, b0, slopes, pValues, fSignificance, rSquared, adjustedRSquared, alpha } = stats;
   const interpretation = [["", ""]];
 

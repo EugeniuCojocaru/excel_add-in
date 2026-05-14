@@ -1,12 +1,13 @@
 import React, { createContext, useState, useContext } from "react";
 import * as dictionary from "./dictionary.json";
+
 const LanguageContext = createContext();
 
 export const LanguageProvider = ({ children }) => {
   // const [lang, setLang] = useState(() => {
   //   return Office.context.document.settings.get("userLang") || "en";
   // });
-  const [lang, setLang] = useState("en");
+  const [lang, setLang] = useState("ro");
   const changeLanguage = (newLang) => {
     setLang(newLang);
     Office.context.document.settings.set("userLang", newLang);

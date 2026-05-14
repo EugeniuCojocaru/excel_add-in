@@ -10,9 +10,9 @@ import {
   Button,
   Checkbox,
 } from "@fluentui/react-components";
-import RangeSelector from "./RangeSelector";
+import RangeSelector from "../components/RangeSelector";
 
-import { getColumnMatrix, insertColumn } from "../api";
+import { getColumnMatrix, insertColumn } from "@api";
 import { calculateRegression } from "@utils/math";
 import { generateSummaryOutput } from "@utils/summaryOutput";
 

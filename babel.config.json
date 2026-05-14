@@ -16,9 +16,9 @@
       {
         "root": ["./src"],
         "alias": {
-          "@components": "./src/components",
-          "@utils": "./src/utils",
-          "@i18n": "./src/i18n"
+          "@utils": "./src/libraries/utils",
+          "@i18n": "./src/libraries/i18n",
+          "@api": "./src/libraries/api"
         }
       }
     ],
