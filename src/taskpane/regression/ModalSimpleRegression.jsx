@@ -17,6 +17,7 @@ import { calculateRegression } from "@utils/math";
 import { generateSummaryOutput } from "@utils/summaryOutput";
 
 import { useLanguage } from "@i18n";
+import { interpretationRegression } from "@utils/econometrics";
 
 const ModalSimpleRegression = () => {
   const { t } = useLanguage();
@@ -34,9 +35,18 @@ const ModalSimpleRegression = () => {
 
     const yData = await getColumnMatrix(YColumnAdress);
 
-    const stats = calculateRegression(yData, xData, 0.05, onlyValues, t);
+    const stats = calculateRegression(yData, xData);
 
-    const dataToWrite = generateSummaryOutput(stats, yData.meta, xData.meta, t);
+    const interpretation = onlyValues
+      ? null
+      : interpretationRegression(stats, 0.05, yData.meta, xData.meta, t);
+
+    const dataToWrite = generateSummaryOutput(
+      { interpretation, ...stats },
+      yData.meta,
+      xData.meta,
+      t
+    );
 
     await insertColumn(dataToWrite, resultDestinationAddress);
   };

@@ -53,107 +53,14 @@ export const calculateDescriptiveStats = (data, alpha = 0.05) => {
   };
 };
 
-/** OBSOLETE
- * Execută regresia liniară simplă prin metoda celor mai mici pătrate.
- * @param {number[]} xData - Variabila independentă
- * @param {number[]} yData - Variabila dependentă
- */
-export const calculateSimpleRegression = (xData, yData, alpha = 0.05, onlyValues = false) => {
-  // Convertim seturile de date în Decimal
-  const xDec = xData.map((val) => new Decimal(val));
-  const yDec = yData.map((val) => new Decimal(val));
-
-  const nDec = new Decimal(xData.length);
-  const df = xData.length - 2; // Grade de libertate pentru regresia simplă (n - k - 1)
-
-  const meanX = OPERATIONS.getMean(xDec);
-  const meanY = OPERATIONS.getMean(yDec);
-
-  // 1. Calculăm sumele necesare pentru panta (b1) folosind formula: (nΣxy - ΣxΣy) / (nΣx² - (Σx)²)
-  let sumX = new Decimal(0);
-  let sumY = new Decimal(0);
-  let sumXY = new Decimal(0);
-  let sumX2 = new Decimal(0);
-
-  for (let i = 0; i < xDec.length; i++) {
-    sumX = sumX.add(xDec[i]);
-    sumY = sumY.add(yDec[i]);
-    sumXY = sumXY.add(xDec[i].mul(yDec[i]));
-    sumX2 = sumX2.add(xDec[i].pow(2));
-  }
-
-  const numerator = nDec.mul(sumXY).sub(sumX.mul(sumY));
-  const denominatorX = nDec.mul(sumX2).sub(sumX.pow(2));
-  const b1 = numerator.div(denominatorX);
-
-  // 2. Calculăm interceptul (b0): medie_y - b1 * medie_x
-  const b0 = meanY.sub(b1.mul(meanX));
-
-  // 3. Calculăm reziduurile (epsilon) și Suma Pătratelor Reziduurilor (SSR)
-  let ssRes = new Decimal(0);
-  let ssTotal = new Decimal(0);
-  let sumSqDevX = new Decimal(0);
-
-  for (let i = 0; i < xDec.length; i++) {
-    const yPred = b0.add(b1.mul(xDec[i])); // Valoarea calculată prin model
-    const resid = yDec[i].sub(yPred);
-    ssRes = ssRes.add(resid.pow(2));
-
-    const devY = yDec[i].sub(meanY);
-    ssTotal = ssTotal.add(devY.pow(2));
-
-    const devX = xDec[i].sub(meanX);
-    sumSqDevX = sumSqDevX.add(devX.pow(2));
-  }
-
-  // 4. Calculăm Eroarea Standard a Estimării (ESE)
-  const ese = math.sqrt(ssRes.div(new Decimal(df)));
-
-  // 5. Calculăm eroarea standard a parametrului b1 (sb1)
-  const sb1 = ese.div(math.sqrt(sumSqDevX));
-
-  // 6. Calculăm statistica test t: t = b1 / sb1
-  const tStat = b1.div(sb1);
-
-  // 7. Calculăm p-value (bilateral): Probabilitatea de a comite eroarea de speța I
-  // jStat necesită valoare primitivă absolută
-  const tStatPrimitive = Math.abs(tStat.toNumber());
-  const pValue = 2 * (1 - jStat.studentt.cdf(tStatPrimitive, df));
-
-  // 8. Calculăm Coeficientul de determinație (R-squared)
-  // Arată în ce măsură variația lui X explică variația lui Y
-  const rSquared = new Decimal(1).sub(ssRes.div(ssTotal));
-
-  return {
-    intercept: b0.toNumber(),
-    slope: b1.toNumber(),
-    rSquared: rSquared.toNumber(),
-    ese: ese.toNumber(),
-    sb1: sb1.toNumber(),
-    tStat: tStat.toNumber(),
-    pValue,
-    isSignificant: pValue < alpha,
-    interpretation: onlyValues
-      ? null
-      : interpretationSimpleRegression({
-          b0: b0.toNumber(),
-          b1: b1.toNumber(),
-          pValue,
-          alpha,
-          rSquared,
-        }),
-  };
-};
-
 /**
  * Execută regresia liniară (Simplă sau Multiplă) prin OLS folosind algebră matriceală.
  * @param {{number[][], meta: { name: string, unit: string }[]}} yData - Variabila dependentă
  * @param {{number[][], meta: { name: string, unit: string }[]}} xData - Variabilele independente
- * @param {number} alpha - Pragul de semnificație (implicit 0.05).
  * @param {boolean} onlyValues - Flag pentru a suprima generarea textului de interpretare.
  * @param {function} t - Functie pentru traduceri
  */
-export const calculateRegression = (yData, xData, alpha = 0.05, onlyValues = true, t) => {
+export const calculateRegression = (yData, xData) => {
   const n = yData.data.length;
   // 1. Verificăm dacă xData are mai multe coloane (Multiplă) sau doar una (Simplă)
   const k = xData.data[0].length;
@@ -238,29 +145,10 @@ export const calculateRegression = (yData, xData, alpha = 0.05, onlyValues = tru
   // p-value pentru testul F
   const fSignificance = 1 - jStat.centralF.cdf(Number(fStat), k, df);
 
-  // 12. Returnăm rezultatele standardizate (convertite înapoi în numere primitive pentru UI)
-  const interpretation = onlyValues
-    ? null
-    : interpretationRegression(
-        {
-          k,
-          b0: toUINumber(b0),
-          slopes: slopes.map((s) => toUINumber(s)),
-          pValues,
-          fSignificance,
-          rSquared: toUINumber(rSquared),
-          adjustedRSquared: toUINumber(adjustedRSquared),
-          alpha,
-        },
-        yData.meta,
-        xData.meta,
-        t
-      );
-
   return {
     k, // Numărul de variabile independente
     df, // Grade de libertate pentru reziduuri
-    intercept: toUINumber(b0),
+    b0: toUINumber(b0), // *
     slopes: slopes.map((b) => toUINumber(b)), // Array cu b1, b2, ..., bk
     rSquared: toUINumber(rSquared),
     adjustedRSquared: toUINumber(adjustedRSquared),
@@ -270,7 +158,97 @@ export const calculateRegression = (yData, xData, alpha = 0.05, onlyValues = tru
     pValues, // Array cu probabilitățile pentru intercept și fiecare pantă (generate deja de jStat)
     fStat: toUINumber(fStat), // Statistica test F
     fSignificance, // Significance F (p-value model)
-    isSignificant: fSignificance < alpha, // Decizia pentru ansamblul parametrilor
-    interpretation,
   };
 };
+
+/** OBSOLETE
+ * Execută regresia liniară simplă prin metoda celor mai mici pătrate.
+ * @param {number[]} xData - Variabila independentă
+ * @param {number[]} yData - Variabila dependentă
+ */
+// export const calculateSimpleRegression = (xData, yData, alpha = 0.05, onlyValues = false) => {
+//   // Convertim seturile de date în Decimal
+//   const xDec = xData.map((val) => new Decimal(val));
+//   const yDec = yData.map((val) => new Decimal(val));
+
+//   const nDec = new Decimal(xData.length);
+//   const df = xData.length - 2; // Grade de libertate pentru regresia simplă (n - k - 1)
+
+//   const meanX = OPERATIONS.getMean(xDec);
+//   const meanY = OPERATIONS.getMean(yDec);
+
+//   // 1. Calculăm sumele necesare pentru panta (b1) folosind formula: (nΣxy - ΣxΣy) / (nΣx² - (Σx)²)
+//   let sumX = new Decimal(0);
+//   let sumY = new Decimal(0);
+//   let sumXY = new Decimal(0);
+//   let sumX2 = new Decimal(0);
+
+//   for (let i = 0; i < xDec.length; i++) {
+//     sumX = sumX.add(xDec[i]);
+//     sumY = sumY.add(yDec[i]);
+//     sumXY = sumXY.add(xDec[i].mul(yDec[i]));
+//     sumX2 = sumX2.add(xDec[i].pow(2));
+//   }
+
+//   const numerator = nDec.mul(sumXY).sub(sumX.mul(sumY));
+//   const denominatorX = nDec.mul(sumX2).sub(sumX.pow(2));
+//   const b1 = numerator.div(denominatorX);
+
+//   // 2. Calculăm interceptul (b0): medie_y - b1 * medie_x
+//   const b0 = meanY.sub(b1.mul(meanX));
+
+//   // 3. Calculăm reziduurile (epsilon) și Suma Pătratelor Reziduurilor (SSR)
+//   let ssRes = new Decimal(0);
+//   let ssTotal = new Decimal(0);
+//   let sumSqDevX = new Decimal(0);
+
+//   for (let i = 0; i < xDec.length; i++) {
+//     const yPred = b0.add(b1.mul(xDec[i])); // Valoarea calculată prin model
+//     const resid = yDec[i].sub(yPred);
+//     ssRes = ssRes.add(resid.pow(2));
+
+//     const devY = yDec[i].sub(meanY);
+//     ssTotal = ssTotal.add(devY.pow(2));
+
+//     const devX = xDec[i].sub(meanX);
+//     sumSqDevX = sumSqDevX.add(devX.pow(2));
+//   }
+
+//   // 4. Calculăm Eroarea Standard a Estimării (ESE)
+//   const ese = math.sqrt(ssRes.div(new Decimal(df)));
+
+//   // 5. Calculăm eroarea standard a parametrului b1 (sb1)
+//   const sb1 = ese.div(math.sqrt(sumSqDevX));
+
+//   // 6. Calculăm statistica test t: t = b1 / sb1
+//   const tStat = b1.div(sb1);
+
+//   // 7. Calculăm p-value (bilateral): Probabilitatea de a comite eroarea de speța I
+//   // jStat necesită valoare primitivă absolută
+//   const tStatPrimitive = Math.abs(tStat.toNumber());
+//   const pValue = 2 * (1 - jStat.studentt.cdf(tStatPrimitive, df));
+
+//   // 8. Calculăm Coeficientul de determinație (R-squared)
+//   // Arată în ce măsură variația lui X explică variația lui Y
+//   const rSquared = new Decimal(1).sub(ssRes.div(ssTotal));
+
+//   return {
+//     intercept: b0.toNumber(),
+//     slope: b1.toNumber(),
+//     rSquared: rSquared.toNumber(),
+//     ese: ese.toNumber(),
+//     sb1: sb1.toNumber(),
+//     tStat: tStat.toNumber(),
+//     pValue,
+//     isSignificant: pValue < alpha,
+//     interpretation: onlyValues
+//       ? null
+//       : interpretationSimpleRegression({
+//           b0: b0.toNumber(),
+//           b1: b1.toNumber(),
+//           pValue,
+//           alpha,
+//           rSquared,
+//         }),
+//   };
+// };

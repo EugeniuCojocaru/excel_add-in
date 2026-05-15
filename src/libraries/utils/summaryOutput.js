@@ -35,7 +35,7 @@ export const generateSummaryOutput = (stats, yMeta, xMeta, t) => {
     ],
     [
       t("regression.summaryOutput.intercept"),
-      stats.intercept,
+      stats.b0,
       stats.standardErrors[0],
       stats.tStats[0],
       stats.pValues[0],
