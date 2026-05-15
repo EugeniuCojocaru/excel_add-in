@@ -17,8 +17,8 @@ const getModel = (k, pValues, fSignificance, rSquared, adjustedRSquared) => {
   const model = [["pValue = ", k === 1 ? pValues[1] : fSignificance]];
 
   if (k > 1) {
-    for (let i = 1; i < k; i++) {
-      model.push([`p${i} = `, pValues[i]]);
+    for (let i = 0; i < k; i++) {
+      model.push([`p${i + 1} = `, pValues[i + 1]]);
     }
   }
   model.push(["R^2 = ", rSquared]);
@@ -57,7 +57,7 @@ const getSignificance = (b, pValue, alpha, bNumber, yMeta, xMeta, t) => {
 
   significance.push([
     `${t("regression.interpretation.secondStep.pValueText")}${alpha}:`,
-    `pValue/2 = ${pValueHalf} ?< α = ${alpha} => ${isSignificant ? t("regression.interpretation.secondStep.signicantBasicTrue", { pValue: pValueHalf }) : t("regression.interpretation.secondStep.signicantBasicFalse", { pValue: pValueHalf })}`,
+    `p${bNumber}/2 = ${pValueHalf} ?< α = ${alpha} => ${isSignificant ? t("regression.interpretation.secondStep.signicantBasicTrue", { pValue: pValueHalf }) : t("regression.interpretation.secondStep.signicantBasicFalse", { pValue: pValueHalf })}`,
   ]);
   const isSignificant = pValueHalf < alpha;
 
