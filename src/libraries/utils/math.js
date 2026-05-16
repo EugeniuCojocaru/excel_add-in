@@ -1,9 +1,45 @@
+import { jStat } from "jstat";
 import Decimal from "decimal.js";
 import math from "./mathConfig";
-import { jStat } from "jstat";
 import OPERATIONS from "./basicMath";
-import { interpretationSimpleRegression, interpretationRegression } from "./econometrics";
 import { toUINumber } from "./ui";
+
+/**
+ * Transformă datele brute în matricele X și Y necesare pentru regresie,
+ * aplicând logaritmul natural (ln) în funcție de modelul ales.
+ * @param {{data: number[][], meta: { name: string, unit: string }[]}} yData
+ * @param {{data: number[][], meta: { name: string, unit: string }[]}} xData
+ * @param {string} modelType - 'linear', 'log-linear', 'semi-log', 'lin-log'
+ * @returns {{ Y: any[], X: any[] }} Matricele gata pentru algebra mathjs
+ */
+const transformDataForModel = (yData, xData, modelType) => {
+  const transformY = modelType === "log-linear" || modelType === "semi-log";
+  const transformX = modelType === "log-linear" || modelType === "lin-log";
+
+  const Y = yData.data.map((val) => {
+    let v = math.bignumber(val[0]);
+    if (transformY) {
+      if (v <= 0) throw new Error("Logaritmul necesită valori strict pozitive pentru Y.");
+      v = math.log(v);
+    }
+    return [math.bignumber(v)];
+  });
+
+  const X = xData.data.map((row) => {
+    const processedRow = row.map((val) => {
+      let v = math.bignumber(val);
+      if (transformX) {
+        if (v <= 0)
+          throw new Error("Logaritmul necesită valori strict pozitive pentru variabilele X.");
+        v = math.log(v);
+      }
+      return v;
+    });
+    return [1, ...processedRow].map((val) => math.bignumber(val));
+  });
+
+  return { Y, X };
+};
 
 /**
  * Calculează indicatorii statistici de bază și intervalul de încredere.
@@ -60,42 +96,33 @@ export const calculateDescriptiveStats = (data, alpha = 0.05) => {
  * @param {boolean} onlyValues - Flag pentru a suprima generarea textului de interpretare.
  * @param {function} t - Functie pentru traduceri
  */
-export const calculateRegression = (yData, xData) => {
+export const calculateRegression = (yData, xData, modelType) => {
   const n = yData.data.length;
   // 1. Verificăm dacă xData are mai multe coloane (Multiplă) sau doar una (Simplă)
   const k = xData.data[0].length;
-
   // Grade de libertate pentru reziduuri (n - k - 1)
   const df = n - k - 1;
 
-  // 2. Construim Matricea Y (vector coloană n x 1)
-  const Y = yData.data.map((val) => [math.bignumber(val[0])]);
+  const { Y, X } = transformDataForModel(yData, xData, modelType);
 
-  // 3. Construim Matricea X (Adăugăm o coloană de 1 la început pentru intercept - b0)
-  const X = xData.data.map((row) => {
-    return [1, ...row].map((val) => math.bignumber(val));
-  });
-
-  // 4. Algebra Matriceală: Beta = (X^T * X)^-1 * X^T * Y
+  // Algebra Matriceală: Beta = (X^T * X)^-1 * X^T * Y
   const X_T = math.transpose(X);
   const X_T_X = math.multiply(X_T, X);
   const X_T_X_inv = math.inv(X_T_X);
   const X_T_Y = math.multiply(X_T, Y);
 
-  // Vectorul coeficienților (matrice k+1 x 1)
+  // Vectorul coeficienților
   const Beta = math.multiply(X_T_X_inv, X_T_Y);
 
-  // Extragem coeficienții pentru a lucra mai ușor cu ei
   const coefficients = Beta.map((row) => row[0]);
-  const b0 = coefficients[0]; // Termenul liber
-  const slopes = coefficients.slice(1); // Parametrii de regresie parțială (b1, b2... bk)
+  const b0 = coefficients[0];
+  const slopes = coefficients.slice(1);
 
-  // 5. Calculăm Valorile Prezise (Y_pred) și Reziduurile
-  // y_i = b_0 + b_1 * x_1i + ... + b_k * x_ki + e_i
+  // Valorile Prezise și Reziduurile
   const Y_pred = math.multiply(X, Beta);
 
-  let ssRes = math.bignumber(0); // Suma Pătratelor Reziduurilor (SSR)
-  let ssTotal = math.bignumber(0); // Suma Pătratelor Totală (SST)
+  let ssRes = math.bignumber(0);
+  let ssTotal = math.bignumber(0);
   const meanY = math.mean(Y.map((row) => row[0]));
 
   for (let i = 0; i < n; i++) {
@@ -106,29 +133,27 @@ export const calculateRegression = (yData, xData) => {
     ssTotal = math.add(ssTotal, math.square(devY));
   }
 
-  // 6. Eroarea Standard a Estimării (ESE)
+  // Eroarea Standard a Estimării (ESE)
   const ese = math.sqrt(math.divide(ssRes, math.bignumber(df)));
 
-  // 7. Erorile Standard ale Coeficienților (sb)
-  // Se găsesc pe diagonala principală a matricei de varianță-covarianță: ESE^2 * (X^T * X)^-1
+  // Erorile Standard ale Coeficienților (sb)
   const varianceMatrix = math.multiply(math.square(ese), X_T_X_inv);
-
   const standardErrors = [];
   for (let i = 0; i < k + 1; i++) {
     standardErrors.push(math.sqrt(varianceMatrix[i][i]));
   }
 
-  // 8. Statistica t și p-value pentru FIECARE coeficient
+  // Statistica t și p-value
   const tStats = coefficients.map((b, i) => math.divide(b, standardErrors[i]));
   const pValues = tStats.map((t) => {
     const tPrimitive = Math.abs(Number(t));
-    return 2 * (1 - jStat.studentt.cdf(tPrimitive, df)); // Test bilateral
+    return 2 * (1 - jStat.studentt.cdf(tPrimitive, df));
   });
 
-  // 9. Coeficientul de Determinație (R-squared)
+  // Coeficientul de Determinație (R-squared)
   const rSquared = math.subtract(math.bignumber(1), math.divide(ssRes, ssTotal));
 
-  // 10. Coeficientul de Determinație Ajustat (Adjusted R-squared)
+  // Coeficientul de Determinație Ajustat
   // Formula: 1 - (1 - R^2) * (n - 1) / (n - k - 1)
   const rSqAdjPart1 = math.subtract(math.bignumber(1), rSquared);
   const rSqAdjPart2 = math.divide(math.bignumber(n - 1), math.bignumber(df));
@@ -137,27 +162,28 @@ export const calculateRegression = (yData, xData) => {
     math.multiply(rSqAdjPart1, rSqAdjPart2)
   );
 
-  // 11. Testul ANOVA (F-Statistic) pentru întregul model
+  // Testul ANOVA (F-Statistic)
   const fNumerator = math.divide(rSquared, math.bignumber(k));
   const fDenominator = math.divide(math.subtract(math.bignumber(1), rSquared), math.bignumber(df));
   const fStat = math.divide(fNumerator, fDenominator);
-
-  // p-value pentru testul F
   const fSignificance = 1 - jStat.centralF.cdf(Number(fStat), k, df);
 
+  // 3. Returnăm rezultatele formatate pentru UI
   return {
-    k, // Numărul de variabile independente
-    df, // Grade de libertate pentru reziduuri
-    b0: toUINumber(b0), // *
-    slopes: slopes.map((b) => toUINumber(b)), // Array cu b1, b2, ..., bk
+    modelType,
+    k,
+    df,
+    ssRes: Number(ssRes),
+    b0: toUINumber(b0),
+    slopes: slopes.map((b) => toUINumber(b)),
     rSquared: toUINumber(rSquared),
     adjustedRSquared: toUINumber(adjustedRSquared),
     ese: toUINumber(ese),
-    standardErrors: standardErrors.map((se) => toUINumber(se)), // Array cu sb0, sb1, ..., sbk
-    tStats: tStats.map((t) => toUINumber(t)), // Array cu scorurile t
-    pValues, // Array cu probabilitățile pentru intercept și fiecare pantă (generate deja de jStat)
-    fStat: toUINumber(fStat), // Statistica test F
-    fSignificance, // Significance F (p-value model)
+    standardErrors: standardErrors.map((se) => toUINumber(se)),
+    tStats: tStats.map((t) => toUINumber(t)),
+    pValues,
+    fStat: toUINumber(fStat),
+    fSignificance,
   };
 };
 

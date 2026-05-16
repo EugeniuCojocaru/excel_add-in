@@ -107,7 +107,10 @@
       "label__x_input": "Selectează variabila X:",
       "label__y_input": "Selectează variabila Y:",
       "label__output": "Selectează celula de început pentru rezultate:",
+      "label__extra_options": "Opțiuni suplimentare:",
       "checkbox__only_values": "Doar valori, fara interpretare.",
+      "input__alpha": { "label": "Nivel de semnificație (α):", "placeholder": "Ex: 0.05" },
+      "combobox__model_type": { "label": "Tip model:", "placeholder": "Selectează opțiunea..." },
       "interpretation": {
         "firstStep": {
           "model": "1. Model",

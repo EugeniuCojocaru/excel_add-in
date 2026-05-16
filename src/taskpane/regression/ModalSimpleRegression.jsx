@@ -9,6 +9,10 @@ import {
   DialogContent,
   Button,
   Checkbox,
+  Field,
+  Input,
+  Combobox,
+  Option,
 } from "@fluentui/react-components";
 import RangeSelector from "../components/RangeSelector";
 
@@ -19,23 +23,34 @@ import { generateSummaryOutput } from "@utils/summaryOutput";
 import { useLanguage } from "@i18n";
 import { interpretationRegression } from "@utils/econometrics";
 
+const MODEL_TYPES = [
+  { key: "linear", label: "Linear" },
+  { key: "log-linear", label: "Log-Linear" },
+  { key: "semi-log", label: "Semi-Log" },
+  { key: "lin-log", label: "Lin-Log" },
+];
 const ModalSimpleRegression = () => {
   const { t } = useLanguage();
+
   const [open, setOpen] = useState(false);
   const [YColumnAdress, setYColumnAddress] = useState("Sheet1!B1:B23");
   const [XColumnAdress, setXColumnAddress] = useState("Sheet1!C1:D23");
   const [resultDestinationAddress, setResultDestinationAddress] = useState("Sheet1!H1");
   const [onlyValues, setOnlyValues] = useState(true);
+  const [modelType, setModelType] = useState("Linear");
+  const [alpha, setAlpha] = useState(0.05);
 
-  const handleCheckboxChange = (event, data) => {
+  console.log("Model type selected:", modelType);
+  const handleCheckboxChange = (_, data) => {
     setOnlyValues(data.checked);
   };
+
   const handleClick = async () => {
     const xData = await getColumnMatrix(XColumnAdress);
 
     const yData = await getColumnMatrix(YColumnAdress);
 
-    const stats = calculateRegression(yData, xData);
+    const stats = calculateRegression(yData, xData, modelType);
 
     const interpretation = onlyValues
       ? null
@@ -53,7 +68,7 @@ const ModalSimpleRegression = () => {
 
   return (
     <div style={{ padding: "20px" }}>
-      <Dialog open={open} onOpenChange={(event, data) => setOpen(data.open)}>
+      <Dialog open={open} onOpenChange={(_, data) => setOpen(data.open)}>
         <DialogTrigger disableButtonEnhancement>
           <Button>{t("regression.title")}</Button>
         </DialogTrigger>
@@ -79,11 +94,33 @@ const ModalSimpleRegression = () => {
                 onRangeChanged={setResultDestinationAddress}
                 value={resultDestinationAddress}
               />
+              <p>{t("regression.label__extra_options")}</p>
               <Checkbox
                 label={t("regression.checkbox__only_values")}
                 checked={onlyValues}
                 onChange={handleCheckboxChange}
               />
+              <Field label={t("regression.input__alpha.label")}>
+                <Input
+                  value={alpha}
+                  onChange={(_, data) => setAlpha(data.value)}
+                  placeholder={t("regression.input__alpha.placeholder")}
+                />
+              </Field>
+
+              <Field label={t("regression.combobox__model_type.label")}>
+                <Combobox
+                  placeholder={t("regression.combobox__model_type.placeholder")}
+                  value={modelType}
+                  onOptionSelect={(_, data) => setModelType(data.optionValue || "")}
+                >
+                  {MODEL_TYPES.map((type) => (
+                    <Option key={type.key} value={type.label}>
+                      {type.label}
+                    </Option>
+                  ))}
+                </Combobox>
+              </Field>
             </DialogContent>
 
             <DialogActions>
