@@ -58,7 +58,7 @@ const getSignificance = (b, pValue, alpha, bNumber, yMeta, xMeta, t) => {
   console.log({ pValue, pValueHalf, alpha, smaller: pValue < alpha });
   significance.push([
     `${t("regression.interpretation.secondStep.pValueText")}${alpha}:`,
-    `p${bNumber === 1 ? "value" : bNumber}/2 = ${pValueHalf} ?< α = ${alpha} => ${isSignificant ? t("regression.interpretation.secondStep.signicantBasicTrue", { pValue: pValueHalf }) : t("regression.interpretation.secondStep.signicantBasicFalse", { pValue: pValueHalf })}`,
+    `p${bNumber === 1 ? "Value" : bNumber}/2 = ${pValueHalf} ?< α = ${alpha} => ${isSignificant ? t("regression.interpretation.secondStep.signicantBasicTrue", { pValue: pValueHalf }) : t("regression.interpretation.secondStep.signicantBasicFalse", { pValue: pValueHalf })}`,
   ]);
 
   significance.push([
@@ -134,18 +134,44 @@ const getConclusion = (isSignificant, bNumber, alpha, yMeta, xMeta, t) => {
   ];
 };
 
-const getInterpretation = (slopes, adjustedRSquared, yMeta, xMeta, t) => {
+const getInterpretation = (slopes, adjustedRSquared, yMeta, xMeta, modelType, t) => {
   const interpretation = [];
   const yName = yMeta[0]?.name || "Y";
 
+  const unitBasedOnModelType = (index) => {
+    const isXVariableLog = modelType === "log-linear" || modelType === "lin-log";
+    const xUnit = isXVariableLog
+      ? "1%"
+      : xMeta[index]?.unit
+        ? `1 ${xMeta[index].unit}`
+        : t("regression.interpretation.thirdStep.unit");
+    const isYVariableLog = modelType === "log-linear" || modelType === "semi-log";
+    const yUnit = isYVariableLog
+      ? "%"
+      : yMeta[0]?.unit
+        ? yMeta[0].unit
+        : ` ${t("regression.interpretation.thirdStep.units")}`;
+    return { xUnit, yUnit };
+  };
+
+  const getYValueBasedOnModelType = (index) => {
+    switch (modelType) {
+      case "semi-log":
+        return slopes[index] * 100;
+      case "lin-log":
+        return slopes[index] / 100;
+      default:
+        return slopes[index];
+    }
+  };
+
   for (let i = 0; i < slopes.length; i++) {
     const xName = xMeta[i]?.name || `X${i + 1}`;
-    const xUnit = xMeta[i]?.unit
-      ? `1 ${xMeta[i].unit}`
-      : t("regression.interpretation.thirdStep.unit");
+    const { xUnit, yUnit } = unitBasedOnModelType(i);
+    const yValue = getYValueBasedOnModelType(i);
     interpretation.push([
       `b${i + 1} = ${slopes[i]}`,
-      `${t("regression.interpretation.thirdStep.interpretationVariable", { xName, xUnit, yName })}${slopes[i]}${yMeta[0]?.unit ? ` ${yMeta[0].unit}` : t("regression.interpretation.thirdStep.units")}`,
+      `${t("regression.interpretation.thirdStep.interpretationVariable", { xName, xUnit, yName })}${yValue}${yUnit}`,
     ]);
   }
   const variableNames = xMeta.map((meta, index) => meta.name || `X${index + 1}`).join(", ");

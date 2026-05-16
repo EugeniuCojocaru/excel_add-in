@@ -3,7 +3,7 @@ import { REGRESSION_INTEPRETATION } from "./interpretation";
 const { getEquation, getModel, getMultipleRegressionSignificance, getInterpretation } =
   REGRESSION_INTEPRETATION;
 
-export const interpretationRegression = (stats, alpha, yMeta, xMeta, t) => {
+export const interpretationRegression = (stats, alpha, yMeta, xMeta, modelType, t) => {
   const { k, b0, slopes, pValues, fSignificance, rSquared, adjustedRSquared } = stats;
   const interpretation = [["", ""]];
 
@@ -27,7 +27,14 @@ export const interpretationRegression = (stats, alpha, yMeta, xMeta, t) => {
   significance.forEach((value) => interpretation.push(value));
 
   interpretation.push([t("regression.interpretation.thirdStep.interpretation"), ""]); // 3. Interpretare
-  const interpretationSlopes = getInterpretation(slopes, adjustedRSquared, yMeta, xMeta, t);
+  const interpretationSlopes = getInterpretation(
+    slopes,
+    adjustedRSquared,
+    yMeta,
+    xMeta,
+    modelType,
+    t
+  );
   interpretationSlopes.forEach((value) => interpretation.push(value));
 
   return interpretation;

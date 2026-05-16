@@ -55,7 +55,7 @@ const ModalSimpleRegression = () => {
 
     const interpretation = onlyValues
       ? null
-      : interpretationRegression(stats, 0.05, yData.meta, xData.meta, t);
+      : interpretationRegression(stats, 0.05, yData.meta, xData.meta, modelTypeKey, t);
 
     const dataToWrite = generateSummaryOutput(
       { interpretation, ...stats },
