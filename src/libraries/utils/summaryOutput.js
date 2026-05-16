@@ -9,6 +9,7 @@ export const generateSummaryOutput = (stats, yMeta, xMeta, t) => {
     [t("regression.summaryOutput.rSquared"), stats.rSquared, "", "", ""],
     [t("regression.summaryOutput.adjustedRSquared"), stats.adjustedRSquared, "", "", ""],
     [t("regression.summaryOutput.standardError"), stats.ese, "", "", ""],
+    [t("regression.summaryOutput.ssRes"), stats.ssRes, "", "", ""],
     ["", "", "", "", ""],
 
     // 2. Tabelul "ANOVA"

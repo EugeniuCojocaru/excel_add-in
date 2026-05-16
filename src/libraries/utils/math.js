@@ -173,7 +173,7 @@ export const calculateRegression = (yData, xData, modelType) => {
     modelType,
     k,
     df,
-    ssRes: Number(ssRes),
+    ssRes: toUINumber(ssRes),
     b0: toUINumber(b0),
     slopes: slopes.map((b) => toUINumber(b)),
     rSquared: toUINumber(rSquared),

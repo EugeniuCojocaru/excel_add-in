@@ -33,8 +33,8 @@ const ModalSimpleRegression = () => {
   const { t } = useLanguage();
 
   const [open, setOpen] = useState(false);
-  const [YColumnAdress, setYColumnAddress] = useState("Sheet1!B1:B23");
-  const [XColumnAdress, setXColumnAddress] = useState("Sheet1!C1:D23");
+  const [YColumnAdress, setYColumnAddress] = useState("Sheet1!A1:A23");
+  const [XColumnAdress, setXColumnAddress] = useState("Sheet1!B1:B23");
   const [resultDestinationAddress, setResultDestinationAddress] = useState("Sheet1!H1");
   const [onlyValues, setOnlyValues] = useState(true);
   const [modelType, setModelType] = useState("Linear");
@@ -50,7 +50,8 @@ const ModalSimpleRegression = () => {
 
     const yData = await getColumnMatrix(YColumnAdress);
 
-    const stats = calculateRegression(yData, xData, modelType);
+    const modelTypeKey = MODEL_TYPES.find((type) => type.label === modelType)?.key || "linear";
+    const stats = calculateRegression(yData, xData, modelTypeKey);
 
     const interpretation = onlyValues
       ? null

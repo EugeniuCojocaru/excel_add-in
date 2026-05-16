@@ -151,6 +151,7 @@
         "rSquared": "Coeficientul de determinație (R²):",
         "adjustedRSquared": "Coeficientul de determinație ajustat (R² adj):",
         "standardError": "Eroarea standard a estimării (ESE):",
+        "ssRes": "Suma pătratelor rezidurilor (SS Res):",
 
         "anova": "Analiza Varianței (ANOVA)",
         "df": "Grade de libertate (df)",

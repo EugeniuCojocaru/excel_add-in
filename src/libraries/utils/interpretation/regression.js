@@ -54,12 +54,12 @@ const getSignificance = (b, pValue, alpha, bNumber, yMeta, xMeta, t) => {
   //   t("regression.interpretation.secondStep.infoText"),
   // ]);
   const pValueHalf = pValue / 2;
-
+  const isSignificant = pValueHalf < alpha;
+  console.log({ pValue, pValueHalf, alpha, smaller: pValue < alpha });
   significance.push([
     `${t("regression.interpretation.secondStep.pValueText")}${alpha}:`,
-    `p${bNumber}/2 = ${pValueHalf} ?< α = ${alpha} => ${isSignificant ? t("regression.interpretation.secondStep.signicantBasicTrue", { pValue: pValueHalf }) : t("regression.interpretation.secondStep.signicantBasicFalse", { pValue: pValueHalf })}`,
+    `p${bNumber === 1 ? "value" : bNumber}/2 = ${pValueHalf} ?< α = ${alpha} => ${isSignificant ? t("regression.interpretation.secondStep.signicantBasicTrue", { pValue: pValueHalf }) : t("regression.interpretation.secondStep.signicantBasicFalse", { pValue: pValueHalf })}`,
   ]);
-  const isSignificant = pValueHalf < alpha;
 
   significance.push([
     "",
