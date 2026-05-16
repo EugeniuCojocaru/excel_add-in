@@ -1,6 +1,19 @@
-const getEquation = (k, b0, b, yMeta, xMeta) => {
-  let equation = `${yMeta[0]?.name || "Y"} = ${b0}`;
-  if (k === 1) equation += ` + ${b[0]} * ${xMeta[0]?.name || "X"}`;
+const getEquation = (k, b0, b, yMeta, xMeta, modelType) => {
+  const getYName = () => {
+    const isLog = modelType === "log-linear" || modelType === "semi-log";
+    const baseName = yMeta[0]?.name || "Y";
+    return isLog ? `ln(${baseName})` : baseName;
+  };
+
+  const getXName = () => {
+    const isLog = modelType === "log-linear" || modelType === "lin-log";
+    const baseName = xMeta[0]?.name || "X";
+    return isLog ? `ln(${baseName})` : baseName;
+  };
+
+  let equation = `${getYName()} = ${b0}`;
+
+  if (k === 1) equation += ` ${b[0] >= 0 && "+"} ${b[0]} * ${getXName()}`;
   else {
     for (let i = 0; i < k; i++) {
       const slope = b[i];

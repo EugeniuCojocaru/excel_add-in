@@ -8,7 +8,7 @@ export const interpretationRegression = (stats, alpha, yMeta, xMeta, modelType, 
   const interpretation = [["", ""]];
 
   interpretation.push([t("regression.interpretation.firstStep.model"), ""]); // 1. Model
-  const equation = getEquation(k, b0, slopes, yMeta, xMeta);
+  const equation = getEquation(k, b0, slopes, yMeta, xMeta, modelType);
   interpretation.push([t("regression.interpretation.firstStep.equation"), equation]);
   const model = getModel(k, pValues, fSignificance, rSquared, adjustedRSquared);
   model.forEach((value) => interpretation.push(value));
