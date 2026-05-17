@@ -35,7 +35,7 @@ const ModalModelComparison = () => {
   const [open, setOpen] = useState(false);
   const [YColumnAdress, setYColumnAddress] = useState("Sheet1!A1:A23");
   const [XColumnAdress, setXColumnAddress] = useState("Sheet1!B1:B23");
-  const [resultDestinationAddress, setResultDestinationAddress] = useState("Sheet1!H1");
+  const [resultDestinationAddress, setResultDestinationAddress] = useState("Sheet1!D1");
   const [alpha, setAlpha] = useState(0.05);
   const [onlyValues, setOnlyValues] = useState(true);
   const [modelKeys, setModelKeys] = useState([]);
@@ -52,17 +52,25 @@ const ModalModelComparison = () => {
       return;
     }
     const stats = modelKeys.map((modelKey) => {
-      const stats = calculateRegression(yData, xData, modelKey);
-      //   const modelInterpretation = onlyValues
-      //     ? null
-      //     : interpretationRegression(stats, alpha, yData.meta, xData.meta, modelKey, t);
+      const statsModel = calculateRegression(yData, xData, modelKey);
+      const modelInterpretation = onlyValues
+        ? null
+        : interpretationRegression(statsModel, alpha, yData.meta, xData.meta, t);
 
-      return { ...stats, modelKey, interpretation: null };
+      return { ...statsModel, interpretation: modelInterpretation };
     });
 
     console.log({ stats });
-    // const stats = calculateRegression(yData, xData, modelTypeKey);
     const comparation = COMPARISSON_INTERPRETATION.comparisonInterpretation(stats, t);
+    const dataToWrite = stats.map((model) => {
+      const uiData = generateSummaryOutput(model, yData.meta, xData.meta, t);
+      return [...uiData, [" "], [" "]];
+    });
+    const dataToWrite2 = [...comparation, [" "], [" "], ...dataToWrite.flat()];
+
+    // console.log({ stats, dataToWrite });
+    // const stats = calculateRegression(yData, xData, modelTypeKey);
+
     // const interpretation = onlyValues
     //   ? null
     //   : interpretationRegression(stats, alpha, yData.meta, xData.meta, modelTypeKey, t);
@@ -73,8 +81,8 @@ const ModalModelComparison = () => {
     //   xData.meta,
     //   t
     // );
-    console.log({ comparation });
-    await insertColumn(comparation, resultDestinationAddress);
+    // console.log({ comparation });
+    await insertColumn(dataToWrite2, resultDestinationAddress);
   };
 
   return (

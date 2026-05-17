@@ -3,8 +3,8 @@ import { REGRESSION_INTEPRETATION } from "./interpretation";
 const { getEquation, getModel, getMultipleRegressionSignificance, getInterpretation } =
   REGRESSION_INTEPRETATION;
 
-export const interpretationRegression = (stats, alpha, yMeta, xMeta, modelType, t) => {
-  const { k, b0, slopes, pValues, fSignificance, rSquared, adjustedRSquared } = stats;
+export const interpretationRegression = (stats, alpha, yMeta, xMeta, t) => {
+  const { k, b0, slopes, pValues, fSignificance, rSquared, adjustedRSquared, modelType } = stats;
   const interpretation = [["", ""]];
 
   interpretation.push([t("regression.interpretation.firstStep.model"), ""]); // 1. Model
