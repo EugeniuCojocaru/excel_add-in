@@ -2,6 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import ModalDescriptiveStats from "./descriptive_stats/ModalDescriptiveStats";
 import ModalSimpleRegression from "./regression/ModalSimpleRegression";
+import ModalModelComparison from "./model_comparison/ModalModelComparison";
 import { makeStyles } from "@fluentui/react-components";
 import { useLanguage } from "@i18n";
 
@@ -24,6 +25,7 @@ const App = (props) => {
       <h1>{t("welcomePage.welcome")}</h1>
       <ModalDescriptiveStats />
       <ModalSimpleRegression />
+      <ModalModelComparison />
     </div>
   );
 };

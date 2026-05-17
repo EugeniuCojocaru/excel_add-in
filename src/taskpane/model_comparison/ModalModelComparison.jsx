@@ -11,9 +11,6 @@ import {
   Checkbox,
   Field,
   Input,
-  Combobox,
-  Option,
-  makeStyles,
 } from "@fluentui/react-components";
 import RangeSelector from "../components/RangeSelector";
 
@@ -32,22 +29,19 @@ const MODEL_TYPES = [
   { key: "lin-log", label: "Lin-Log" },
 ];
 
-const ModalSimpleRegression = () => {
+const ModalModelComparison = () => {
   const { t } = useLanguage();
 
   const [open, setOpen] = useState(false);
   const [YColumnAdress, setYColumnAddress] = useState("Sheet1!A1:A23");
   const [XColumnAdress, setXColumnAddress] = useState("Sheet1!B1:B23");
   const [resultDestinationAddress, setResultDestinationAddress] = useState("Sheet1!H1");
-  const [onlyValues, setOnlyValues] = useState(true);
-  const [modelType, setModelType] = useState("Linear");
   const [alpha, setAlpha] = useState(0.05);
+  const [onlyValues, setOnlyValues] = useState(true);
 
-  console.log("Model type selected:", modelType);
   const handleCheckboxChange = (_, data) => {
     setOnlyValues(data.checked);
   };
-
   const handleClick = async () => {
     const xData = await getColumnMatrix(XColumnAdress);
 
@@ -56,84 +50,70 @@ const ModalSimpleRegression = () => {
     const modelTypeKey = MODEL_TYPES.find((type) => type.label === modelType)?.key || "linear";
     const stats = calculateRegression(yData, xData, modelTypeKey);
 
-    // const interpretation = onlyValues?
-    // const interpretation = onlyValues
-    //   ? null
-    //   : interpretationRegression(stats, alpha, yData.meta, xData.meta, modelTypeKey, t);
+    const interpretation = onlyValues
+      ? null
+      : interpretationRegression(stats, alpha, yData.meta, xData.meta, modelTypeKey, t);
 
-    // const dataToWrite = generateSummaryOutput(
-    //   { interpretation, ...stats },
-    //   yData.meta,
-    //   xData.meta,
-    //   t
-    // );
+    const dataToWrite = generateSummaryOutput(
+      { interpretation, ...stats },
+      yData.meta,
+      xData.meta,
+      t
+    );
 
-    // await insertColumn(dataToWrite, resultDestinationAddress);
+    await insertColumn(dataToWrite, resultDestinationAddress);
   };
 
   return (
     <div style={{ padding: "20px" }}>
       <Dialog open={open} onOpenChange={(_, data) => setOpen(data.open)}>
         <DialogTrigger disableButtonEnhancement>
-          <Button>{t("regression.title")}</Button>
+          <Button>{t("modelComparison.title")}</Button>
         </DialogTrigger>
 
         <DialogSurface>
           <DialogBody>
-            <DialogTitle>{t("regression.title")}</DialogTitle>
+            <DialogTitle>{t("modelComparison.title")}</DialogTitle>
 
             <DialogContent style={{ width: "100%", gap: "12px" }}>
               <RangeSelector
-                label={t("regression.label__y_input")}
+                label={t("modelComparison.label__y_input")}
                 onRangeChanged={setYColumnAddress}
                 value={YColumnAdress}
               />
               <RangeSelector
-                label={t("regression.label__x_input")}
+                label={t("modelComparison.label__x_input")}
                 onRangeChanged={setXColumnAddress}
                 value={XColumnAdress}
               />
               <RangeSelector
-                label={t("regression.label__output")}
+                label={t("modelComparison.label__output")}
                 placeholder="Ex: A1"
                 onRangeChanged={setResultDestinationAddress}
                 value={resultDestinationAddress}
               />
-              <p>{t("regression.label__extra_options")}</p>
+
+              <Field label={t("modelComparison.input__alpha.label")} style={{ flex: "1" }}>
+                <Input
+                  value={alpha}
+                  onChange={(_, data) => setAlpha(data.value)}
+                  placeholder={t("modelComparison.input__alpha.placeholder")}
+                />
+              </Field>
+              <ComboboxTags />
               <Checkbox
                 label={t("regression.checkbox__only_values")}
                 checked={onlyValues}
                 onChange={handleCheckboxChange}
               />
-
-              <Field label={t("regression.combobox__model_type.label")} style={{ flex: "1" }}>
-                <Combobox
-                  placeholder={t("regression.combobox__model_type.placeholder")}
-                  value={modelType}
-                  onOptionSelect={(_, data) => setModelType(data.optionValue || "")}
-                >
-                  {MODEL_TYPES.map((type) => (
-                    <Option key={type.key} value={type.label}>
-                      {type.label}
-                    </Option>
-                  ))}
-                </Combobox>
-              </Field>
-              <Field label={t("regression.input__alpha.label")} style={{ flex: "1" }}>
-                <Input
-                  value={alpha}
-                  onChange={(_, data) => setAlpha(data.value)}
-                  placeholder={t("regression.input__alpha.placeholder")}
-                />
-              </Field>
             </DialogContent>
 
             <DialogActions>
               <DialogTrigger disableButtonEnhancement>
-                <Button appearance="secondary">{t("regression.button__cancel")}</Button>
+                <Button appearance="secondary">{t("modelComparison.button__cancel")}</Button>
               </DialogTrigger>
               <Button appearance="primary" onClick={handleClick}>
-                {t("regression.button__submit")}
+                {t("modelComparison.button__submit")}
               </Button>
             </DialogActions>
           </DialogBody>
@@ -143,4 +123,4 @@ const ModalSimpleRegression = () => {
   );
 };
 
-export default ModalSimpleRegression;
+export default ModalModelComparison;

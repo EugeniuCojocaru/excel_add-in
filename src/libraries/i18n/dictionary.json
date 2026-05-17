@@ -170,6 +170,15 @@
 
         "interpretation": "Interpretare model:"
       }
+    },
+    "modelComparison": {
+      "title": "Comparare modele",
+      "button__cancel": "Anulează",
+      "button__submit": "Inserează în Excel",
+      "label__y_input": "Selectează variabila Y:",
+      "label__x_input": "Selectează variabila X:",
+      "label__output": "Selectează celula de început pentru rezultate:",
+      "input__alpha": { "label": "Nivel de semnificație (α):", "placeholder": "Ex: 0.05" }
     }
   }
 }
