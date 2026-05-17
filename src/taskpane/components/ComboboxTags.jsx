@@ -1,25 +1,18 @@
 import React, { useState } from "react";
 import { Field, Combobox, Option } from "@fluentui/react-components";
 
-const MODEL_TYPES = [
-  { key: "linear", label: "Linear" },
-  { key: "log-linear", label: "Log-Linear" },
-  { key: "semi-log", label: "Semi-Log" },
-  { key: "lin-log", label: "Lin-Log" },
-];
-
-const ComboboxTags = () => {
+const ComboboxTags = ({ data, value, setValue }) => {
   // State-ul reține direct un array cu string-uri (cheile)
-  const [selectedKeys, setSelectedKeys] = useState([]);
-  console.log("Selected model types:", selectedKeys);
+
+  console.log("Selected model types:", value);
   // Funcția apelată la bifarea/debifarea unei opțiuni din listă
-  const onOptionSelect = (e, data) => {
-    setSelectedKeys(data.selectedOptions);
+  const onOptionSelect = (_, data) => {
+    setValue(data.selectedOptions);
   };
 
   // Transformă cheile în etichete citibile pentru a le afișa în input-ul combobox-ului
-  const displayValue = selectedKeys
-    .map((key) => MODEL_TYPES.find((m) => m.key === key)?.label)
+  const displayValue = value
+    .map((key) => data.find((m) => m.key === key)?.label)
     .filter(Boolean)
     .join(", ");
 
@@ -30,10 +23,10 @@ const ComboboxTags = () => {
           multiselect
           placeholder="Alege opțiunile..."
           value={displayValue}
-          selectedOptions={selectedKeys}
+          selectedOptions={value}
           onOptionSelect={onOptionSelect}
         >
-          {MODEL_TYPES.map((model) => (
+          {data.map((model) => (
             <Option key={model.key} value={model.key}>
               {model.label}
             </Option>

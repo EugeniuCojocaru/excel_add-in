@@ -1,9 +1,15 @@
-export const generateSummaryOutput = (stats, yMeta, xMeta, t) => {
+export const generateSummaryOutput = (stats, yMeta, xMeta, modelType, t) => {
   const n = stats.df + stats.k + 1;
 
   let dataToWrite = [
     // 1. Tabelul "Regression Statistics"
-    [t("regression.summaryOutput.summary"), "", "", "", ""],
+    [
+      t("regression.summaryOutput.summary"),
+      t("regression.summaryOutput.modelType", { modelType: modelType }),
+      "",
+      "",
+      "",
+    ],
     ["", "", "", "", ""],
     [t("regression.summaryOutput.n"), n, "", "", ""],
     [t("regression.summaryOutput.rSquared"), stats.rSquared, "", "", ""],

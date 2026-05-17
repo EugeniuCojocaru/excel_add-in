@@ -56,19 +56,19 @@ const ModalSimpleRegression = () => {
     const modelTypeKey = MODEL_TYPES.find((type) => type.label === modelType)?.key || "linear";
     const stats = calculateRegression(yData, xData, modelTypeKey);
 
-    // const interpretation = onlyValues?
-    // const interpretation = onlyValues
-    //   ? null
-    //   : interpretationRegression(stats, alpha, yData.meta, xData.meta, modelTypeKey, t);
+    const interpretation = onlyValues
+      ? null
+      : interpretationRegression(stats, alpha, yData.meta, xData.meta, modelTypeKey, t);
 
-    // const dataToWrite = generateSummaryOutput(
-    //   { interpretation, ...stats },
-    //   yData.meta,
-    //   xData.meta,
-    //   t
-    // );
+    const dataToWrite = generateSummaryOutput(
+      { interpretation, ...stats },
+      yData.meta,
+      xData.meta,
+      modelType,
+      t
+    );
 
-    // await insertColumn(dataToWrite, resultDestinationAddress);
+    await insertColumn(dataToWrite, resultDestinationAddress);
   };
 
   return (

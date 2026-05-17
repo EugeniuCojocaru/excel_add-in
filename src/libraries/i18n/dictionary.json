@@ -147,6 +147,7 @@
       },
       "summaryOutput": {
         "summary": "REZUMAT REGRESIE - Statistici esențiale",
+        "modelType": "Tip model: {modelType}",
         "n": "Număr de observații (n):",
         "rSquared": "Coeficientul de determinație (R²):",
         "adjustedRSquared": "Coeficientul de determinație ajustat (R² adj):",
@@ -178,7 +179,10 @@
       "label__y_input": "Selectează variabila Y:",
       "label__x_input": "Selectează variabila X:",
       "label__output": "Selectează celula de început pentru rezultate:",
-      "input__alpha": { "label": "Nivel de semnificație (α):", "placeholder": "Ex: 0.05" }
+      "input__alpha": { "label": "Nivel de semnificație (α):", "placeholder": "Ex: 0.05" },
+      "interpretation": {
+        "title": "Comparare modele"
+      }
     }
   }
 }
