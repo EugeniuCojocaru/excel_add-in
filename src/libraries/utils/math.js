@@ -91,35 +91,33 @@ export const calculateDescriptiveStats = (data, alpha = 0.05) => {
 
 /**
  * Execută regresia liniară (Simplă sau Multiplă) prin OLS folosind algebră matriceală.
- * @param {{number[][], meta: { name: string, unit: string }[]}} yData - Variabila dependentă
- * @param {{number[][], meta: { name: string, unit: string }[]}} xData - Variabilele independente
- * @param {boolean} onlyValues - Flag pentru a suprima generarea textului de interpretare.
- * @param {function} t - Functie pentru traduceri
+ * @param {{data: number[][], meta: { name: string, unit: string }[]}} yData - Variabila dependentă
+ * @param {{data: number[][], meta: { name: string, unit: string }[]}} xData - Variabilele independente
+ * @param {string} modelType - Tipul modelului de regresie dorit
  */
 export const calculateRegression = (yData, xData, modelType) => {
   const n = yData.data.length;
-  // 1. Verificăm dacă xData are mai multe coloane (Multiplă) sau doar una (Simplă)
   const k = xData.data[0].length;
-  // Grade de libertate pentru reziduuri (n - k - 1)
   const df = n - k - 1;
 
   const { Y, X } = transformDataForModel(yData, xData, modelType);
 
-  // Algebra Matriceală: Beta = (X^T * X)^-1 * X^T * Y
   const X_T = math.transpose(X);
   const X_T_X = math.multiply(X_T, X);
-  const X_T_X_inv = math.inv(X_T_X);
   const X_T_Y = math.multiply(X_T, Y);
 
-  // Vectorul coeficienților
-  const Beta = math.multiply(X_T_X_inv, X_T_Y);
+  // 1. Aflăm coeficienții direct (Beta = X_T_X \ X_T_Y)
+  // X_T_Y este un vector coloană, deci lusolve funcționează perfect
+  const BetaRaw = math.lusolve(X_T_X, X_T_Y);
+  const Beta = BetaRaw.toArray ? BetaRaw.toArray() : BetaRaw;
 
-  const coefficients = Beta.map((row) => row[0]);
+  const coefficients = Beta.map((row) => (Array.isArray(row) ? row[0] : row));
   const b0 = coefficients[0];
   const slopes = coefficients.slice(1);
 
-  // Valorile Prezise și Reziduurile
-  const Y_pred = math.multiply(X, Beta);
+  // 2. Valorile Prezise și Reziduurile
+  const Y_predRaw = math.multiply(X, Beta);
+  const Y_pred = Y_predRaw.toArray ? Y_predRaw.toArray() : Y_predRaw;
 
   let ssRes = math.bignumber(0);
   let ssTotal = math.bignumber(0);
@@ -133,28 +131,41 @@ export const calculateRegression = (yData, xData, modelType) => {
     ssTotal = math.add(ssTotal, math.square(devY));
   }
 
-  // Eroarea Standard a Estimării (ESE)
+  // 3. Eroarea Standard a Estimării (ESE)
   const ese = math.sqrt(math.divide(ssRes, math.bignumber(df)));
+  const eseSq = math.square(ese);
 
-  // Erorile Standard ale Coeficienților (sb)
-  const varianceMatrix = math.multiply(math.square(ese), X_T_X_inv);
+  // 4. FIX CRITIC: Calculăm doar elementele de pe diagonală ale inversei
   const standardErrors = [];
   for (let i = 0; i < k + 1; i++) {
-    standardErrors.push(math.sqrt(varianceMatrix[i][i]));
+    // Creăm vectorul coloană e_i (plin cu 0, și 1 la poziția i)
+    const e_i = [];
+    for (let j = 0; j < k + 1; j++) {
+      e_i.push([math.bignumber(i === j ? 1 : 0)]);
+    }
+
+    // Rezolvăm X_T_X * v_i = e_i (acum trimitem strict un vector, eroarea dispare)
+    const v_i_raw = math.lusolve(X_T_X, e_i);
+    const v_i = v_i_raw.toArray ? v_i_raw.toArray() : v_i_raw;
+
+    // Elementul de pe diagonală este elementul "i" din vectorul calculat
+    const diagElement = Array.isArray(v_i[i]) ? v_i[i][0] : v_i[i];
+
+    // sb = sqrt( ESE^2 * element_diagonală )
+    const variance_i = math.multiply(eseSq, diagElement);
+    standardErrors.push(math.sqrt(variance_i));
   }
 
-  // Statistica t și p-value
+  // 5. Statistica t și p-value
   const tStats = coefficients.map((b, i) => math.divide(b, standardErrors[i]));
   const pValues = tStats.map((t) => {
     const tPrimitive = Math.abs(Number(t));
     return 2 * (1 - jStat.studentt.cdf(tPrimitive, df));
   });
 
-  // Coeficientul de Determinație (R-squared)
+  // 6. Coeficientul de Determinație (R-squared)
   const rSquared = math.subtract(math.bignumber(1), math.divide(ssRes, ssTotal));
 
-  // Coeficientul de Determinație Ajustat
-  // Formula: 1 - (1 - R^2) * (n - 1) / (n - k - 1)
   const rSqAdjPart1 = math.subtract(math.bignumber(1), rSquared);
   const rSqAdjPart2 = math.divide(math.bignumber(n - 1), math.bignumber(df));
   const adjustedRSquared = math.subtract(
@@ -162,13 +173,12 @@ export const calculateRegression = (yData, xData, modelType) => {
     math.multiply(rSqAdjPart1, rSqAdjPart2)
   );
 
-  // Testul ANOVA (F-Statistic)
+  // 7. Testul ANOVA (F-Statistic)
   const fNumerator = math.divide(rSquared, math.bignumber(k));
   const fDenominator = math.divide(math.subtract(math.bignumber(1), rSquared), math.bignumber(df));
   const fStat = math.divide(fNumerator, fDenominator);
   const fSignificance = 1 - jStat.centralF.cdf(Number(fStat), k, df);
 
-  // 3. Returnăm rezultatele formatate pentru UI
   return {
     modelType,
     k,

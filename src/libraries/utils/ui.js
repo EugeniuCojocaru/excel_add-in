@@ -15,7 +15,7 @@ export const standardizeDataToWrite = (array) => {
 
   const finishedData = array.map((row) => {
     const diff = max - row.length;
-    row.push(...Array(diff).fill(""));
+    if (diff !== 0) row.push(...Array(diff).fill(""));
     return row;
   });
   console.log(finishedData);

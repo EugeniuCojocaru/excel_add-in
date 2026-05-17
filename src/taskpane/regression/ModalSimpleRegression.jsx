@@ -23,7 +23,6 @@ import { generateSummaryOutput } from "@utils/summaryOutput";
 
 import { useLanguage } from "@i18n";
 import { interpretationRegression } from "@utils/econometrics";
-import ComboboxTags from "../components/ComboboxTags";
 
 const MODEL_TYPES = [
   { key: "linear", label: "Linear" },
@@ -36,9 +35,9 @@ const ModalSimpleRegression = () => {
   const { t } = useLanguage();
 
   const [open, setOpen] = useState(false);
-  const [YColumnAdress, setYColumnAddress] = useState("Sheet1!A1:A23");
-  const [XColumnAdress, setXColumnAddress] = useState("Sheet1!B1:B23");
-  const [resultDestinationAddress, setResultDestinationAddress] = useState("Sheet1!H1");
+  const [YColumnAdress, setYColumnAddress] = useState("Sheet5!A1:A10");
+  const [XColumnAdress, setXColumnAddress] = useState("Sheet5!D1:F10");
+  const [resultDestinationAddress, setResultDestinationAddress] = useState("Sheet5!A15");
   const [onlyValues, setOnlyValues] = useState(true);
   const [modelType, setModelType] = useState("Linear");
   const [alpha, setAlpha] = useState(0.05);
@@ -55,16 +54,13 @@ const ModalSimpleRegression = () => {
 
     const modelTypeKey = MODEL_TYPES.find((type) => type.label === modelType)?.key || "linear";
     const stats = calculateRegression(yData, xData, modelTypeKey);
-
     const interpretation = onlyValues
       ? null
       : interpretationRegression(stats, alpha, yData.meta, xData.meta, t);
-
     const dataToWrite = generateSummaryOutput(
       { interpretation, ...stats },
       yData.meta,
       xData.meta,
-      modelType,
       t
     );
 

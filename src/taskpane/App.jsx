@@ -5,6 +5,7 @@ import ModalSimpleRegression from "./regression/ModalSimpleRegression";
 import ModalModelComparison from "./model_comparison/ModalModelComparison";
 import { makeStyles } from "@fluentui/react-components";
 import { useLanguage } from "@i18n";
+import ModalDummyVariables from "./dummy_variables/ModalDummyVariables";
 
 const useStyles = makeStyles({
   root: {
@@ -26,6 +27,7 @@ const App = (props) => {
       <ModalDescriptiveStats />
       <ModalSimpleRegression />
       <ModalModelComparison />
+      <ModalDummyVariables />
     </div>
   );
 };

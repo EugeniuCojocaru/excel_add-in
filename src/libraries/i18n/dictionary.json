@@ -24,7 +24,16 @@
       "label__x_input": "Select X variable:",
       "label__y_input": "Select Y variable:",
       "label__output": "Select starting cell for results:",
+      "label__extra_options": "Additional options:",
       "checkbox__only_values": "Only values, no interpretation.",
+      "input__alpha": {
+        "label": "Significance level (α):",
+        "placeholder": "Ex: 0.05"
+      },
+      "combobox__model_type": {
+        "label": "Model type:",
+        "placeholder": "Select option..."
+      },
       "interpretation": {
         "firstStep": {
           "model": "1. Model",
@@ -61,10 +70,12 @@
       },
       "summaryOutput": {
         "summary": "REGRESSION SUMMARY - Essential Statistics",
+        "modelType": "Model type: {modelType}",
         "n": "Number of observations (n):",
         "rSquared": "Coefficient of determination (R²):",
         "adjustedRSquared": "Adjusted coefficient of determination (R² adj):",
         "standardError": "Standard error of the estimate (SEE):",
+        "ssRes": "Residual sum of squares (SS Res):",
         "anova": "Analysis of Variance (ANOVA)",
         "df": "Degrees of freedom (df)",
         "f": "Fisher test statistic (F)",
@@ -80,6 +91,28 @@
         "variableX": "Variable X{index}",
         "interpretation": "Model interpretation:"
       }
+    },
+    "modelComparison": {
+      "title": "Model Comparison",
+      "button__cancel": "Cancel",
+      "button__submit": "Insert into Excel",
+      "label__y_input": "Select Y variable:",
+      "label__x_input": "Select X variable:",
+      "label__output": "Select starting cell for results:",
+      "input__alpha": {
+        "label": "Significance level (α):",
+        "placeholder": "Ex: 0.05"
+      },
+      "interpretation": {
+        "title": "Model Comparison"
+      }
+    },
+    "dummyVariables": {
+      "title": "Dummy Variables",
+      "button__cancel": "Cancel",
+      "button__submit": "Insert into Excel",
+      "label__x_input": "Select X variable:",
+      "label__d_output": "Select starting cell for D columns:"
     }
   },
   "ro": {
@@ -153,7 +186,6 @@
         "adjustedRSquared": "Coeficientul de determinație ajustat (R² adj):",
         "standardError": "Eroarea standard a estimării (ESE):",
         "ssRes": "Suma pătratelor rezidurilor (SS Res):",
-
         "anova": "Analiza Varianței (ANOVA)",
         "df": "Grade de libertate (df)",
         "f": "Statistica testului Fisher (F)",
@@ -161,14 +193,12 @@
         "regression": "Regresie",
         "residual": "Reziduuri (Erori)",
         "total": "Total",
-
         "coefficients": "Coeficienți (b)",
         "standardErrorCoef": "Eroare standard (sb)",
         "tStat": "Statistica Student (t Stat)",
         "pValue": "Probabilitate (P-value)",
         "intercept": "Termenul liber (Intercept / b0)",
         "variableX": "Variabila X{index}",
-
         "interpretation": "Interpretare model:"
       }
     },
@@ -183,6 +213,13 @@
       "interpretation": {
         "title": "Comparare modele"
       }
+    },
+    "dummyVariables": {
+      "title": "Variabile dummy",
+      "button__cancel": "Anulează",
+      "button__submit": "Inserează în Excel",
+      "label__x_input": "Selectează variabila X:",
+      "label__d_output": "Selectează celula de început pentru coloanele D:"
     }
   }
 }
