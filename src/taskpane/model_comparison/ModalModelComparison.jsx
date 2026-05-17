@@ -73,7 +73,7 @@ const ModalModelComparison = () => {
     //   xData.meta,
     //   t
     // );
-console.log({comparation})
+    console.log({ comparation });
     await insertColumn(comparation, resultDestinationAddress);
   };
 
