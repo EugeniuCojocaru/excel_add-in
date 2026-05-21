@@ -16,52 +16,60 @@ const useStyles = makeStyles({
     flexDirection: "column",
     justifyContent: "center",
     alignItems: "center",
+    fontFamily: "'Libre Franklin', sans-serif",
   },
   app: {
     maxWidth: "500px",
+    width: "100%",
     flex: "1",
     display: "flex",
     flexDirection: "column",
-    border: "2px solid black",
     padding: tokens.spacingHorizontalM,
   },
   topPart: {
     display: "flex",
     flexDirection: "column",
-    width: "100%",
-    flex: "1",
-    backgroundColor: "#f4a261",
+    padding: `${tokens.spacingVerticalM} ${tokens.spacingHorizontalM}`,
+    borderBottom: "1px solid",
+  },
+  title: {
+    margin: "0",
+    fontSize: "40px",
+    lineHeight: "60px",
+    fontWeight: "700",
+  },
+  subtitle: {
+    margin: `${tokens.spacingVerticalXS} 0 0 0`,
+    fontSize: "24px",
+    lineHeight: "32px",
   },
   middlePart: {
     display: "flex",
     flexDirection: "column",
-    alignItems: "flex-start",
+    alignItems: "stretch",
     width: "100%",
     gap: tokens.spacingVerticalS,
-    flex: "3",
-    backgroundColor: "#2a9d8f",
+    flex: "1",
+    boxSizing: "border-box",
   },
   bottomPart: {
-    // marginTop: "auto",
     display: "flex",
-    alignItems: "flex-end",
-    // paddingTop: tokens.spacingVerticalM,
-    cursor: "pointer",
-    flex: "1",
-    backgroundColor: "#e76f51",
+    alignItems: "center",
+    justifyContent: "flex-end",
+    padding: `${tokens.spacingVerticalS} ${tokens.spacingHorizontalM}`,
+    borderTop: "1px solid",
   },
 });
 
-const App = (props) => {
-  const { title } = props;
+const App = () => {
   const styles = useStyles();
   const { t } = useLanguage();
   return (
     <div className={styles.root}>
       <div className={styles.app}>
         <div className={styles.topPart}>
-          <h1>{title}</h1>
-          <p>{t("welcomePage.welcome")}</p>
+          <h1 className={styles.title}>{t("welcomePage.title")}</h1>
+          <p className={styles.subtitle}>{t("welcomePage.subtitle")}</p>
         </div>
 
         <div className={styles.middlePart}>

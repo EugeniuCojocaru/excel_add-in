@@ -1,12 +1,10 @@
 import * as React from "react";
 import { createRoot } from "react-dom/client";
-import { FluentProvider, webLightTheme } from "@fluentui/react-components";
+import { FluentProvider, webLightTheme, webDarkTheme } from "@fluentui/react-components";
 import LanguageProvider from "@i18n";
 import App from "./App";
 
 /* global document, Office, module, require */
-
-const title = "Jenu's Awesome Excel Add-in";
 
 const rootElement = document.getElementById("container");
 const root = rootElement ? createRoot(rootElement) : undefined;
@@ -16,7 +14,7 @@ Office.onReady(() => {
   root?.render(
     <FluentProvider theme={webLightTheme}>
       <LanguageProvider>
-        <App title={title} />
+        <App />
       </LanguageProvider>
     </FluentProvider>
   );

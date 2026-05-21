@@ -1,7 +1,9 @@
 {
   "en": {
     "welcomePage": {
-      "welcome": "Welcome to the Add-in"
+      "welcome": "Welcome to the Add-in",
+      "title": "Analysis Tools",
+      "subtitle": "Select an action to apply to your current range."
     },
     "descriptiveStats": {
       "n": "Sample size (n):",
@@ -117,7 +119,9 @@
   },
   "ro": {
     "welcomePage": {
-      "welcome": "Bun venit în Add-in"
+      "welcome": "Bun venit în Add-in",
+      "title": "Instrumente de Analiză",
+      "subtitle": "Selectează o acțiune pentru intervalul curent."
     },
     "descriptiveStats": {
       "n": "Volum eșantion (n):",
