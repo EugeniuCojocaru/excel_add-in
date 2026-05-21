@@ -14,7 +14,8 @@ import RangeSelector from "../components/RangeSelector";
 import { getColumnStringMatrix, insertColumn } from "@api";
 import { preprocessDummyVariables, createNewTableRows } from "@utils/dummyVariables";
 import { useLanguage } from "@i18n";
-
+import ActionButton from "../components/ActionButton";
+import { TableAddFilled } from "@fluentui/react-icons";
 const ModalDummyVariables = () => {
   const { t } = useLanguage();
 
@@ -35,7 +36,11 @@ const ModalDummyVariables = () => {
     <div style={{ padding: "20px" }}>
       <Dialog open={open} onOpenChange={(_, data) => setOpen(data.open)}>
         <DialogTrigger disableButtonEnhancement>
-          <Button>{t("dummyVariables.title")}</Button>
+          <ActionButton
+            text={t("dummyVariables.title")}
+            beforeIcon={<TableAddFilled style={{ color: "green" }} />}
+            textAlign="left"
+          />
         </DialogTrigger>
 
         <DialogSurface>

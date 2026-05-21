@@ -23,6 +23,8 @@ import { generateSummaryOutput } from "@utils/summaryOutput";
 
 import { useLanguage } from "@i18n";
 import { interpretationRegression } from "@utils/econometrics";
+import { DataTrendingFilled } from "@fluentui/react-icons";
+import ActionButton from "../components/ActionButton";
 
 const MODEL_TYPES = [
   { key: "linear", label: "Linear" },
@@ -71,7 +73,12 @@ const ModalSimpleRegression = () => {
     <div style={{ padding: "20px" }}>
       <Dialog open={open} onOpenChange={(_, data) => setOpen(data.open)}>
         <DialogTrigger disableButtonEnhancement>
-          <Button>{t("regression.title")}</Button>
+          {/* <Button>{t("regression.title")}</Button> */}
+          <ActionButton
+            text={t("regression.title")}
+            beforeIcon={<DataTrendingFilled style={{ color: "green" }} />}
+            textAlign="left"
+          />
         </DialogTrigger>
 
         <DialogSurface>

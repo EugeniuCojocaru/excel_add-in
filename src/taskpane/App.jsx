@@ -4,7 +4,7 @@ import ModalDescriptiveStats from "./descriptive_stats/ModalDescriptiveStats";
 import ModalSimpleRegression from "./regression/ModalSimpleRegression";
 import ModalModelComparison from "./model_comparison/ModalModelComparison";
 import { makeStyles, tokens } from "@fluentui/react-components";
-import { SettingsRegular } from "@fluentui/react-icons";
+import { SettingsFilled } from "@fluentui/react-icons";
 import { useLanguage } from "@i18n";
 import ModalDummyVariables from "./dummy_variables/ModalDummyVariables";
 
@@ -80,7 +80,7 @@ const App = () => {
         </div>
 
         <div className={styles.bottomPart}>
-          <SettingsRegular fontSize={24} />
+          <SettingsFilled fontSize={32} />
         </div>
       </div>
     </div>

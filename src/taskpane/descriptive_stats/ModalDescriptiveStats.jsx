@@ -16,7 +16,7 @@ import { calculateDescriptiveStats } from "@utils/math";
 
 import { useLanguage } from "@i18n";
 import ActionButton from "../components/ActionButton";
-import { AccessTimeFilled, ChevronRightFilled } from "@fluentui/react-icons";
+import { AccessTimeFilled } from "@fluentui/react-icons";
 
 const ModalDescriptiveStats = () => {
   const { t } = useLanguage();
@@ -49,9 +49,8 @@ const ModalDescriptiveStats = () => {
           {/* <Button>{t("descriptiveStats.title")}</Button> */}
           <ActionButton
             text={t("descriptiveStats.title")}
-            handleClick={() => {}}
             beforeIcon={<AccessTimeFilled style={{ color: "green" }} />}
-            afterIcon={<ChevronRightFilled style={{ color: "grey" }} />}
+            textAlign="left"
           />
         </DialogTrigger>
 

@@ -1,17 +1,19 @@
 import React from "react";
 import { Button, makeStyles, tokens } from "@fluentui/react-components";
+import { ChevronRightFilled } from "@fluentui/react-icons";
 
 const useStyles = makeStyles({
   button: {
     width: "100%",
-    minHeight: "32px",
+    minHeight: "48px",
     padding: `0 ${tokens.spacingHorizontalM}`,
   },
   content: {
     display: "flex",
     alignItems: "center",
+    justifyContent: "space-around",
     width: "100%",
-    gap: tokens.spacingHorizontalS,
+    gap: tokens.spacingHorizontalM,
   },
   contentCenter: {
     justifyContent: "center",
@@ -24,20 +26,43 @@ const useStyles = makeStyles({
     alignItems: "center",
     justifyContent: "center",
     lineHeight: 0,
+    fontSize: "28px",
+  },
+  text: {
+    fontSize: "16px",
+    lineHeight: "24px",
+    display: "flex",
+    flex: "1",
   },
 });
 
-const ActionButton = ({ text, handleClick, beforeIcon, afterIcon, textAlign = "center", ...rest }) => {
+const ActionButton = ({
+  text,
+  handleClick = () => {},
+  beforeIcon,
+  afterIcon,
+  displayAfterIcon = true,
+  textAlign = "center",
+  ...rest
+}) => {
   const styles = useStyles();
 
   const justifyStyle = textAlign === "left" ? styles.contentLeft : styles.contentCenter;
 
+  const rightIcon = () => {
+    if (!displayAfterIcon) return null;
+    return (
+      <span className={styles.icon}>
+        {afterIcon || <ChevronRightFilled style={{ color: "grey" }} />}
+      </span>
+    );
+  };
   return (
     <Button className={styles.button} onClick={handleClick} {...rest}>
-      <span className={`${styles.content} ${justifyStyle}`}>
+      <span className={styles.content}>
         {beforeIcon && <span className={styles.icon}>{beforeIcon}</span>}
-        <span>{text}</span>
-        {afterIcon && <span className={styles.icon}>{afterIcon}</span>}
+        <span className={`${styles.text} ${justifyStyle}`}>{text}</span>
+        {rightIcon()}
       </span>
     </Button>
   );

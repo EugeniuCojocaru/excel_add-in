@@ -22,6 +22,8 @@ import { useLanguage } from "@i18n";
 import { interpretationRegression } from "@utils/econometrics";
 import ComboboxTags from "../components/ComboboxTags";
 import { COMPARISSON_INTERPRETATION } from "@utils/interpretation";
+import ActionButton from "../components/ActionButton";
+import { ScalesFilled } from "@fluentui/react-icons";
 const MODEL_TYPES = [
   { key: "linear", label: "Linear" },
   { key: "log-linear", label: "Log-Linear" },
@@ -89,7 +91,12 @@ const ModalModelComparison = () => {
     <div style={{ padding: "20px" }}>
       <Dialog open={open} onOpenChange={(_, data) => setOpen(data.open)}>
         <DialogTrigger disableButtonEnhancement>
-          <Button>{t("modelComparison.title")}</Button>
+          {/* <Button>{t("modelComparison.title")}</Button> */}
+          <ActionButton
+            text={t("modelComparison.title")}
+            beforeIcon={<ScalesFilled style={{ color: "green" }} />}
+            textAlign="left"
+          />
         </DialogTrigger>
 
         <DialogSurface>
