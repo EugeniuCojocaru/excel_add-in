@@ -115,6 +115,30 @@
       "button__submit": "Insert into Excel",
       "label__x_input": "Select X variable:",
       "label__d_output": "Select starting cell for D columns:"
+    },
+    "settings": {
+      "title": "Settings",
+      "language": {
+        "label": "App language",
+        "romanian": "Romanian",
+        "english": "English"
+      },
+      "theme": {
+        "label": "Theme",
+        "light": "Light",
+        "dark": "Dark"
+      },
+      "responseDisplay": {
+        "label": "Response display",
+        "info": "Info",
+        "compact": "Compact"
+      },
+      "decimals": {
+        "label": "Decimal places",
+        "placeholder": "Ex: 2"
+      },
+      "button__save": "Save",
+      "button__cancel": "Cancel"
     }
   },
   "ro": {
@@ -224,6 +248,30 @@
       "button__submit": "Inserează în Excel",
       "label__x_input": "Selectează variabila X:",
       "label__d_output": "Selectează celula de început pentru coloanele D:"
+    },
+    "settings": {
+      "title": "Setări",
+      "language": {
+        "label": "Limba aplicației",
+        "romanian": "Română",
+        "english": "Engleză"
+      },
+      "theme": {
+        "label": "Temă",
+        "light": "Deschisă",
+        "dark": "Întunecată"
+      },
+      "responseDisplay": {
+        "label": "Afișare rezultate",
+        "info": "Info",
+        "compact": "Compact"
+      },
+      "decimals": {
+        "label": "Zecimale",
+        "placeholder": "Ex: 2"
+      },
+      "button__save": "Salvează",
+      "button__cancel": "Anulează"
     }
   }
 }

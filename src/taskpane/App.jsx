@@ -1,12 +1,13 @@
-import React from "react";
+import React, { useState } from "react";
 import PropTypes from "prop-types";
 import ModalDescriptiveStats from "./descriptive_stats/ModalDescriptiveStats";
 import ModalSimpleRegression from "./regression/ModalSimpleRegression";
 import ModalModelComparison from "./model_comparison/ModalModelComparison";
+import ModalDummyVariables from "./dummy_variables/ModalDummyVariables";
+import ModalSettings from "./components/ModalSettings";
 import { makeStyles, tokens } from "@fluentui/react-components";
 import { SettingsFilled } from "@fluentui/react-icons";
 import { useLanguage } from "@i18n";
-import ModalDummyVariables from "./dummy_variables/ModalDummyVariables";
 
 const useStyles = makeStyles({
   root: {
@@ -64,6 +65,7 @@ const useStyles = makeStyles({
 const App = () => {
   const styles = useStyles();
   const { t } = useLanguage();
+  const [settingsOpen, setSettingsOpen] = useState(false);
   return (
     <div className={styles.root}>
       <div className={styles.app}>
@@ -79,9 +81,11 @@ const App = () => {
           <ModalDummyVariables />
         </div>
 
-        <div className={styles.bottomPart}>
+        <div className={styles.bottomPart} onClick={() => setSettingsOpen(true)}>
           <SettingsFilled fontSize={32} />
         </div>
+
+        <ModalSettings open={settingsOpen} onClose={() => setSettingsOpen(false)} />
       </div>
     </div>
   );
