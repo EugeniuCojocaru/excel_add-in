@@ -1,4 +1,5 @@
-export const preprocessDummyVariables = (xData) => {
+export const preprocessDummyVariables = (xData, options = {}) => {
+  const { referenceCategories = [] } = options;
   const rows = xData.data;
   const meta = xData.meta || [];
   const n = rows.length;
@@ -10,23 +11,14 @@ export const preprocessDummyVariables = (xData) => {
     .map(() => []);
 
   for (let colIndex = 0; colIndex < k; colIndex++) {
-    // 1. Verificăm dacă respectiva coloană conține texte (adică e calitativă)
-    let isCategorical = false;
-    for (let i = 0; i < n; i++) {
-      if (typeof rows[i][colIndex] === "string" && isNaN(Number(rows[i][colIndex]))) {
-        isCategorical = true;
-        break;
-      }
-    }
-
     const originalMeta = meta[colIndex] || { name: `D${colIndex + 1}` };
 
     // 2. Extragem categoriile unice (ex: ["licență", "master"])
     const uniqueCategories = [...new Set(rows.map((row) => row[colIndex]))].sort();
 
-    // 3. Alegem categoria de referință (prima în ordine alfabetică)
-    const referenceCategory = uniqueCategories[0];
-    const dummyCategories = uniqueCategories.slice(1); // Acestea vor forma cele m-1 variabile
+    // 3. Alegem categoria de referință (user override sau prima în ordine alfabetică)
+    const referenceCategory = referenceCategories[colIndex] ?? uniqueCategories[0];
+    const dummyCategories = uniqueCategories.filter((c) => c !== referenceCategory);
 
     // 4. Adăugăm meta-datele pentru noile coloane generate
     dummyCategories.forEach((cat) => {

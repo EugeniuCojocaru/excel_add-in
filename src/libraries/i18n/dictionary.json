@@ -113,9 +113,17 @@
     "dummyVariables": {
       "title": "Dummy Variables",
       "button__cancel": "Cancel",
-      "button__submit": "Insert into Excel",
+      "button__next": "Next",
+      "button__back": "Back",
+      "button__generate": "Generate",
       "label__x_input": "Select X variable:",
-      "label__d_output": "Select starting cell for D columns:"
+      "label__d_output": "Select starting cell for D columns:",
+      "step__indicator": "Step {current} of {total}",
+      "step2__title": "Select Main Value",
+      "step2__description": "We detected the following unique values in your selected range. Choose the one that should act as your baseline (coded as 0).",
+      "step2__detected_values": "Detected Values ({column})",
+      "step2__info": "The selected baseline will be omitted to avoid perfect multicollinearity in your regression model.",
+      "step2__empty": "No dummy variables found in the selected range."
     },
     "rangeSelector": {
       "tooltip": "Get current selection from spreadsheet",
@@ -251,9 +259,17 @@
     "dummyVariables": {
       "title": "Variabile dummy",
       "button__cancel": "Anulează",
-      "button__submit": "Inserează în Excel",
+      "button__next": "Continuă",
+      "button__back": "Înapoi",
+      "button__generate": "Generează",
       "label__x_input": "Selectează variabila X:",
-      "label__d_output": "Selectează celula de început pentru coloanele D:"
+      "label__d_output": "Selectează celula de început pentru coloanele D:",
+      "step__indicator": "Pasul {current} din {total}",
+      "step2__title": "Selectează Valoarea Principală",
+      "step2__description": "Am detectat următoarele valori unice în intervalul selectat. Alegeți cea care va fi categoria de referință (codificată ca 0).",
+      "step2__detected_values": "Valori Detectate ({column})",
+      "step2__info": "Valoarea de referință selectată va fi omisă pentru a evita multicolinearitatea perfectă în modelul de regresie.",
+      "step2__empty": "Nu au fost găsite variabile dummy în intervalul selectat."
     },
     "rangeSelector": {
       "tooltip": "Preluare selecție curentă din tabel",
