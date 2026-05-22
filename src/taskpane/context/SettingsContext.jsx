@@ -5,7 +5,7 @@ const SettingsContext = createContext();
 export const SettingsProvider = ({ children }) => {
   const [settings, setSettings] = useState({
     theme: "light",
-    responseDisplay: "INFO",
+    interpretation: "COMPACT",
     decimals: 4,
   });
 

@@ -141,9 +141,9 @@
         "light": "Light",
         "dark": "Dark"
       },
-      "responseDisplay": {
-        "label": "Response display",
-        "info": "Info",
+      "interpretation": {
+        "label": "Interpretation",
+        "extended": "Extended",
         "compact": "Compact"
       },
       "decimals": {
@@ -287,9 +287,9 @@
         "light": "Deschisă",
         "dark": "Întunecată"
       },
-      "responseDisplay": {
-        "label": "Afișare rezultate",
-        "info": "Info",
+      "interpretation": {
+        "label": "Interpretare",
+        "extended": "Extins",
         "compact": "Compact"
       },
       "decimals": {

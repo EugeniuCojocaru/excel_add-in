@@ -63,14 +63,14 @@ const useStyles = makeStyles({
 
 const ModalSettings = ({ open, onClose }) => {
   const { t, lang, setLanguage } = useLanguage();
-  const { theme, responseDisplay, decimals, updateSettings } = useSettings();
+  const { theme, interpretation, decimals, updateSettings } = useSettings();
   const styles = useStyles();
 
-  const [draft, setDraft] = useState({ lang, theme, responseDisplay, decimals });
+  const [draft, setDraft] = useState({ lang, theme, interpretation, decimals });
 
   useEffect(() => {
     if (open) {
-      setDraft({ lang, theme, responseDisplay, decimals });
+      setDraft({ lang, theme, interpretation, decimals });
     }
   }, [open]);
 
@@ -78,7 +78,7 @@ const ModalSettings = ({ open, onClose }) => {
     setLanguage(draft.lang);
     updateSettings({
       theme: draft.theme,
-      responseDisplay: draft.responseDisplay,
+      interpretation: draft.interpretation,
       decimals: Number(draft.decimals),
     });
     onClose();
@@ -117,14 +117,14 @@ const ModalSettings = ({ open, onClose }) => {
                 <Radio value="dark" label={t("settings.theme.dark")} />
               </RadioGroup>
 
-              <span className={styles.gridLabel}>{t("settings.responseDisplay.label")}</span>
+              <span className={styles.gridLabel}>{t("settings.interpretation.label")}</span>
               <RadioGroup
                 className={styles.radioGroup}
-                value={draft.responseDisplay}
-                onChange={(_, data) => setDraft((d) => ({ ...d, responseDisplay: data.value }))}
+                value={draft.interpretation}
+                onChange={(_, data) => setDraft((d) => ({ ...d, interpretation: data.value }))}
               >
-                <Radio value="INFO" label={t("settings.responseDisplay.info")} />
-                <Radio value="COMPACT" label={t("settings.responseDisplay.compact")} />
+                <Radio value="EXTENDED" label={t("settings.interpretation.extended")} />
+                <Radio value="COMPACT" label={t("settings.interpretation.compact")} />
               </RadioGroup>
             </div>
 
