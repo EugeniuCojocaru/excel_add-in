@@ -25,13 +25,15 @@ const useStyles = makeStyles({
     padding: "8px",
   },
   body: {
+    display: "flex",
+    flexDirection: "column",
     padding: "0",
     gap: "0",
   },
   header: {
     padding: "12px 8px",
     margin: "0",
-    borderBottom: `1px solid ${tokens.colorNeutralStroke1}`,
+    borderBottom: `1px solid ${tokens.colorNeutralStroke3}`,
   },
   content: {
     padding: "16px 8px",
@@ -40,8 +42,18 @@ const useStyles = makeStyles({
     gap: "16px",
   },
   footer: {
+    width: "100%",
+    boxSizing: "border-box",
     padding: "12px 8px",
-    borderTop: `1px solid ${tokens.colorNeutralStroke1}`,
+    borderTop: `1px solid ${tokens.colorNeutralStroke3}`,
+    display: "flex",
+    justifyContent: "flex-end"
+  },
+  cancelButton: {
+    borderColor: tokens.colorNeutralStrokeAccessible,
+    ":hover": {
+      borderColor: tokens.colorNeutralStrokeAccessible,
+    },
   },
 });
 
@@ -101,7 +113,7 @@ const ModalDescriptiveStats = () => {
 
           <DialogActions className={styles.footer}>
             <DialogTrigger disableButtonEnhancement>
-              <Button appearance="secondary">{t("descriptiveStats.button__cancel")}</Button>
+              <Button appearance="secondary" className={styles.cancelButton}>{t("descriptiveStats.button__cancel")}</Button>
             </DialogTrigger>
             <Button appearance="primary" onClick={handleClick}>
               {t("descriptiveStats.button__submit")}
