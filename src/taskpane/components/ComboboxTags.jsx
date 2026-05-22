@@ -1,7 +1,14 @@
 import React, { useState } from "react";
-import { Field, Combobox, Option } from "@fluentui/react-components";
+import { Field, Combobox, Option, makeStyles } from "@fluentui/react-components";
+
+const useStyles = makeStyles({
+  combobox: {
+    minHeight: "48px",
+  },
+});
 
 const ComboboxTags = ({ data, value, setValue }) => {
+  const styles = useStyles();
   // State-ul reține direct un array cu string-uri (cheile)
 
   console.log("Selected model types:", value);
@@ -20,6 +27,7 @@ const ComboboxTags = ({ data, value, setValue }) => {
     <>
       <Field label="Selectează tipurile de model">
         <Combobox
+          className={styles.combobox}
           multiselect
           placeholder="Alege opțiunile..."
           value={displayValue}
