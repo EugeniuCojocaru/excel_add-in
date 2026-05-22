@@ -1,8 +1,38 @@
 import React, { useState } from "react";
-import { Input, Button, Field, Tooltip } from "@fluentui/react-components";
-import { TableRegular } from "@fluentui/react-icons";
+import { Input, Button, Field, Tooltip, makeStyles, tokens } from "@fluentui/react-components";
+import { TableFilled, TargetArrowFilled } from "@fluentui/react-icons";
+import { useLanguage } from "@i18n";
 
-const RangeSelector = ({ label, placeholder = "Ex: A1:A10", onRangeChanged, value }) => {
+const useStyles = makeStyles({
+  gridButton: {
+    minWidth: "32px",
+    padding: "4px 6px",
+    borderRadius: "0",
+    color: tokens.colorBrandForeground1,
+    borderLeft: `1px solid ${tokens.colorNeutralStroke1}`,
+    ":hover": {
+      backgroundColor: tokens.colorBrandBackground,
+      color: tokens.colorNeutralForegroundOnBrand,
+      borderLeftColor: "transparent",
+    },
+    ":active": {
+      backgroundColor: tokens.colorBrandBackgroundPressed,
+      color: tokens.colorNeutralForegroundOnBrand,
+      borderLeftColor: "transparent",
+    },
+  },
+});
+
+const RangeSelector = ({
+  label,
+  placeholder = "Ex: A1:A10",
+  onRangeChanged,
+  value,
+  size = "medium",
+  input = true,
+}) => {
+  const styles = useStyles();
+  const { t } = useLanguage();
   const [rangeAddress, setRangeAddress] = useState(value || "");
 
   const handleGetSelection = async () => {
@@ -24,20 +54,22 @@ const RangeSelector = ({ label, placeholder = "Ex: A1:A10", onRangeChanged, valu
   return (
     <Field label={label}>
       <Input
+        size={size}
         value={rangeAddress}
-        onChange={(e, data) => {
+        onChange={(_, data) => {
           setRangeAddress(data.value);
           if (onRangeChanged) onRangeChanged(data.value);
         }}
         placeholder={placeholder}
         contentAfter={
-          <Tooltip content="Preluare selecție curentă din tabel" relationship="label">
+          <Tooltip content={t("rangeSelector.tooltip")} relationship="label">
             <Button
               appearance="transparent"
-              icon={<TableRegular />}
+              className={styles.gridButton}
+              icon={input ? <TableFilled /> : <TargetArrowFilled />}
               onClick={handleGetSelection}
               size="small"
-              aria-label="Preluare selecție"
+              aria-label={t("rangeSelector.ariaLabel")}
             />
           </Tooltip>
         }

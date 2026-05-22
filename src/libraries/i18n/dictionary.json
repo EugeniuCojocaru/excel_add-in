@@ -116,6 +116,10 @@
       "label__x_input": "Select X variable:",
       "label__d_output": "Select starting cell for D columns:"
     },
+    "rangeSelector": {
+      "tooltip": "Get current selection from spreadsheet",
+      "ariaLabel": "Get selection"
+    },
     "settings": {
       "title": "Settings",
       "language": {
@@ -248,6 +252,10 @@
       "button__submit": "Inserează în Excel",
       "label__x_input": "Selectează variabila X:",
       "label__d_output": "Selectează celula de început pentru coloanele D:"
+    },
+    "rangeSelector": {
+      "tooltip": "Preluare selecție curentă din tabel",
+      "ariaLabel": "Preluare selecție"
     },
     "settings": {
       "title": "Setări",

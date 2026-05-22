@@ -1,6 +1,7 @@
 import * as React from "react";
 import { createRoot } from "react-dom/client";
-import { FluentProvider, webLightTheme, webDarkTheme } from "@fluentui/react-components";
+import { FluentProvider } from "@fluentui/react-components";
+import { dizeLightTheme, dizeDarkTheme } from "./theme";
 import LanguageProvider from "@i18n";
 import { SettingsProvider, useSettings } from "./context/SettingsContext";
 import App from "./App";
@@ -13,7 +14,7 @@ const root = rootElement ? createRoot(rootElement) : undefined;
 const ThemedApp = () => {
   const { theme } = useSettings();
   return (
-    <FluentProvider theme={theme === "dark" ? webDarkTheme : webLightTheme}>
+    <FluentProvider theme={theme === "dark" ? dizeDarkTheme : dizeLightTheme}>
       <LanguageProvider>
         <App />
       </LanguageProvider>

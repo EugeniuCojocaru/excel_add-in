@@ -8,6 +8,8 @@ import {
   DialogActions,
   DialogContent,
   Button,
+  makeStyles,
+  tokens,
 } from "@fluentui/react-components";
 import RangeSelector from "../components/RangeSelector";
 
@@ -16,9 +18,35 @@ import { calculateDescriptiveStats } from "@utils/math";
 
 import { useLanguage } from "@i18n";
 import ActionButton from "../components/ActionButton";
-import { AccessTimeFilled } from "@fluentui/react-icons";
+import { CalculatorRegular } from "@fluentui/react-icons";
+
+const useStyles = makeStyles({
+  surface: {
+    padding: "8px",
+  },
+  body: {
+    padding: "0",
+    gap: "0",
+  },
+  header: {
+    padding: "12px 8px",
+    margin: "0",
+    borderBottom: `1px solid ${tokens.colorNeutralStroke1}`,
+  },
+  content: {
+    padding: "16px 8px",
+    display: "flex",
+    flexDirection: "column",
+    gap: "16px",
+  },
+  footer: {
+    padding: "12px 8px",
+    borderTop: `1px solid ${tokens.colorNeutralStroke1}`,
+  },
+});
 
 const ModalDescriptiveStats = () => {
+  const styles = useStyles();
   const { t } = useLanguage();
 
   const [open, setOpen] = useState(false);
@@ -43,45 +71,45 @@ const ModalDescriptiveStats = () => {
   };
 
   return (
-    <div style={{ padding: "20px" }}>
-      <Dialog open={open} onOpenChange={(event, data) => setOpen(data.open)}>
-        <DialogTrigger disableButtonEnhancement>
-          {/* <Button>{t("descriptiveStats.title")}</Button> */}
-          <ActionButton
-            text={t("descriptiveStats.title")}
-            beforeIcon={<AccessTimeFilled style={{ color: "green" }} />}
-            textAlign="left"
-          />
-        </DialogTrigger>
+    <Dialog open={open} onOpenChange={(_, data) => setOpen(data.open)}>
+      <DialogTrigger disableButtonEnhancement>
+        <ActionButton
+          text={t("descriptiveStats.title")}
+          beforeIcon={<CalculatorRegular style={{ color: "green" }} />}
+          textAlign="left"
+        />
+      </DialogTrigger>
 
-        <DialogSurface>
-          <DialogBody>
-            <DialogTitle>{t("descriptiveStats.title")}</DialogTitle>
+      <DialogSurface className={styles.surface}>
+        <DialogBody className={styles.body}>
+          <DialogTitle className={styles.header}>{t("descriptiveStats.title")}</DialogTitle>
 
-            <DialogContent>
-              <RangeSelector
-                label={t("descriptiveStats.label__x_input")}
-                onRangeChanged={setAdresaX}
-              />
-              <RangeSelector
-                label={t("descriptiveStats.label__output")}
-                placeholder="Ex: A1"
-                onRangeChanged={setAdresaY}
-              />
-            </DialogContent>
+          <DialogContent className={styles.content}>
+            <RangeSelector
+              label={t("descriptiveStats.label__x_input")}
+              onRangeChanged={setAdresaX}
+              size="large"
+            />
+            <RangeSelector
+              label={t("descriptiveStats.label__output")}
+              placeholder="Ex: A1"
+              onRangeChanged={setAdresaY}
+              size="large"
+              input={false}
+            />
+          </DialogContent>
 
-            <DialogActions>
-              <DialogTrigger disableButtonEnhancement>
-                <Button appearance="secondary">{t("descriptiveStats.button__cancel")}</Button>
-              </DialogTrigger>
-              <Button appearance="primary" onClick={handleClick}>
-                {t("descriptiveStats.button__submit")}
-              </Button>
-            </DialogActions>
-          </DialogBody>
-        </DialogSurface>
-      </Dialog>
-    </div>
+          <DialogActions className={styles.footer}>
+            <DialogTrigger disableButtonEnhancement>
+              <Button appearance="secondary">{t("descriptiveStats.button__cancel")}</Button>
+            </DialogTrigger>
+            <Button appearance="primary" onClick={handleClick}>
+              {t("descriptiveStats.button__submit")}
+            </Button>
+          </DialogActions>
+        </DialogBody>
+      </DialogSurface>
+    </Dialog>
   );
 };
 
