@@ -3,7 +3,7 @@ import { Field, Combobox, Option, makeStyles } from "@fluentui/react-components"
 
 const useStyles = makeStyles({
   combobox: {
-    minHeight: "48px",
+    height: "40px",
   },
 });
 
