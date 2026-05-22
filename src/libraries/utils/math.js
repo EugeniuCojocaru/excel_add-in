@@ -2,7 +2,6 @@ import { jStat } from "jstat";
 import Decimal from "decimal.js";
 import math from "./mathConfig";
 import OPERATIONS from "./basicMath";
-import { toUINumber } from "./ui";
 
 /**
  * Transformă datele brute în matricele X și Y necesare pentru regresie,
@@ -95,7 +94,7 @@ export const calculateDescriptiveStats = (data, alpha = 0.05) => {
  * @param {{data: number[][], meta: { name: string, unit: string }[]}} xData - Variabilele independente
  * @param {string} modelType - Tipul modelului de regresie dorit
  */
-export const calculateRegression = (yData, xData, modelType) => {
+export const calculateRegression = (yData, xData, modelType, toUINumber) => {
   const n = yData.data.length;
   const k = xData.data[0].length;
   const df = n - k - 1;

@@ -1,11 +1,3 @@
-export const toUINumber = (num) => {
-  const number = typeof num === "number" ? num : num.toNumber();
-
-  if (number <= 0.001) return number;
-
-  return Number(number.toFixed(5));
-};
-
 export const standardizeDataToWrite = (array) => {
   let max = array[0].length;
 

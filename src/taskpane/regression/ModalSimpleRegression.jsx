@@ -20,6 +20,7 @@ import RangeSelector from "../components/RangeSelector";
 
 import { getColumnMatrix, insertColumn } from "@api";
 import { calculateRegression } from "@utils/math";
+import { usePrecision } from "@utils/hooks";
 import { generateSummaryOutput } from "@utils/summaryOutput";
 
 import { useLanguage } from "@i18n";
@@ -95,6 +96,7 @@ const useStyles = makeStyles({
 const ModalSimpleRegression = () => {
   const styles = useStyles();
   const { t } = useLanguage();
+  const { toUINumber } = usePrecision();
 
   const [open, setOpen] = useState(false);
   const [YColumnAdress, setYColumnAddress] = useState("Sheet5!A1:A10");
@@ -109,7 +111,7 @@ const ModalSimpleRegression = () => {
     const yData = await getColumnMatrix(YColumnAdress);
 
     const modelTypeKey = MODEL_TYPES.find((type) => type.label === modelType)?.key || "linear";
-    const stats = calculateRegression(yData, xData, modelTypeKey);
+    const stats = calculateRegression(yData, xData, modelTypeKey, toUINumber);
     const interpretation = econometricInterpretation
       ? interpretationRegression(stats, parseFloat(alpha), yData.meta, xData.meta, t)
       : null;
@@ -177,10 +179,7 @@ const ModalSimpleRegression = () => {
                   ))}
                 </Combobox>
               </Field>
-              <Field
-                label={t("regression.input__alpha.label")}
-                className={styles.alphaField}
-              >
+              <Field label={t("regression.input__alpha.label")} className={styles.alphaField}>
                 <Input
                   type="number"
                   min={0}

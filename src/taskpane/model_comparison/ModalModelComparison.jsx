@@ -18,6 +18,7 @@ import RangeSelector from "../components/RangeSelector";
 
 import { getColumnMatrix, insertColumn } from "@api";
 import { calculateRegression } from "@utils/math";
+import { usePrecision } from "@utils/hooks";
 import { generateSummaryOutput } from "@utils/summaryOutput";
 
 import { useLanguage } from "@i18n";
@@ -95,6 +96,7 @@ const useStyles = makeStyles({
 const ModalModelComparison = () => {
   const styles = useStyles();
   const { t } = useLanguage();
+  const { toUINumber } = usePrecision();
 
   const [open, setOpen] = useState(false);
   const [YColumnAdress, setYColumnAddress] = useState("Sheet1!A1:A23");
@@ -111,7 +113,7 @@ const ModalModelComparison = () => {
     if (modelKeys.length < 2) return;
 
     const stats = modelKeys.map((modelKey) => {
-      const statsModel = calculateRegression(yData, xData, modelKey);
+      const statsModel = calculateRegression(yData, xData, modelKey, toUINumber);
       const modelInterpretation = econometricInterpretation
         ? interpretationRegression(statsModel, parseFloat(alpha), yData.meta, xData.meta, t)
         : null;
@@ -124,7 +126,10 @@ const ModalModelComparison = () => {
       return [...uiData, [" "], [" "]];
     });
 
-    await insertColumn([...comparation, [" "], [" "], ...dataToWrite.flat()], resultDestinationAddress);
+    await insertColumn(
+      [...comparation, [" "], [" "], ...dataToWrite.flat()],
+      resultDestinationAddress
+    );
   };
 
   return (

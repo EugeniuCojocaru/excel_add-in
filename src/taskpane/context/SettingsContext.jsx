@@ -6,7 +6,7 @@ export const SettingsProvider = ({ children }) => {
   const [settings, setSettings] = useState({
     theme: "light",
     responseDisplay: "INFO",
-    decimals: 2,
+    decimals: 4,
   });
 
   const updateSettings = (newSettings) => {
