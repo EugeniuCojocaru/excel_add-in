@@ -8,12 +8,13 @@ import {
   DialogActions,
   DialogContent,
   Button,
-  Checkbox,
   Field,
   Input,
   Combobox,
   Option,
+  Switch,
   makeStyles,
+  tokens,
 } from "@fluentui/react-components";
 import RangeSelector from "../components/RangeSelector";
 
@@ -33,32 +34,85 @@ const MODEL_TYPES = [
   { key: "lin-log", label: "Lin-Log" },
 ];
 
+const useStyles = makeStyles({
+  surface: {
+    padding: "8px",
+  },
+  body: {
+    display: "flex",
+    flexDirection: "column",
+    padding: "0",
+    gap: "0",
+  },
+  header: {
+    padding: "12px 8px",
+    margin: "0",
+    borderBottom: `1px solid ${tokens.colorNeutralStroke3}`,
+  },
+  content: {
+    padding: "16px 8px",
+    display: "flex",
+    flexDirection: "column",
+    gap: "16px",
+  },
+  optionsRow: {
+    display: "flex",
+    gap: "8px",
+    alignItems: "flex-end",
+  },
+  modelTypeField: {
+    flex: "2",
+  },
+  alphaField: {
+    flex: "1",
+  },
+  switchRow: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    width: "100%",
+  },
+  switchLabel: {
+    fontSize: tokens.fontSizeBase300,
+    color: tokens.colorNeutralForeground1,
+  },
+  footer: {
+    width: "100%",
+    boxSizing: "border-box",
+    padding: "12px 8px",
+    borderTop: `1px solid ${tokens.colorNeutralStroke3}`,
+    display: "flex",
+    justifyContent: "flex-end",
+  },
+  cancelButton: {
+    borderColor: tokens.colorNeutralStrokeAccessible,
+    ":hover": {
+      borderColor: tokens.colorNeutralStrokeAccessible,
+    },
+  },
+});
+
 const ModalSimpleRegression = () => {
+  const styles = useStyles();
   const { t } = useLanguage();
 
   const [open, setOpen] = useState(false);
   const [YColumnAdress, setYColumnAddress] = useState("Sheet5!A1:A10");
   const [XColumnAdress, setXColumnAddress] = useState("Sheet5!D1:F10");
   const [resultDestinationAddress, setResultDestinationAddress] = useState("Sheet5!A15");
-  const [onlyValues, setOnlyValues] = useState(true);
+  const [econometricInterpretation, setEconometricInterpretation] = useState(false);
   const [modelType, setModelType] = useState("Linear");
   const [alpha, setAlpha] = useState(0.05);
 
-  console.log("Model type selected:", modelType);
-  const handleCheckboxChange = (_, data) => {
-    setOnlyValues(data.checked);
-  };
-
   const handleClick = async () => {
     const xData = await getColumnMatrix(XColumnAdress);
-
     const yData = await getColumnMatrix(YColumnAdress);
 
     const modelTypeKey = MODEL_TYPES.find((type) => type.label === modelType)?.key || "linear";
     const stats = calculateRegression(yData, xData, modelTypeKey);
-    const interpretation = onlyValues
-      ? null
-      : interpretationRegression(stats, alpha, yData.meta, xData.meta, t);
+    const interpretation = econometricInterpretation
+      ? interpretationRegression(stats, parseFloat(alpha), yData.meta, xData.meta, t)
+      : null;
     const dataToWrite = generateSummaryOutput(
       { interpretation, ...stats },
       yData.meta,
@@ -70,50 +124,51 @@ const ModalSimpleRegression = () => {
   };
 
   return (
-    <div style={{ padding: "20px" }}>
-      <Dialog open={open} onOpenChange={(_, data) => setOpen(data.open)}>
-        <DialogTrigger disableButtonEnhancement>
-          {/* <Button>{t("regression.title")}</Button> */}
-          <ActionButton
-            text={t("regression.title")}
-            beforeIcon={<DataTrendingFilled style={{ color: "green" }} />}
-            textAlign="left"
-          />
-        </DialogTrigger>
+    <Dialog open={open} onOpenChange={(_, data) => setOpen(data.open)}>
+      <DialogTrigger disableButtonEnhancement>
+        <ActionButton
+          text={t("regression.title")}
+          beforeIcon={<DataTrendingFilled style={{ color: "green" }} />}
+          textAlign="left"
+        />
+      </DialogTrigger>
 
-        <DialogSurface>
-          <DialogBody>
-            <DialogTitle>{t("regression.title")}</DialogTitle>
+      <DialogSurface className={styles.surface}>
+        <DialogBody className={styles.body}>
+          <DialogTitle className={styles.header}>{t("regression.title")}</DialogTitle>
 
-            <DialogContent style={{ width: "100%", gap: "12px" }}>
-              <RangeSelector
-                label={t("regression.label__y_input")}
-                onRangeChanged={setYColumnAddress}
-                value={YColumnAdress}
-              />
-              <RangeSelector
-                label={t("regression.label__x_input")}
-                onRangeChanged={setXColumnAddress}
-                value={XColumnAdress}
-              />
-              <RangeSelector
-                label={t("regression.label__output")}
-                placeholder="Ex: A1"
-                onRangeChanged={setResultDestinationAddress}
-                value={resultDestinationAddress}
-              />
-              <p>{t("regression.label__extra_options")}</p>
-              <Checkbox
-                label={t("regression.checkbox__only_values")}
-                checked={onlyValues}
-                onChange={handleCheckboxChange}
-              />
+          <DialogContent className={styles.content}>
+            <RangeSelector
+              label={t("regression.label__y_input")}
+              onRangeChanged={setYColumnAddress}
+              value={YColumnAdress}
+              size="large"
+            />
+            <RangeSelector
+              label={t("regression.label__x_input")}
+              onRangeChanged={setXColumnAddress}
+              value={XColumnAdress}
+              size="large"
+            />
+            <RangeSelector
+              label={t("regression.label__output")}
+              placeholder="Ex: A1"
+              onRangeChanged={setResultDestinationAddress}
+              value={resultDestinationAddress}
+              size="large"
+              input={false}
+            />
 
-              <Field label={t("regression.combobox__model_type.label")} style={{ flex: "1" }}>
+            <div className={styles.optionsRow}>
+              <Field
+                label={t("regression.combobox__model_type.label")}
+                className={styles.modelTypeField}
+              >
                 <Combobox
                   placeholder={t("regression.combobox__model_type.placeholder")}
                   value={modelType}
                   onOptionSelect={(_, data) => setModelType(data.optionValue || "")}
+                  size="large"
                 >
                   {MODEL_TYPES.map((type) => (
                     <Option key={type.key} value={type.label}>
@@ -122,27 +177,45 @@ const ModalSimpleRegression = () => {
                   ))}
                 </Combobox>
               </Field>
-              <Field label={t("regression.input__alpha.label")} style={{ flex: "1" }}>
+              <Field
+                label={t("regression.input__alpha.label")}
+                className={styles.alphaField}
+              >
                 <Input
-                  value={alpha}
+                  type="number"
+                  min={0}
+                  max={1}
+                  step={0.01}
+                  value={String(alpha)}
                   onChange={(_, data) => setAlpha(data.value)}
                   placeholder={t("regression.input__alpha.placeholder")}
+                  size="large"
                 />
               </Field>
-            </DialogContent>
+            </div>
 
-            <DialogActions>
-              <DialogTrigger disableButtonEnhancement>
-                <Button appearance="secondary">{t("regression.button__cancel")}</Button>
-              </DialogTrigger>
-              <Button appearance="primary" onClick={handleClick}>
-                {t("regression.button__submit")}
+            <div className={styles.switchRow}>
+              <span className={styles.switchLabel}>{t("regression.switch__interpretation")}</span>
+              <Switch
+                checked={econometricInterpretation}
+                onChange={(_, data) => setEconometricInterpretation(data.checked)}
+              />
+            </div>
+          </DialogContent>
+
+          <DialogActions className={styles.footer}>
+            <DialogTrigger disableButtonEnhancement>
+              <Button appearance="secondary" className={styles.cancelButton}>
+                {t("regression.button__cancel")}
               </Button>
-            </DialogActions>
-          </DialogBody>
-        </DialogSurface>
-      </Dialog>
-    </div>
+            </DialogTrigger>
+            <Button appearance="primary" onClick={handleClick}>
+              {t("regression.button__submit")}
+            </Button>
+          </DialogActions>
+        </DialogBody>
+      </DialogSurface>
+    </Dialog>
   );
 };
 

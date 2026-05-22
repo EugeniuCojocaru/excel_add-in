@@ -28,6 +28,7 @@
       "label__output": "Select starting cell for results:",
       "label__extra_options": "Additional options:",
       "checkbox__only_values": "Only values, no interpretation.",
+      "switch__interpretation": "Econometric interpretation",
       "input__alpha": {
         "label": "Significance level (α):",
         "placeholder": "Ex: 0.05"
@@ -174,6 +175,7 @@
       "label__output": "Selectează celula de început pentru rezultate:",
       "label__extra_options": "Opțiuni suplimentare:",
       "checkbox__only_values": "Doar valori, fara interpretare.",
+      "switch__interpretation": "Interpretare econometrică",
       "input__alpha": { "label": "Nivel de semnificație (α):", "placeholder": "Ex: 0.05" },
       "combobox__model_type": { "label": "Tip model:", "placeholder": "Selectează opțiunea..." },
       "interpretation": {
