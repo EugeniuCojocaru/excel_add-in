@@ -113,7 +113,7 @@ const ModalModelComparison = () => {
     if (modelKeys.length < 2) return;
 
     const stats = modelKeys.map((modelKey) => {
-      const statsModel = calculateRegression(yData, xData, modelKey, toUINumber);
+      const statsModel = calculateRegression(yData, xData, modelKey, toUINumber, alpha);
       const modelInterpretation = econometricInterpretation
         ? interpretationRegression(statsModel, parseFloat(alpha), yData.meta, xData.meta, t)
         : null;
