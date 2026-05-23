@@ -162,7 +162,7 @@ const getConclusion = (isSignificant, bNumber, alpha, yMeta, xMeta, t) => {
   ];
 };
 
-const getInterpretation = (slopes, adjustedRSquared, yMeta, xMeta, modelType, t) => {
+const getInterpretation = (slopes, adjustedRSquared, yMeta, xMeta, modelType, t, confidenceIntervals, alpha) => {
   const interpretation = [];
   const yName = yMeta[0]?.name || "Y";
 
@@ -193,14 +193,31 @@ const getInterpretation = (slopes, adjustedRSquared, yMeta, xMeta, modelType, t)
     }
   };
 
+  const confidence = confidenceIntervals && alpha !== undefined ? (1 - alpha) * 100 : null;
+
   for (let i = 0; i < slopes.length; i++) {
     const xName = xMeta[i]?.name || `X${i + 1}`;
     const { xUnit, yUnit } = unitBasedOnModelType(i);
     const yValue = getYValueBasedOnModelType(i);
+    const directionKey = yValue >= 0
+      ? "regression.interpretation.thirdStep.interpretationVariable"
+      : "regression.interpretation.thirdStep.interpretationVariableDecrease";
     interpretation.push([
       `b${i + 1} = ${slopes[i]}`,
-      `${t("regression.interpretation.thirdStep.interpretationVariable", { xName, xUnit, yName })}${yValue}${yUnit}`,
+      `${t(directionKey, { xName, xUnit, yName })}${Math.abs(yValue)}${yUnit}`,
     ]);
+    if (confidence !== null) {
+      const ci = confidenceIntervals[i + 1]; // [0] is intercept
+      interpretation.push([
+        "",
+        t("regression.interpretation.thirdStep.ciSentence", {
+          confidence,
+          lower: ci[0],
+          upper: ci[1],
+          yUnit: yUnit.trim(),
+        }),
+      ]);
+    }
   }
   const variableNames = xMeta.map((meta, index) => meta.name || `X${index + 1}`).join(", ");
 
@@ -208,6 +225,7 @@ const getInterpretation = (slopes, adjustedRSquared, yMeta, xMeta, modelType, t)
     `R^2 ${t("regression.interpretation.thirdStep.r2Adjusted")} = ${adjustedRSquared}`,
     `${(adjustedRSquared * 100).toFixed(2)}% ${t("regression.interpretation.thirdStep.interpretationR2Adjusted", { yName, variableNames })}`,
   ]);
+
   return interpretation;
 };
 

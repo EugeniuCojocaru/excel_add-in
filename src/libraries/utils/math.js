@@ -155,7 +155,14 @@ export const calculateRegression = (yData, xData, modelType, toUINumber, alpha =
     standardErrors.push(math.sqrt(variance_i));
   }
 
-  // 5. Statistica t și p-value (two-tailed)
+  // 5. Confidence Intervals (two-tailed, user alpha)
+  const tCritical = math.bignumber(Math.abs(jStat.studentt.inv(alpha / 2, df)));
+  const confidenceIntervals = coefficients.map((b, i) => {
+    const margin = math.multiply(tCritical, standardErrors[i]);
+    return [toUINumber(math.subtract(b, margin)), toUINumber(math.add(b, margin))];
+  });
+
+  // 6. Statistica t și p-value (two-tailed)
   const tStats = coefficients.map((b, i) => math.divide(b, standardErrors[i]));
   const pValues = tStats.map((t) => {
     const tPrimitive = Math.abs(Number(t));
@@ -165,7 +172,7 @@ export const calculateRegression = (yData, xData, modelType, toUINumber, alpha =
   // Pre-computing here prevents downstream code from accidentally halving pValues.
   const isSignificant = pValues.map((p) => p < alpha);
 
-  // 6. Coeficientul de Determinație (R-squared)
+  // 7. Coeficientul de Determinație (R-squared)
   const rSquared = math.subtract(math.bignumber(1), math.divide(ssRes, ssTotal));
 
   const rSqAdjPart1 = math.subtract(math.bignumber(1), rSquared);
@@ -175,7 +182,7 @@ export const calculateRegression = (yData, xData, modelType, toUINumber, alpha =
     math.multiply(rSqAdjPart1, rSqAdjPart2)
   );
 
-  // 7. Testul ANOVA (F-Statistic)
+  // 8. Testul ANOVA (F-Statistic)
   const fNumerator = math.divide(rSquared, math.bignumber(k));
   const fDenominator = math.divide(math.subtract(math.bignumber(1), rSquared), math.bignumber(df));
   const fStat = math.divide(fNumerator, fDenominator);
@@ -195,6 +202,7 @@ export const calculateRegression = (yData, xData, modelType, toUINumber, alpha =
     adjustedRSquared: toUINumber(adjustedRSquared),
     ese: toUINumber(ese),
     standardErrors: standardErrors.map((se) => toUINumber(se)),
+    confidenceIntervals,
     tStats: tStats.map((t) => toUINumber(t)),
     pValues,
     isSignificant,

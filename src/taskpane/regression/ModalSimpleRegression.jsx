@@ -111,7 +111,7 @@ const ModalSimpleRegression = () => {
     const yData = await getColumnMatrix(YColumnAdress);
 
     const modelTypeKey = MODEL_TYPES.find((type) => type.label === modelType)?.key || "linear";
-    const stats = calculateRegression(yData, xData, modelTypeKey, toUINumber);
+    const stats = calculateRegression(yData, xData, modelTypeKey, toUINumber, alpha);
     const interpretation = econometricInterpretation
       ? interpretationRegression(stats, parseFloat(alpha), yData.meta, xData.meta, t)
       : null;
