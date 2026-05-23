@@ -81,5 +81,57 @@ export const generateSummaryOutput = (stats, yMeta, xMeta, t) => {
     });
   }
 
+  // 5. VIF & Correlation Matrix (only meaningful for multiple regression)
+  if (stats.k > 1) {
+    const xNames = Array.from({ length: stats.k }, (_, i) =>
+      xMeta[i]?.name || t("regression.summaryOutput.variableX", { index: i + 1 })
+    );
+
+    // VIF table
+    dataToWrite.push(["", "", "", "", ""]);
+    dataToWrite.push([t("regression.summaryOutput.vifTitle"), "", "", "", ""]);
+    dataToWrite.push(["", t("regression.summaryOutput.vifValue"), "", "", ""]);
+    for (let i = 0; i < stats.k; i++) {
+      dataToWrite.push([xNames[i], stats.vifValues[i], "", "", ""]);
+    }
+    if (stats.hasMulticollinearity) {
+      dataToWrite.push(["", "", "", "", ""]);
+      dataToWrite.push([t("regression.summaryOutput.multicollinearityWarning"), "", "", "", ""]);
+      dataToWrite.push([t("regression.summaryOutput.multicollinearityEffect"), "", "", "", ""]);
+    }
+
+    // Correlation matrix
+    dataToWrite.push(["", "", "", "", ""]);
+    dataToWrite.push([t("regression.summaryOutput.correlationMatrixTitle"), "", "", "", ""]);
+    dataToWrite.push(["", ...xNames]);
+    for (let i = 0; i < stats.k; i++) {
+      dataToWrite.push([xNames[i], ...stats.correlationMatrix[i]]);
+    }
+
+    // Interpretation for high correlations
+    const highPairs = [];
+    for (let i = 0; i < stats.k; i++) {
+      for (let j = i + 1; j < stats.k; j++) {
+        const r = stats.correlationMatrix[i][j];
+        if (Math.abs(r) > 0.8) {
+          highPairs.push({ nameI: xNames[i], nameJ: xNames[j], r });
+        }
+      }
+    }
+
+    if (highPairs.length > 0) {
+      dataToWrite.push(["", "", "", "", ""]);
+      dataToWrite.push([t("regression.summaryOutput.observation"), "", "", "", ""]);
+      highPairs.forEach(({ nameI, nameJ, r }) => {
+        const label =
+          Math.abs(r) > 0.9
+            ? t("regression.summaryOutput.veryStrongCorrelation")
+            : t("regression.summaryOutput.strongCorrelation");
+        dataToWrite.push([`r(${nameI},${nameJ}) = ${r} → ${label}.`, "", "", "", ""]);
+      });
+      dataToWrite.push([t("regression.summaryOutput.multicollinearityEffect"), "", "", "", ""]);
+    }
+  }
+
   return dataToWrite;
 };

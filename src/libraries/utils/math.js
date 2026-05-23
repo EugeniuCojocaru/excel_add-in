@@ -173,17 +173,73 @@ export const calculateRegression = (yData, xData, modelType, toUINumber, alpha =
   const isSignificant = pValues.map((p) => p < alpha);
 
   // 7. Standardized Coefficients (Beta weights): β*_i = b_i × (SD_Xi / SD_Y)
+  const predictorCols = Array.from({ length: k }, (_, i) => X.map((row) => row[i + 1]));
+  const predictorMeans = predictorCols.map((col) => math.mean(col));
+  const predictorSS = predictorCols.map((col, i) =>
+    col.reduce(
+      (sum, val) => math.add(sum, math.square(math.subtract(val, predictorMeans[i]))),
+      math.bignumber(0)
+    )
+  );
+
   const sdY = math.sqrt(math.divide(ssTotal, math.bignumber(n - 1)));
   const betaWeights = slopes.map((b, i) => {
-    const colValues = X.map((row) => row[i + 1]);
-    const meanXi = math.mean(colValues);
-    const ssXi = colValues.reduce(
-      (sum, val) => math.add(sum, math.square(math.subtract(val, meanXi))),
-      math.bignumber(0)
-    );
-    const sdXi = math.sqrt(math.divide(ssXi, math.bignumber(n - 1)));
+    const sdXi = math.sqrt(math.divide(predictorSS[i], math.bignumber(n - 1)));
     return toUINumber(math.divide(math.multiply(b, sdXi), sdY));
   });
+
+  // 10. Correlation Matrix for predictors (k × k)
+  const correlationMatrix = Array.from({ length: k }, (_, i) =>
+    Array.from({ length: k }, (_, j) => {
+      if (i === j) return toUINumber(math.bignumber(1));
+      let cov = math.bignumber(0);
+      for (let obs = 0; obs < n; obs++) {
+        cov = math.add(
+          cov,
+          math.multiply(
+            math.subtract(predictorCols[i][obs], predictorMeans[i]),
+            math.subtract(predictorCols[j][obs], predictorMeans[j])
+          )
+        );
+      }
+      return toUINumber(math.divide(cov, math.sqrt(math.multiply(predictorSS[i], predictorSS[j]))));
+    })
+  );
+
+  // 11. Variance Inflation Factor (VIF): regress each Xi on all other predictors
+  const vifValues = [];
+  let hasMulticollinearity = false;
+
+  if (k === 1) {
+    vifValues.push(toUINumber(math.bignumber(1)));
+  } else {
+    for (let i = 0; i < k; i++) {
+      const Yi_vif = predictorCols[i].map((val) => [val]);
+      const Xi_vif = X.map((row) => [row[0], ...row.slice(1).filter((_, j) => j !== i)]);
+
+      const Xt = math.transpose(Xi_vif);
+      const XtX = math.multiply(Xt, Xi_vif);
+      const XtY = math.multiply(Xt, Yi_vif);
+      const bVifRaw = math.lusolve(XtX, XtY);
+      const bVif = bVifRaw.toArray ? bVifRaw.toArray() : bVifRaw;
+
+      const yHatRaw = math.multiply(Xi_vif, bVif);
+      const yHat = yHatRaw.toArray ? yHatRaw.toArray() : yHatRaw;
+
+      let ssRes_i = math.bignumber(0);
+      let ssTot_i = predictorSS[i];
+      for (let j = 0; j < n; j++) {
+        const resid = math.subtract(Yi_vif[j][0], yHat[j][0]);
+        ssRes_i = math.add(ssRes_i, math.square(resid));
+      }
+
+      const r2_i = math.subtract(math.bignumber(1), math.divide(ssRes_i, ssTot_i));
+      const vif_raw = math.divide(math.bignumber(1), math.subtract(math.bignumber(1), r2_i));
+
+      if (Number(vif_raw) > 5) hasMulticollinearity = true;
+      vifValues.push(toUINumber(vif_raw));
+    }
+  }
 
   // 8. Coeficientul de Determinație (R-squared)
   const rSquared = math.subtract(math.bignumber(1), math.divide(ssRes, ssTotal));
@@ -223,6 +279,9 @@ export const calculateRegression = (yData, xData, modelType, toUINumber, alpha =
     fSignificance,
     fIsSignificant,
     betaWeights,
+    correlationMatrix,
+    vifValues,
+    hasMulticollinearity,
   };
 };
 

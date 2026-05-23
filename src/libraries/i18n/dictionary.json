@@ -97,7 +97,15 @@
         "betaWeight": "Beta weight (β*)",
         "intercept": "Intercept (Intercept / b0)",
         "variableX": "Variable X{index}",
-        "interpretation": "Model interpretation:"
+        "interpretation": "Model interpretation:",
+        "vifTitle": "Variance Inflation Factor (VIF)",
+        "vifValue": "VIF",
+        "multicollinearityWarning": "Warning: at least one VIF > 5 — multicollinearity detected.",
+        "multicollinearityEffect": "This may affect the individual significance of the coefficients.",
+        "correlationMatrixTitle": "Predictor Correlation Matrix",
+        "observation": "Observation:",
+        "strongCorrelation": "strong correlation between predictors",
+        "veryStrongCorrelation": "very strong (problematic) multicollinearity between predictors"
       }
     },
     "modelComparison": {
@@ -251,7 +259,15 @@
         "betaWeight": "Coeficient beta (β*)",
         "intercept": "Termenul liber (Intercept / b0)",
         "variableX": "Variabila X{index}",
-        "interpretation": "Interpretare model:"
+        "interpretation": "Interpretare model:",
+        "vifTitle": "Factorul de Inflație a Varianței (VIF)",
+        "vifValue": "VIF",
+        "multicollinearityWarning": "Atenție: cel puțin un VIF > 5 — multicoliniaritate detectată.",
+        "multicollinearityEffect": "Aceasta poate afecta semnificatia individuala a coeficientilor.",
+        "correlationMatrixTitle": "Matricea de corelatie a predictorilor",
+        "observation": "Observatie:",
+        "strongCorrelation": "corelatie puternica intre regresori",
+        "veryStrongCorrelation": "multicoliniaritate puternica intre regresori"
       }
     },
     "modelComparison": {
