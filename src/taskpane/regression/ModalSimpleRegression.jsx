@@ -99,9 +99,9 @@ const ModalSimpleRegression = () => {
   const { toUINumber } = usePrecision();
 
   const [open, setOpen] = useState(false);
-  const [YColumnAdress, setYColumnAddress] = useState("Sheet5!A1:A10");
-  const [XColumnAdress, setXColumnAddress] = useState("Sheet5!D1:F10");
-  const [resultDestinationAddress, setResultDestinationAddress] = useState("Sheet5!A15");
+  const [YColumnAdress, setYColumnAddress] = useState("Sheet1!A13:A64");
+  const [XColumnAdress, setXColumnAddress] = useState("Sheet1!B13:C64");
+  const [resultDestinationAddress, setResultDestinationAddress] = useState("Sheet1!E13");
   const [econometricInterpretation, setEconometricInterpretation] = useState(false);
   const [modelType, setModelType] = useState("Linear");
   const [alpha, setAlpha] = useState(0.05);

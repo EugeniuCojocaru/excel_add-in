@@ -94,7 +94,7 @@ export const calculateDescriptiveStats = (data, alpha = 0.05) => {
  * @param {{data: number[][], meta: { name: string, unit: string }[]}} xData - Variabilele independente
  * @param {string} modelType - Tipul modelului de regresie dorit
  */
-export const calculateRegression = (yData, xData, modelType, toUINumber) => {
+export const calculateRegression = (yData, xData, modelType, toUINumber, alpha = 0.05) => {
   const n = yData.data.length;
   const k = xData.data[0].length;
   const df = n - k - 1;
@@ -155,12 +155,15 @@ export const calculateRegression = (yData, xData, modelType, toUINumber) => {
     standardErrors.push(math.sqrt(variance_i));
   }
 
-  // 5. Statistica t și p-value
+  // 5. Statistica t și p-value (two-tailed)
   const tStats = coefficients.map((b, i) => math.divide(b, standardErrors[i]));
   const pValues = tStats.map((t) => {
     const tPrimitive = Math.abs(Number(t));
     return 2 * (1 - jStat.studentt.cdf(tPrimitive, df));
   });
+  // Significance is evaluated strictly against alpha using two-tailed p-values.
+  // Pre-computing here prevents downstream code from accidentally halving pValues.
+  const isSignificant = pValues.map((p) => p < alpha);
 
   // 6. Coeficientul de Determinație (R-squared)
   const rSquared = math.subtract(math.bignumber(1), math.divide(ssRes, ssTotal));
@@ -176,9 +179,12 @@ export const calculateRegression = (yData, xData, modelType, toUINumber) => {
   const fNumerator = math.divide(rSquared, math.bignumber(k));
   const fDenominator = math.divide(math.subtract(math.bignumber(1), rSquared), math.bignumber(df));
   const fStat = math.divide(fNumerator, fDenominator);
+  // F-test significance is inherently one-tailed (upper tail), correct as-is.
   const fSignificance = 1 - jStat.centralF.cdf(Number(fStat), k, df);
+  const fIsSignificant = fSignificance < alpha;
 
   return {
+    alpha,
     modelType,
     k,
     df,
@@ -191,8 +197,10 @@ export const calculateRegression = (yData, xData, modelType, toUINumber) => {
     standardErrors: standardErrors.map((se) => toUINumber(se)),
     tStats: tStats.map((t) => toUINumber(t)),
     pValues,
+    isSignificant,
     fStat: toUINumber(fStat),
     fSignificance,
+    fIsSignificant,
   };
 };
 

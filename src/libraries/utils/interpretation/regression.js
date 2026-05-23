@@ -40,8 +40,18 @@ const getModel = (k, pValues, fSignificance, rSquared, adjustedRSquared) => {
   return model;
 };
 
+const DEFAULT_ALPHA_LEVELS = [0.01, 0.05, 0.1];
+
+const buildAlphaSet = (userAlpha) => {
+  const levels = DEFAULT_ALPHA_LEVELS.includes(userAlpha)
+    ? [...DEFAULT_ALPHA_LEVELS]
+    : [...DEFAULT_ALPHA_LEVELS, userAlpha];
+  return levels.sort((a, b) => a - b);
+};
+
 const getSignificance = (b, pValue, alpha, bNumber, yMeta, xMeta, t) => {
   const xName = xMeta[bNumber - 1]?.name || `X${bNumber}`;
+  const pLabel = bNumber === 1 && xMeta.length === 1 ? "pValue" : `p${bNumber}`;
   const significance = [
     [
       t("regression.interpretation.secondStep.significanceBasedOnVariable", { xName }),
@@ -66,14 +76,16 @@ const getSignificance = (b, pValue, alpha, bNumber, yMeta, xMeta, t) => {
   //   t("regression.interpretation.secondStep.info"),
   //   t("regression.interpretation.secondStep.infoText"),
   // ]);
-  const pValueHalf = pValue / 2;
-  const isSignificant = pValueHalf < alpha;
-  console.log({ pValue, pValueHalf, alpha, smaller: pValue < alpha });
-  significance.push([
-    `${t("regression.interpretation.secondStep.pValueText")}${alpha}:`,
-    `p${bNumber === 1 ? "Value" : bNumber}/2 = ${pValueHalf} ?< α = ${alpha} => ${isSignificant ? t("regression.interpretation.secondStep.signicantBasicTrue", { pValue: pValueHalf }) : t("regression.interpretation.secondStep.signicantBasicFalse", { pValue: pValueHalf })}`,
-  ]);
 
+  buildAlphaSet(alpha).forEach((level) => {
+    const isSig = pValue < level;
+    significance.push([
+      `${t("regression.interpretation.secondStep.pValueText")}${level}:`,
+      `${pLabel} = ${pValue} ?< α = ${level} => ${isSig ? t("regression.interpretation.secondStep.signicantBasicTrue", { pValue }) : t("regression.interpretation.secondStep.signicantBasicFalse", { pValue })}`,
+    ]);
+  });
+
+  const isSignificant = pValue < alpha;
   significance.push([
     "",
     `${isSignificant ? t("regression.interpretation.secondStep.significantTrue", { bNumber }) : t("regression.interpretation.secondStep.significantFalse")}`,
@@ -114,11 +126,14 @@ const getMultipleRegressionSignificance = (
     ]);
     significance.push(["", t("regression.interpretation.secondStep.notAllZeroHypothesis")]);
 
+    buildAlphaSet(alpha).forEach((level) => {
+      const isSig = fSignificance < level;
+      significance.push([
+        `${t("regression.interpretation.secondStep.pValueText")}${level}:`,
+        `pValue = ${fSignificance} ?< α = ${level} => ${isSig ? t("regression.interpretation.secondStep.signicantBasicTrue", { pValue: fSignificance }) : t("regression.interpretation.secondStep.signicantBasicFalse", { pValue: fSignificance })}`,
+      ]);
+    });
     const isSignificant = fSignificance < alpha;
-    significance.push([
-      `${t("regression.interpretation.secondStep.pValueText")}${alpha}:`,
-      `pValue = ${fSignificance} ?< α = ${alpha} => ${isSignificant ? t("regression.interpretation.secondStep.signicantBasicTrue", { pValue: fSignificance }) : t("regression.interpretation.secondStep.signicantBasicFalse", { pValue: fSignificance })}`,
-    ]);
 
     const variableNames = xMeta.map((meta, index) => meta.name || `X${index + 1}`).join(", ");
     const yName = yMeta[0]?.name || "Y";
