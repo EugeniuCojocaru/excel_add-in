@@ -94,6 +94,7 @@
         "pValue": "Probability (P-value)",
         "lowerCI": "Lower bound CI ({confidence}%)",
         "upperCI": "Upper bound CI ({confidence}%)",
+        "betaWeight": "Beta weight (β*)",
         "intercept": "Intercept (Intercept / b0)",
         "variableX": "Variable X{index}",
         "interpretation": "Model interpretation:"
@@ -247,6 +248,7 @@
         "pValue": "Probabilitate (P-value)",
         "lowerCI": "Limita inferioară IC ({confidence}%)",
         "upperCI": "Limita superioară IC ({confidence}%)",
+        "betaWeight": "Coeficient beta (β*)",
         "intercept": "Termenul liber (Intercept / b0)",
         "variableX": "Variabila X{index}",
         "interpretation": "Interpretare model:"

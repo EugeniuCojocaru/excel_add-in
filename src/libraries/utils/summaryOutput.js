@@ -41,6 +41,7 @@ export const generateSummaryOutput = (stats, yMeta, xMeta, t) => {
       t("regression.summaryOutput.pValue"),
       t("regression.summaryOutput.lowerCI", { confidence: (1 - stats.alpha) * 100 }),
       t("regression.summaryOutput.upperCI", { confidence: (1 - stats.alpha) * 100 }),
+      t("regression.summaryOutput.betaWeight"),
     ],
     [
       t("regression.summaryOutput.intercept"),
@@ -50,6 +51,7 @@ export const generateSummaryOutput = (stats, yMeta, xMeta, t) => {
       stats.pValues[0],
       stats.confidenceIntervals[0][0],
       stats.confidenceIntervals[0][1],
+      "",
     ],
   ];
 
@@ -65,6 +67,7 @@ export const generateSummaryOutput = (stats, yMeta, xMeta, t) => {
       stats.pValues[index],
       stats.confidenceIntervals[index][0],
       stats.confidenceIntervals[index][1],
+      stats.betaWeights[i],
     ]);
   }
 

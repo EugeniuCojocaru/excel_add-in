@@ -172,7 +172,20 @@ export const calculateRegression = (yData, xData, modelType, toUINumber, alpha =
   // Pre-computing here prevents downstream code from accidentally halving pValues.
   const isSignificant = pValues.map((p) => p < alpha);
 
-  // 7. Coeficientul de Determinație (R-squared)
+  // 7. Standardized Coefficients (Beta weights): β*_i = b_i × (SD_Xi / SD_Y)
+  const sdY = math.sqrt(math.divide(ssTotal, math.bignumber(n - 1)));
+  const betaWeights = slopes.map((b, i) => {
+    const colValues = X.map((row) => row[i + 1]);
+    const meanXi = math.mean(colValues);
+    const ssXi = colValues.reduce(
+      (sum, val) => math.add(sum, math.square(math.subtract(val, meanXi))),
+      math.bignumber(0)
+    );
+    const sdXi = math.sqrt(math.divide(ssXi, math.bignumber(n - 1)));
+    return toUINumber(math.divide(math.multiply(b, sdXi), sdY));
+  });
+
+  // 8. Coeficientul de Determinație (R-squared)
   const rSquared = math.subtract(math.bignumber(1), math.divide(ssRes, ssTotal));
 
   const rSqAdjPart1 = math.subtract(math.bignumber(1), rSquared);
@@ -182,7 +195,7 @@ export const calculateRegression = (yData, xData, modelType, toUINumber, alpha =
     math.multiply(rSqAdjPart1, rSqAdjPart2)
   );
 
-  // 8. Testul ANOVA (F-Statistic)
+  // 9. Testul ANOVA (F-Statistic)
   const fNumerator = math.divide(rSquared, math.bignumber(k));
   const fDenominator = math.divide(math.subtract(math.bignumber(1), rSquared), math.bignumber(df));
   const fStat = math.divide(fNumerator, fDenominator);
@@ -209,6 +222,7 @@ export const calculateRegression = (yData, xData, modelType, toUINumber, alpha =
     fStat: toUINumber(fStat),
     fSignificance,
     fIsSignificant,
+    betaWeights,
   };
 };
 
