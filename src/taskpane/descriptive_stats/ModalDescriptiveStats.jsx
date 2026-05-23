@@ -13,8 +13,9 @@ import {
 } from "@fluentui/react-components";
 import RangeSelector from "../components/RangeSelector";
 
-import { getSelectedNumericColumn, insertColumn } from "@api";
+import { getColumnMatrix, insertColumn } from "@api";
 import { calculateDescriptiveStats } from "@utils/math";
+import usePrecision from "@utils/hooks/usePrecision";
 
 import { useLanguage } from "@i18n";
 import ActionButton from "../components/ActionButton";
@@ -47,7 +48,7 @@ const useStyles = makeStyles({
     padding: "12px 8px",
     borderTop: `1px solid ${tokens.colorNeutralStroke3}`,
     display: "flex",
-    justifyContent: "flex-end"
+    justifyContent: "flex-end",
   },
   cancelButton: {
     borderColor: tokens.colorNeutralStrokeAccessible,
@@ -57,27 +58,56 @@ const useStyles = makeStyles({
   },
 });
 
+const STAT_FIELDS = [
+  "n",
+  "mean",
+  "stdDev",
+  "standardError",
+  "confidenceLevel",
+  "lowerBound",
+  "upperBound",
+];
+
+export const buildDescriptiveStatsMatrix = (columnMatrix, statLabels, toUINumber) => {
+  const k = columnMatrix.data[0].length;
+  const meta = columnMatrix.meta;
+
+  const allStats = Array.from({ length: k }, (_, j) => {
+    const colValues = columnMatrix.data.map((row) => row[j]);
+    return calculateDescriptiveStats(colValues);
+  });
+
+  const headerRow = [
+    "",
+    ...Array.from({ length: k }, (_, j) => {
+      const { name, unit } = meta[j] ?? { name: `X${j + 1}`, unit: null };
+      return unit ? `${name} <${unit}>` : name;
+    }),
+  ];
+
+  const statRows = STAT_FIELDS.map((field, i) => [
+    statLabels[i],
+    ...allStats.map((s) => (field === "n" ? s[field] : toUINumber(s[field]))),
+  ]);
+
+  return [headerRow, ...statRows];
+};
+
 const ModalDescriptiveStats = () => {
   const styles = useStyles();
   const { t } = useLanguage();
+  const { toUINumber } = usePrecision();
 
   const [open, setOpen] = useState(false);
   const [adresaX, setAdresaX] = useState("");
   const [adresaY, setAdresaY] = useState("");
 
   const handleClick = async () => {
-    const values = await getSelectedNumericColumn(adresaX);
-    const stats = calculateDescriptiveStats(values);
+    const columnMatrix = await getColumnMatrix(adresaX);
+    if (!columnMatrix?.data?.length) return;
 
-    const dataToWrite = [
-      [t("descriptiveStats.n"), stats.n],
-      [t("descriptiveStats.mean"), stats.mean],
-      [t("descriptiveStats.stdDev"), stats.stdDev],
-      [t("descriptiveStats.standardError"), stats.standardError],
-      [t("descriptiveStats.confidenceLevel"), stats.confidenceLevel],
-      [t("descriptiveStats.lowerBound"), stats.lowerBound],
-      [t("descriptiveStats.upperBound"), stats.upperBound],
-    ];
+    const statLabels = STAT_FIELDS.map((key) => t(`descriptiveStats.${key}`));
+    const dataToWrite = buildDescriptiveStatsMatrix(columnMatrix, statLabels, toUINumber);
 
     await insertColumn(dataToWrite, adresaY);
   };
@@ -113,7 +143,9 @@ const ModalDescriptiveStats = () => {
 
           <DialogActions className={styles.footer}>
             <DialogTrigger disableButtonEnhancement>
-              <Button appearance="secondary" className={styles.cancelButton}>{t("descriptiveStats.button__cancel")}</Button>
+              <Button appearance="secondary" className={styles.cancelButton}>
+                {t("descriptiveStats.button__cancel")}
+              </Button>
             </DialogTrigger>
             <Button appearance="primary" onClick={handleClick}>
               {t("descriptiveStats.button__submit")}
