@@ -8,6 +8,7 @@ import ModalSettings from "./components/ModalSettings";
 import { makeStyles, tokens } from "@fluentui/react-components";
 import { SettingsFilled } from "@fluentui/react-icons";
 import { useLanguage } from "@i18n";
+import ActionButton from "./components/ActionButton";
 
 const useStyles = makeStyles({
   root: {
@@ -66,6 +67,43 @@ const App = () => {
   const styles = useStyles();
   const { t } = useLanguage();
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const onPress = async () => {
+    await Excel.run(async (context) => {
+      const range = context.workbook.worksheets.getActiveWorksheet().getRange("A1:B3");
+
+      // range.format.font.bold = true;
+      // range.format.font.italic = true;
+      // range.format.font.underline = "Single";
+      // range.format.font.name = "Calibri";
+      // range.format.font.size = 14;
+      range.format.font.color = "#FF0000";
+      // range.format.font.strikethrough = true;
+
+      // Cell fill
+      // range.format.fill.color = "#FFFF00";
+      range.format.fill.pattern = Excel.FillPattern.darkGray; // optional pattern
+
+      // Alignment
+      range.format.horizontalAlignment = Excel.HorizontalAlignment.center;
+      range.format.verticalAlignment = Excel.VerticalAlignment.middle;
+      range.format.wrapText = true;
+      range.format.indentLevel = 2;
+      range.format.readingOrder = Excel.ReadingOrder.leftToRight;
+
+      // Borders
+      range.format.borders.getItem("EdgeBottom").style = Excel.BorderLineStyle.continuous;
+      range.format.borders.getItem("EdgeBottom").color = "#000000";
+      range.format.borders.getItem("EdgeBottom").weight = Excel.BorderWeight.medium;
+
+      // Row & column sizing
+      range.format.columnWidth = 120;
+      range.format.rowHeight = 30;
+      range.format.autofitColumns();
+      range.format.autofitRows();
+
+      await context.sync();
+    });
+  };
   return (
     <div className={styles.root}>
       <div className={styles.app}>
@@ -79,6 +117,7 @@ const App = () => {
           <ModalSimpleRegression />
           <ModalModelComparison />
           <ModalDummyVariables />
+          <ActionButton text={"aaaaaaaa"} handleClick={onPress} />
         </div>
 
         <div className={styles.bottomPart} onClick={() => setSettingsOpen(true)}>

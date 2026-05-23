@@ -86,9 +86,15 @@ const useStyles = makeStyles({
     justifyContent: "flex-end",
   },
   cancelButton: {
-    borderColor: tokens.colorNeutralStrokeAccessible,
+    borderTopColor: tokens.colorNeutralStrokeAccessible,
+    borderRightColor: tokens.colorNeutralStrokeAccessible,
+    borderBottomColor: tokens.colorNeutralStrokeAccessible,
+    borderLeftColor: tokens.colorNeutralStrokeAccessible,
     ":hover": {
-      borderColor: tokens.colorNeutralStrokeAccessible,
+      borderTopColor: tokens.colorNeutralStrokeAccessible,
+      borderRightColor: tokens.colorNeutralStrokeAccessible,
+      borderBottomColor: tokens.colorNeutralStrokeAccessible,
+      borderLeftColor: tokens.colorNeutralStrokeAccessible,
     },
   },
 });
@@ -115,14 +121,14 @@ const ModalSimpleRegression = () => {
     const interpretation = econometricInterpretation
       ? interpretationRegression(stats, parseFloat(alpha), yData.meta, xData.meta, t)
       : null;
-    const dataToWrite = generateSummaryOutput(
+    const rawFullData = generateSummaryOutput(
       { interpretation, ...stats },
       yData.meta,
       xData.meta,
       t
     );
 
-    await insertColumn(dataToWrite, resultDestinationAddress);
+    await insertColumn(rawFullData, resultDestinationAddress);
   };
 
   return (

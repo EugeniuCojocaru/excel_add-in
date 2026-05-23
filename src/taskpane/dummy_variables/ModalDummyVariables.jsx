@@ -95,9 +95,15 @@ const useStyles = makeStyles({
     justifyContent: "space-between",
   },
   cancelButton: {
-    borderColor: tokens.colorNeutralStrokeAccessible,
+    borderTopColor: tokens.colorNeutralStrokeAccessible,
+    borderRightColor: tokens.colorNeutralStrokeAccessible,
+    borderBottomColor: tokens.colorNeutralStrokeAccessible,
+    borderLeftColor: tokens.colorNeutralStrokeAccessible,
     ":hover": {
-      borderColor: tokens.colorNeutralStrokeAccessible,
+      borderTopColor: tokens.colorNeutralStrokeAccessible,
+      borderRightColor: tokens.colorNeutralStrokeAccessible,
+      borderBottomColor: tokens.colorNeutralStrokeAccessible,
+      borderLeftColor: tokens.colorNeutralStrokeAccessible,
     },
   },
 });

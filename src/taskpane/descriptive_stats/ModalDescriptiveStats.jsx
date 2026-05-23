@@ -51,9 +51,15 @@ const useStyles = makeStyles({
     justifyContent: "flex-end",
   },
   cancelButton: {
-    borderColor: tokens.colorNeutralStrokeAccessible,
+    borderTopColor: tokens.colorNeutralStrokeAccessible,
+    borderRightColor: tokens.colorNeutralStrokeAccessible,
+    borderBottomColor: tokens.colorNeutralStrokeAccessible,
+    borderLeftColor: tokens.colorNeutralStrokeAccessible,
     ":hover": {
-      borderColor: tokens.colorNeutralStrokeAccessible,
+      borderTopColor: tokens.colorNeutralStrokeAccessible,
+      borderRightColor: tokens.colorNeutralStrokeAccessible,
+      borderBottomColor: tokens.colorNeutralStrokeAccessible,
+      borderLeftColor: tokens.colorNeutralStrokeAccessible,
     },
   },
 });
