@@ -34,8 +34,8 @@ const getModel = (k, pValues, fSignificance, rSquared, adjustedRSquared) => {
       model.push([`p${i + 1} = `, pValues[i + 1]]);
     }
   }
-  model.push(["R^2 = ", rSquared]);
-  if (k > 1) model.push(["R^2 ajustat = ", adjustedRSquared]);
+  model.push(["R² = ", rSquared]);
+  if (k > 1) model.push(["R² adj = ", adjustedRSquared]);
 
   return model;
 };
@@ -162,7 +162,16 @@ const getConclusion = (isSignificant, bNumber, alpha, yMeta, xMeta, t) => {
   ];
 };
 
-const getInterpretation = (slopes, adjustedRSquared, yMeta, xMeta, modelType, t, confidenceIntervals, alpha) => {
+const getInterpretation = (
+  slopes,
+  adjustedRSquared,
+  yMeta,
+  xMeta,
+  modelType,
+  t,
+  confidenceIntervals,
+  alpha
+) => {
   const interpretation = [];
   const yName = yMeta[0]?.name || "Y";
 
@@ -199,9 +208,10 @@ const getInterpretation = (slopes, adjustedRSquared, yMeta, xMeta, modelType, t,
     const xName = xMeta[i]?.name || `X${i + 1}`;
     const { xUnit, yUnit } = unitBasedOnModelType(i);
     const yValue = getYValueBasedOnModelType(i);
-    const directionKey = yValue >= 0
-      ? "regression.interpretation.thirdStep.interpretationVariable"
-      : "regression.interpretation.thirdStep.interpretationVariableDecrease";
+    const directionKey =
+      yValue >= 0
+        ? "regression.interpretation.thirdStep.interpretationVariable"
+        : "regression.interpretation.thirdStep.interpretationVariableDecrease";
     interpretation.push([
       `b${i + 1} = ${slopes[i]}`,
       `${t(directionKey, { xName, xUnit, yName })}${Math.abs(yValue)}${yUnit}`,

@@ -104,12 +104,13 @@ export const splitAndCompleteRawData = (rawData) => {
   const excelData = dataToWrite.map((data, rowIndex) => {
     const { row, format } = data;
     format.forEach((cellFormat, columnIndex) => {
-      if (cellFormat !== null && cellFormat !== "")
+      if (cellFormat !== null && cellFormat !== "") {
         formats.push({
           row: rowIndex,
           column: columnIndex,
           format: cellFormat,
         });
+      }
     });
     const diff = maxColumns - row.length;
     if (diff !== 0) row.push(...Array(diff).fill(""));

@@ -20,7 +20,9 @@ export async function insertColumn(array, positions) {
 
       formats.forEach((cellFormat) => {
         const { row, column, format } = cellFormat;
-        applyStyle(targetRange, format, row, column);
+        const { fullWidth, ...rest } = format;
+        if (fullWidth) applyStyle(targetRange, rest, row);
+        else applyStyle(targetRange, rest, row, column);
       });
 
       await context.sync();

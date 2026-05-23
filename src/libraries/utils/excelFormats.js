@@ -77,7 +77,15 @@ export const EXCEL_FORMATS = {
 };
 
 export const applyStyle = (range, style, row = null, col = null) => {
-  const target = row !== null && col !== null ? range.getCell(row, col) : range;
+  let target;
+
+  if (row !== null && col !== null) {
+    target = range.getCell(row, col); // specific cell
+  } else if (row !== null) {
+    target = range.getRow(row); // whole row
+  } else {
+    target = range; // whole range
+  }
 
   if (style.font) Object.assign(target.format.font, style.font);
   if (style.fill) Object.assign(target.format.fill, style.fill);
