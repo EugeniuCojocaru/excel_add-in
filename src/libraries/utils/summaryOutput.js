@@ -7,12 +7,19 @@ const addRowData = (rowData, newRow) => {
   rowData.dataToWrite.push(newRow);
 };
 
-export const generateSummaryOutput = (stats, yMeta, xMeta, t) => {
+// Accepts wrapped uiStats (from toUIStats spread with interpretation) and { mode, fillFor }.
+export const generateSummaryOutput = (
+  stats,
+  _yMeta,
+  xMeta,
+  t,
+  { mode = "STUDENT", fillFor = () => null } = {}
+) => {
   const rawData = { dataToWrite: [], maxColumns: 0 };
-  const n = stats.df + stats.k + 1;
+  const n = stats.df.value + stats.k.value + 1;
   const confidence = (1 - stats.alpha) * 100;
   const xNames = Array.from(
-    { length: stats.k },
+    { length: stats.k.value },
     (_, i) => xMeta[i]?.name || t("regression.summaryOutput.variableX", { index: i + 1 })
   );
 
@@ -36,28 +43,28 @@ export const generateSummaryOutput = (stats, yMeta, xMeta, t) => {
   addRowData(
     rawData,
     toUIData(
-      [t("regression.summaryOutput.rSquared"), stats.rSquared],
+      [t("regression.summaryOutput.rSquared"), stats.rSquared.value],
+      [EXCEL_FORMATS.tableRowHeader, fillFor(stats.rSquared)]
+    )
+  );
+  addRowData(
+    rawData,
+    toUIData(
+      [t("regression.summaryOutput.adjustedRSquared"), stats.adjustedRSquared.value],
+      [EXCEL_FORMATS.tableRowHeader, fillFor(stats.adjustedRSquared)]
+    )
+  );
+  addRowData(
+    rawData,
+    toUIData(
+      [t("regression.summaryOutput.standardError"), stats.ese.value],
       [EXCEL_FORMATS.tableRowHeader, null]
     )
   );
   addRowData(
     rawData,
     toUIData(
-      [t("regression.summaryOutput.adjustedRSquared"), stats.adjustedRSquared],
-      [EXCEL_FORMATS.tableRowHeader, null]
-    )
-  );
-  addRowData(
-    rawData,
-    toUIData(
-      [t("regression.summaryOutput.standardError"), stats.ese],
-      [EXCEL_FORMATS.tableRowHeader, null]
-    )
-  );
-  addRowData(
-    rawData,
-    toUIData(
-      [t("regression.summaryOutput.ssRes"), stats.ssRes],
+      [t("regression.summaryOutput.ssRes"), stats.ssRes.value],
       [EXCEL_FORMATS.tableRowHeader, null]
     )
   );
@@ -89,21 +96,26 @@ export const generateSummaryOutput = (stats, yMeta, xMeta, t) => {
   addRowData(
     rawData,
     toUIData(
-      [t("regression.summaryOutput.regression"), stats.k, stats.fStat, stats.fSignificance],
+      [
+        t("regression.summaryOutput.regression"),
+        stats.k.value,
+        stats.fStat.value,
+        stats.fSignificance.value,
+      ],
+      [EXCEL_FORMATS.tableRowHeader, null, null, fillFor(stats.fSignificance)]
+    )
+  );
+  addRowData(
+    rawData,
+    toUIData(
+      [t("regression.summaryOutput.residual"), stats.df.value, "", ""],
       [EXCEL_FORMATS.tableRowHeader, null, null, null]
     )
   );
   addRowData(
     rawData,
     toUIData(
-      [t("regression.summaryOutput.residual"), stats.df, "", ""],
-      [EXCEL_FORMATS.tableRowHeader, null, null, null]
-    )
-  );
-  addRowData(
-    rawData,
-    toUIData(
-      [t("regression.summaryOutput.total"), stats.df + stats.k, "", ""],
+      [t("regression.summaryOutput.total"), stats.df.value + stats.k.value, "", ""],
       [EXCEL_FORMATS.tableRowHeader, null, null, null]
     )
   );
@@ -131,32 +143,41 @@ export const generateSummaryOutput = (stats, yMeta, xMeta, t) => {
     toUIData(
       [
         t("regression.summaryOutput.intercept"),
-        stats.b0,
-        stats.standardErrors[0],
-        stats.tStats[0],
-        stats.pValues[0],
-        stats.confidenceIntervals[0][0],
-        stats.confidenceIntervals[0][1],
+        stats.b0.value,
+        stats.standardErrors[0].value,
+        stats.tStats[0].value,
+        stats.pValues[0].value,
+        stats.confidenceIntervals[0][0].value,
+        stats.confidenceIntervals[0][1].value,
         "",
       ],
-      [EXCEL_FORMATS.tableRowHeader, ...Array(7).fill(null)]
+      [EXCEL_FORMATS.tableRowHeader, fillFor(stats.b0), null, null, null, null, null, null]
     )
   );
-  for (let i = 0; i < stats.k; i++) {
+  for (let i = 0; i < stats.k.value; i++) {
     addRowData(
       rawData,
       toUIData(
         [
           `${xNames[i]} (b${i + 1})`,
-          stats.slopes[i],
-          stats.standardErrors[i + 1],
-          stats.tStats[i + 1],
-          stats.pValues[i + 1],
-          stats.confidenceIntervals[i + 1][0],
-          stats.confidenceIntervals[i + 1][1],
-          stats.betaWeights[i],
+          stats.slopes[i].value,
+          stats.standardErrors[i + 1].value,
+          stats.tStats[i + 1].value,
+          stats.pValues[i + 1].value,
+          stats.confidenceIntervals[i + 1][0].value,
+          stats.confidenceIntervals[i + 1][1].value,
+          stats.betaWeights[i].value,
         ],
-        [EXCEL_FORMATS.tableRowHeader, ...Array(7).fill(null)]
+        [
+          EXCEL_FORMATS.tableRowHeader,
+          fillFor(stats.slopes[i]),
+          null,
+          null,
+          fillFor(stats.pValues[i + 1]),
+          fillFor(stats.confidenceIntervals[i + 1][0]),
+          fillFor(stats.confidenceIntervals[i + 1][1]),
+          null,
+        ]
       )
     );
   }
@@ -169,41 +190,43 @@ export const generateSummaryOutput = (stats, yMeta, xMeta, t) => {
   }
 
   // 5. VIF & Correlation Matrix (only meaningful for multiple regression)
-  if (stats.k > 1) {
+  if (stats.k.value > 1) {
     addRowData(rawData, toUIData([""]));
 
-    // VIF table
-    addRowData(
-      rawData,
-      toUIData(
-        [t("regression.summaryOutput.vifTitle")],
-        [{ ...EXCEL_FORMATS.h1Title, fullWidth: true }]
-      )
-    );
-    addRowData(rawData, toUIData([""]));
-    addRowData(
-      rawData,
-      toUIData(["", t("regression.summaryOutput.vifValue")], [null, EXCEL_FORMATS.tableColHeader])
-    );
-    for (let i = 0; i < stats.k; i++) {
-      addRowData(
-        rawData,
-        toUIData([xNames[i], stats.vifValues[i]], [EXCEL_FORMATS.tableRowHeader, null])
-      );
-    }
-    if (stats.hasMulticollinearity) {
-      addRowData(rawData, toUIData([""]));
+    // VIF table — hidden in COMPACT mode
+    if (mode !== "COMPACT") {
       addRowData(
         rawData,
         toUIData(
-          [t("regression.summaryOutput.multicollinearityWarning")],
-          [{ ...EXCEL_FORMATS.h3Subtitle, fullWidth: true }]
+          [t("regression.summaryOutput.vifTitle")],
+          [{ ...EXCEL_FORMATS.h1Title, fullWidth: true }]
         )
       );
-      addRowData(rawData, toUIData([t("regression.summaryOutput.multicollinearityEffect")]));
+      addRowData(rawData, toUIData([""]));
+      addRowData(
+        rawData,
+        toUIData(["", t("regression.summaryOutput.vifValue")], [null, EXCEL_FORMATS.tableColHeader])
+      );
+      for (let i = 0; i < stats.k.value; i++) {
+        addRowData(
+          rawData,
+          toUIData([xNames[i], stats.vifValues[i].value], [EXCEL_FORMATS.tableRowHeader, null])
+        );
+      }
+      if (stats.hasMulticollinearity) {
+        addRowData(rawData, toUIData([""]));
+        addRowData(
+          rawData,
+          toUIData(
+            [t("regression.summaryOutput.multicollinearityWarning")],
+            [{ ...EXCEL_FORMATS.h3Subtitle, fullWidth: true }]
+          )
+        );
+        addRowData(rawData, toUIData([t("regression.summaryOutput.multicollinearityEffect")]));
+      }
     }
 
-    // Correlation matrix
+    // Correlation matrix — always shown
     addRowData(rawData, toUIData([""]));
     addRowData(
       rawData,
@@ -217,21 +240,21 @@ export const generateSummaryOutput = (stats, yMeta, xMeta, t) => {
       rawData,
       toUIData(["", ...xNames], [null, ...xNames.map(() => EXCEL_FORMATS.tableColHeader)])
     );
-    for (let i = 0; i < stats.k; i++) {
+    for (let i = 0; i < stats.k.value; i++) {
       addRowData(
         rawData,
         toUIData(
-          [xNames[i], ...stats.correlationMatrix[i]],
-          [EXCEL_FORMATS.tableRowHeader, ...stats.correlationMatrix[i].map(() => null)]
+          [xNames[i], ...stats.correlationMatrix[i].map((c) => c.value)],
+          [EXCEL_FORMATS.tableRowHeader, null]
         )
       );
     }
 
     // High-correlation pairs observation
     const highPairs = [];
-    for (let i = 0; i < stats.k; i++) {
-      for (let j = i + 1; j < stats.k; j++) {
-        const r = stats.correlationMatrix[i][j];
+    for (let i = 0; i < stats.k.value; i++) {
+      for (let j = i + 1; j < stats.k.value; j++) {
+        const r = stats.correlationMatrix[i][j].value;
         if (Math.abs(r) > 0.8) highPairs.push({ nameI: xNames[i], nameJ: xNames[j], r });
       }
     }
@@ -251,8 +274,8 @@ export const generateSummaryOutput = (stats, yMeta, xMeta, t) => {
       addRowData(rawData, toUIData([t("regression.summaryOutput.multicollinearityEffect")]));
     }
 
-    // 6. Executive Summary (always shown)
-    const adjRSqNum = Number(stats.adjustedRSquared);
+    // 6. Executive Summary — always shown
+    const adjRSqNum = Number(stats.adjustedRSquared.value);
     const adjRSqPct = Math.round(adjRSqNum * 100);
     const powerLabel =
       adjRSqNum < 0.3
@@ -262,7 +285,8 @@ export const generateSummaryOutput = (stats, yMeta, xMeta, t) => {
           : t("regression.summaryOutput.powerStrong");
 
     const strongestIdx = stats.betaWeights.reduce(
-      (maxIdx, val, i) => (Math.abs(val) > Math.abs(stats.betaWeights[maxIdx]) ? i : maxIdx),
+      (maxIdx, val, i) =>
+        Math.abs(val.value) > Math.abs(stats.betaWeights[maxIdx].value) ? i : maxIdx,
       0
     );
 
@@ -280,7 +304,7 @@ export const generateSummaryOutput = (stats, yMeta, xMeta, t) => {
         rawData,
         toUIData([
           t("regression.summaryOutput.executiveSummaryNotSignificant", {
-            pValue: stats.fSignificance,
+            pValue: stats.fSignificance.value,
           }),
         ])
       );

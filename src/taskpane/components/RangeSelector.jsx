@@ -30,6 +30,7 @@ const RangeSelector = ({
   value,
   size = "medium",
   input = true,
+  disabled = false,
 }) => {
   const styles = useStyles();
   const { t } = useLanguage();
@@ -56,6 +57,7 @@ const RangeSelector = ({
       <Input
         size={size}
         value={rangeAddress}
+        disabled={disabled}
         onChange={(_, data) => {
           setRangeAddress(data.value);
           if (onRangeChanged) onRangeChanged(data.value);
@@ -69,6 +71,7 @@ const RangeSelector = ({
               icon={input ? <TableFilled /> : <TargetArrowFilled />}
               onClick={handleGetSelection}
               size="small"
+              disabled={disabled}
               aria-label={t("rangeSelector.ariaLabel")}
             />
           </Tooltip>

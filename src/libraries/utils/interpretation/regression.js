@@ -29,20 +29,6 @@ const getEquation = (k, b0, b, yMeta, xMeta, modelType) => {
   return equation;
 };
 
-const getModel = (k, pValues, fSignificance, rSquared, adjustedRSquared) => {
-  const model = [["pValue = ", k === 1 ? pValues[1] : fSignificance]];
-
-  if (k > 1) {
-    for (let i = 0; i < k; i++) {
-      model.push([`p${i + 1} = `, pValues[i + 1]]);
-    }
-  }
-  model.push(["R² = ", rSquared]);
-  if (k > 1) model.push(["R² adj = ", adjustedRSquared]);
-
-  return model;
-};
-
 const DEFAULT_ALPHA_LEVELS = [0.01, 0.05, 0.1];
 
 const buildAlphaSet = (userAlpha) => {
@@ -52,9 +38,24 @@ const buildAlphaSet = (userAlpha) => {
   return levels.sort((a, b) => a - b);
 };
 
-// single: { pValue, alpha, bNumber, yMeta, xMeta, t }
-// multiple: { pValue, alpha, slopes, yMeta, xMeta, t }
-const getConclusion = ({ pValue, alpha, bNumber = null, slopes = null, yMeta, xMeta, t }) => {
+// Merges a fill color into an existing format object without mutating it.
+const withFill = (baseFormat, stat, fillFor) => {
+  const fill = fillFor(stat);
+  if (!fill || !baseFormat) return baseFormat;
+  return { ...baseFormat, ...fill };
+};
+
+const getConclusion = ({
+  pValue,
+  alpha,
+  bNumber = null,
+  slopes = null,
+  yMeta,
+  xMeta,
+  t,
+  fillFor = () => null,
+  pValueStat = null,
+}) => {
   const isMultiple = slopes !== null;
   const isSignificant = pValue < alpha;
   const isMarginal = !isSignificant && pValue - alpha < 0.02;
@@ -99,11 +100,21 @@ const getConclusion = ({ pValue, alpha, bNumber = null, slopes = null, yMeta, xM
 
   return toUIData(
     [t("regression.interpretation.secondStep.conclusion"), `${verdict} ${conventional}`],
-    [EXCEL_FORMATS.tableRowHeader, null]
+    [EXCEL_FORMATS.tableRowHeader, fillFor(pValueStat)]
   );
 };
 
-const getSignificance = (b, pValue, alpha, bNumber, yMeta, xMeta, t) => {
+// { mode, fillFor, bStat, pValueStat } — bStat and pValueStat are { value, color } objects
+const getSignificance = (
+  b,
+  pValue,
+  alpha,
+  bNumber,
+  yMeta,
+  xMeta,
+  t,
+  { mode = "STUDENT", fillFor = () => null, bStat = null, pValueStat = null } = {}
+) => {
   const xName = xMeta[bNumber - 1]?.name || `X${bNumber}`;
   const pLabel = bNumber === 1 && xMeta.length === 1 ? "pValue" : `p${bNumber}`;
   const significance = [
@@ -118,42 +129,51 @@ const getSignificance = (b, pValue, alpha, bNumber, yMeta, xMeta, t) => {
 
   if (b > 0) {
     significance.push(
-      toUIData([
-        "",
-        t("regression.interpretation.secondStep.notZeroHypothesisRight", { bNumber, b }),
-      ])
+      toUIData(
+        ["", t("regression.interpretation.secondStep.notZeroHypothesisRight", { bNumber, b })],
+        [null, fillFor(bStat)]
+      )
     );
   }
   if (b < 0) {
     significance.push(
-      toUIData([
-        "",
-        t("regression.interpretation.secondStep.notZeroHypothesisLeft", { bNumber, b }),
-      ])
+      toUIData(
+        ["", t("regression.interpretation.secondStep.notZeroHypothesisLeft", { bNumber, b })],
+        [null, fillFor(bStat)]
+      )
     );
   }
 
-  buildAlphaSet(alpha).forEach((level) => {
-    const isSig = pValue < level;
-    significance.push(
-      toUIData([
-        `${t("regression.interpretation.secondStep.pValueText")}${level}:`,
-        `${pLabel} = ${pValue} ?< α = ${level} => ${isSig ? t("regression.interpretation.secondStep.significantBasicTrue", { pValue }) : t("regression.interpretation.secondStep.significantBasicFalse", { pValue })}`,
-      ])
-    );
-    significance.push(
-      toUIData([
-        "",
-        `${isSig ? t("regression.interpretation.secondStep.significantTrue", { bNumber, level }) : t("regression.interpretation.secondStep.significantFalse", { bNumber, level })}`,
-      ])
-    );
-  });
+  // Step-by-step alpha comparison — hidden in COMPACT mode
+  if (mode !== "COMPACT") {
+    buildAlphaSet(alpha).forEach((level) => {
+      const isSig = pValue < level;
+      significance.push(
+        toUIData(
+          [
+            `${t("regression.interpretation.secondStep.pValueText")}${level}:`,
+            `${pLabel} = ${pValue} ?< α = ${level} => ${isSig ? t("regression.interpretation.secondStep.significantBasicTrue", { pValue }) : t("regression.interpretation.secondStep.significantBasicFalse", { pValue })}`,
+          ],
+          [null, fillFor(pValueStat)]
+        )
+      );
+      significance.push(
+        toUIData([
+          "",
+          `${isSig ? t("regression.interpretation.secondStep.significantTrue", { bNumber, level }) : t("regression.interpretation.secondStep.significantFalse", { bNumber, level })}`,
+        ])
+      );
+    });
+  }
 
-  significance.push(getConclusion({ pValue, alpha, bNumber, yMeta, xMeta, t }));
+  significance.push(
+    getConclusion({ pValue, alpha, bNumber, yMeta, xMeta, t, fillFor, pValueStat })
+  );
 
   return significance;
 };
 
+// slopeStats / pValueStats / fSigStat are { value, color } objects for fills
 const getMultipleRegressionSignificance = (
   slopes,
   pValues,
@@ -161,14 +181,26 @@ const getMultipleRegressionSignificance = (
   alpha,
   yMeta,
   xMeta,
-  t
+  t,
+  {
+    mode = "STUDENT",
+    fillFor = () => null,
+    slopeStats = [],
+    pValueStats = [],
+    fSigStat = null,
+  } = {}
 ) => {
   const significance = [toUIData([""])];
 
   slopes.forEach((b, index) => {
     const bNumber = index + 1;
     const pValue = pValues[bNumber];
-    const bSignificance = getSignificance(b, pValue, alpha, bNumber, yMeta, xMeta, t);
+    const bSignificance = getSignificance(b, pValue, alpha, bNumber, yMeta, xMeta, t, {
+      mode,
+      fillFor,
+      bStat: slopeStats[index] ?? null,
+      pValueStat: pValueStats[bNumber] ?? null,
+    });
     bSignificance.forEach((row) => significance.push(row));
     significance.push(toUIData([""]));
   });
@@ -195,10 +227,13 @@ const getMultipleRegressionSignificance = (
     buildAlphaSet(alpha).forEach((level) => {
       const isSig = fSignificance < level;
       significance.push(
-        toUIData([
-          `${t("regression.interpretation.secondStep.pValueText")}${level}:`,
-          `pValue = ${fSignificance} ?< α = ${level} => ${isSig ? t("regression.interpretation.secondStep.significantBasicTrue", { pValue: fSignificance }) : t("regression.interpretation.secondStep.significantBasicFalse", { pValue: fSignificance })}`,
-        ])
+        toUIData(
+          [
+            `${t("regression.interpretation.secondStep.pValueText")}${level}:`,
+            `pValue = ${fSignificance} ?< α = ${level} => ${isSig ? t("regression.interpretation.secondStep.significantBasicTrue", { pValue: fSignificance }) : t("regression.interpretation.secondStep.significantBasicFalse", { pValue: fSignificance })}`,
+          ],
+          [null, fillFor(fSigStat)]
+        )
       );
       significance.push(
         toUIData([
@@ -208,12 +243,24 @@ const getMultipleRegressionSignificance = (
       );
     });
 
-    significance.push(getConclusion({ pValue: fSignificance, alpha, slopes, yMeta, xMeta, t }));
+    significance.push(
+      getConclusion({
+        pValue: fSignificance,
+        alpha,
+        slopes,
+        yMeta,
+        xMeta,
+        t,
+        fillFor,
+        pValueStat: fSigStat,
+      })
+    );
     significance.push(toUIData([""]));
   }
   return significance;
 };
 
+// slopeStats / adjRSqStat are { value, color } objects for fills; confidenceIntervals are already wrapped
 const getInterpretation = (
   slopes,
   adjustedRSquared,
@@ -222,7 +269,8 @@ const getInterpretation = (
   modelType,
   t,
   confidenceIntervals,
-  alpha
+  alpha,
+  { fillFor = () => null, slopeStats = [], adjRSqStat = null } = {}
 ) => {
   const interpretation = [toUIData([""])];
   const yName = yMeta[0]?.name || "Y";
@@ -270,21 +318,24 @@ const getInterpretation = (
           `b${i + 1} = ${slopes[i]}`,
           `${t(directionKey, { xName, xUnit, yName })}${Math.abs(yValue)}${yUnit}`,
         ],
-        [EXCEL_FORMATS.tableRowHeader, null]
+        [withFill(EXCEL_FORMATS.tableRowHeader, slopeStats[i] ?? null, fillFor), null]
       )
     );
     if (confidence !== null && confidenceIntervals) {
       const ci = confidenceIntervals[i + 1]; // [0] is intercept
       interpretation.push(
-        toUIData([
-          "",
-          t("regression.interpretation.thirdStep.ciSentence", {
-            confidence,
-            lower: ci[0].value,
-            upper: ci[1].value,
-            yUnit: yUnit.trim(),
-          }),
-        ])
+        toUIData(
+          [
+            "",
+            t("regression.interpretation.thirdStep.ciSentence", {
+              confidence,
+              lower: ci[0].value,
+              upper: ci[1].value,
+              yUnit: yUnit.trim(),
+            }),
+          ],
+          [null, fillFor(ci[0])]
+        )
       );
     }
   }
@@ -296,7 +347,7 @@ const getInterpretation = (
         `R² ${t("regression.interpretation.thirdStep.r2Adjusted")} = ${adjustedRSquared}`,
         `${(adjustedRSquared * 100).toFixed(2)}% ${t("regression.interpretation.thirdStep.interpretationR2Adjusted", { yName, variableNames })}`,
       ],
-      [EXCEL_FORMATS.tableRowHeader, null]
+      [withFill(EXCEL_FORMATS.tableRowHeader, adjRSqStat, fillFor), null]
     )
   );
 
@@ -305,7 +356,6 @@ const getInterpretation = (
 
 const REGRESSION_INTEPRETATION = {
   getEquation,
-  getModel,
   getMultipleRegressionSignificance,
   getInterpretation,
 };

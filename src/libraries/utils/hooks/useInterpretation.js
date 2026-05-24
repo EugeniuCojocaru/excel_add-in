@@ -1,15 +1,17 @@
-// import { useSettings } from "../../../taskpane/context/SettingsContext";
+import { useSettings } from "../../../taskpane/context/SettingsContext";
 
-// const usePrecision = () => {
-//   const { decimals } = useSettings();
+const useInterpretation = () => {
+  const { interpretation } = useSettings();
+  const mode = interpretation;
+  const isStudent = mode === "STUDENT";
+  const isCompact = mode === "COMPACT";
 
-//   const toUINumber = (num) => {
-//     const number = typeof num === "number" ? num : num.toNumber();
-//     if (number <= 0.001) return number;
-//     return Number(number.toFixed(decimals));
-//   };
+  const fillFor = (uiStat) => {
+    if (!isStudent || !uiStat?.color) return null;
+    return { fill: { color: uiStat.color } };
+  };
 
-//   return { toUINumber };
-// };
+  return { mode, isStudent, isCompact, fillFor };
+};
 
-// export default usePrecision;
+export default useInterpretation;

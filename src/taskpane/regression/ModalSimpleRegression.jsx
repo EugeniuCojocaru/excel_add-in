@@ -18,10 +18,11 @@ import {
 } from "@fluentui/react-components";
 import RangeSelector from "../components/RangeSelector";
 
-import { getColumnMatrix, insertColumn } from "@api";
+import { getColumnMatrix, insertColumn, insertColumnTo } from "@api";
 import { calculateRegression } from "@utils/math";
-import { usePrecision } from "@utils/hooks";
+import { usePrecision, useInterpretation } from "@utils/hooks";
 import { generateSummaryOutput } from "@utils/summaryOutput";
+import { toUIStats } from "@utils/ui";
 
 import { useLanguage } from "@i18n";
 import { interpretationRegression } from "@utils/econometrics";
@@ -103,6 +104,7 @@ const ModalSimpleRegression = () => {
   const styles = useStyles();
   const { t } = useLanguage();
   const { toUINumber } = usePrecision();
+  const { mode, isCompact, fillFor } = useInterpretation();
 
   const [open, setOpen] = useState(false);
   const [YColumnAdress, setYColumnAddress] = useState("Sheet1!A13:A64");
@@ -117,18 +119,24 @@ const ModalSimpleRegression = () => {
     const yData = await getColumnMatrix(YColumnAdress);
 
     const modelTypeKey = MODEL_TYPES.find((type) => type.label === modelType)?.key || "linear";
-    const stats = calculateRegression(yData, xData, modelTypeKey, toUINumber, alpha);
+    const rawStats = calculateRegression(yData, xData, modelTypeKey, toUINumber, alpha);
+    const uiStats = toUIStats(rawStats);
     const interpretation = econometricInterpretation
-      ? interpretationRegression(stats, parseFloat(alpha), yData.meta, xData.meta, t)
+      ? interpretationRegression(uiStats, parseFloat(alpha), yData.meta, xData.meta, t, { mode, fillFor })
       : null;
     const rawFullData = generateSummaryOutput(
-      { interpretation, ...stats },
+      { interpretation, ...uiStats },
       yData.meta,
       xData.meta,
-      t
+      t,
+      { mode, fillFor }
     );
 
-    await insertColumn(rawFullData, resultDestinationAddress);
+    if (isCompact) {
+      await insertColumnTo(rawFullData, "Discussion", "A1");
+    } else {
+      await insertColumn(rawFullData, resultDestinationAddress);
+    }
   };
 
   return (
@@ -160,11 +168,12 @@ const ModalSimpleRegression = () => {
             />
             <RangeSelector
               label={t("regression.label__output")}
-              placeholder="Ex: A1"
+              placeholder={isCompact ? t("regression.label__output_compact_disabled") : "Ex: A1"}
               onRangeChanged={setResultDestinationAddress}
-              value={resultDestinationAddress}
+              value={isCompact ? "" : resultDestinationAddress}
               size="large"
               input={false}
+              disabled={isCompact}
             />
 
             <div className={styles.optionsRow}>

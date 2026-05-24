@@ -26,6 +26,7 @@
       "label__x_input": "Select X variable:",
       "label__y_input": "Select Y variable:",
       "label__output": "Select starting cell for results:",
+      "label__output_compact_disabled": "Not available in compact mode",
       "label__extra_options": "Additional options:",
       "checkbox__only_values": "Only values, no interpretation.",
       "switch__interpretation": "Econometric interpretation",
@@ -106,7 +107,7 @@
         "intercept": "Intercept (Intercept / b0)",
         "variableX": "Variable X{index}",
         "interpretation": "Model interpretation:",
-        "executiveSummaryTitle": "Executive Summary",
+        "executiveSummaryTitle": "6. Executive Summary",
         "executiveSummarySignificant": "The model is statistically significant, with {power} predictive power, explaining {pct}% of the dependent variable's variation.",
         "executiveSummaryNotSignificant": "The model is not statistically significant (F p-value = {pValue}), and cannot be used for reliable predictions.",
         "executiveSummaryStrongestPredictor": "Based on standardized coefficients, {name} is the most influential predictor.",
@@ -114,11 +115,11 @@
         "powerWeak": "weak",
         "powerModerate": "moderate",
         "powerStrong": "strong",
-        "vifTitle": "Variance Inflation Factor (VIF)",
+        "vifTitle": "4. Variance Inflation Factor (VIF)",
         "vifValue": "VIF",
         "multicollinearityWarning": "Warning: at least one VIF > 5 — multicollinearity detected.",
         "multicollinearityEffect": "This may affect the individual significance of the coefficients.",
-        "correlationMatrixTitle": "Predictor Correlation Matrix",
+        "correlationMatrixTitle": "5. Predictor Correlation Matrix",
         "observation": "Observation:",
         "strongCorrelation": "strong correlation between predictors",
         "veryStrongCorrelation": "very strong (problematic) multicollinearity between predictors"
@@ -172,7 +173,7 @@
       },
       "interpretation": {
         "label": "Interpretation",
-        "extended": "Extended",
+        "student": "Student",
         "compact": "Compact"
       },
       "decimals": {
@@ -210,6 +211,7 @@
       "label__x_input": "Selectează variabila X:",
       "label__y_input": "Selectează variabila Y:",
       "label__output": "Selectează celula de început pentru rezultate:",
+      "label__output_compact_disabled": "Indisponibil în modul compact",
       "label__extra_options": "Opțiuni suplimentare:",
       "checkbox__only_values": "Doar valori, fara interpretare.",
       "switch__interpretation": "Interpretare econometrică",
@@ -290,7 +292,7 @@
         "intercept": "Termenul liber (Intercept / b0)",
         "variableX": "Variabila X{index}",
         "interpretation": "Interpretare model:",
-        "executiveSummaryTitle": "Concluzie generala",
+        "executiveSummaryTitle": "6. Concluzie generala",
         "executiveSummarySignificant": "Modelul este semnificativ statistic, având o putere de predicție {power}, explicând {pct}% din variația variabilei dependente.",
         "executiveSummaryNotSignificant": "Modelul nu este semnificativ statistic (p-valoare F = {pValue}), deci nu poate fi utilizat pentru predicții fiabile.",
         "executiveSummaryStrongestPredictor": "Pe baza coeficienților standardizați, variabila {name} este cel mai important factor de influență.",
@@ -298,11 +300,11 @@
         "powerWeak": "slabă",
         "powerModerate": "moderată",
         "powerStrong": "puternică",
-        "vifTitle": "Factorul de Inflație a Varianței (VIF)",
+        "vifTitle": "4. Factorul de Inflație a Varianței (VIF)",
         "vifValue": "VIF",
         "multicollinearityWarning": "Atenție: cel puțin un VIF > 5 — multicoliniaritate detectată.",
         "multicollinearityEffect": "Aceasta poate afecta semnificatia individuala a coeficientilor.",
-        "correlationMatrixTitle": "Matricea de corelatie a predictorilor",
+        "correlationMatrixTitle": "5. Matricea de corelatie a predictorilor",
         "observation": "Observatie:",
         "strongCorrelation": "corelatie puternica intre regresori",
         "veryStrongCorrelation": "multicoliniaritate puternica intre regresori"
@@ -356,7 +358,7 @@
       },
       "interpretation": {
         "label": "Interpretare",
-        "extended": "Extins",
+        "student": "Student",
         "compact": "Compact"
       },
       "decimals": {

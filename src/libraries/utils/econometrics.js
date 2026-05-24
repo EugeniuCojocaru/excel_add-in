@@ -1,12 +1,12 @@
 import { EXCEL_FORMATS } from "./excelFormats";
 import { REGRESSION_INTEPRETATION } from "./interpretation";
-import { toUIData, toUIStats } from "./ui";
+import { toUIData } from "./ui";
 
-const { getEquation, getModel, getMultipleRegressionSignificance, getInterpretation } =
+const { getEquation, getMultipleRegressionSignificance, getInterpretation } =
   REGRESSION_INTEPRETATION;
 
-export const interpretationRegression = (stats, alpha, yMeta, xMeta, t) => {
-  const uiStats = toUIStats(stats);
+// Accepts pre-wrapped uiStats (from toUIStats) and optional { mode, fillFor } for colored output.
+export const interpretationRegression = (uiStats, alpha, yMeta, xMeta, t, { mode = "STUDENT", fillFor = () => null } = {}) => {
   const {
     k,
     b0,
@@ -44,17 +44,32 @@ export const interpretationRegression = (stats, alpha, yMeta, xMeta, t) => {
   );
   interpretation.push(toUIData([""]));
 
-  const model = getModel(
-    k.value,
-    pValues.map((p) => p.value),
-    fSignificance.value,
-    rSquared.value,
-    adjustedRSquared.value
+  // Model stats inline so we can apply per-cell fills
+  if (k.value === 1) {
+    interpretation.push(
+      toUIData(["pValue = ", pValues[1].value], [EXCEL_FORMATS.tableRowHeader, fillFor(pValues[1])])
+    );
+  } else {
+    interpretation.push(
+      toUIData(["pValue = ", fSignificance.value], [EXCEL_FORMATS.tableRowHeader, fillFor(fSignificance)])
+    );
+    for (let i = 0; i < k.value; i++) {
+      interpretation.push(
+        toUIData([`p${i + 1} = `, pValues[i + 1].value], [EXCEL_FORMATS.tableRowHeader, fillFor(pValues[i + 1])])
+      );
+    }
+  }
+  interpretation.push(
+    toUIData(["R² = ", rSquared.value], [EXCEL_FORMATS.tableRowHeader, fillFor(rSquared)])
   );
-  model.forEach((row) => interpretation.push(toUIData(row, [EXCEL_FORMATS.tableRowHeader, null])));
+  if (k.value > 1) {
+    interpretation.push(
+      toUIData(["R² adj = ", adjustedRSquared.value], [EXCEL_FORMATS.tableRowHeader, fillFor(adjustedRSquared)])
+    );
+  }
   interpretation.push(toUIData([""]));
 
-  // 2. Semnificatie
+  // 2. Significance
   interpretation.push(
     toUIData(
       [t("regression.interpretation.secondStep.significance")],
@@ -68,11 +83,12 @@ export const interpretationRegression = (stats, alpha, yMeta, xMeta, t) => {
     alpha,
     yMeta,
     xMeta,
-    t
+    t,
+    { mode, fillFor, slopeStats: slopes, pValueStats: pValues, fSigStat: fSignificance }
   );
   significance.forEach((row) => interpretation.push(row));
 
-  // 3. Interpretare
+  // 3. Interpretation
   interpretation.push(
     toUIData(
       [t("regression.interpretation.thirdStep.interpretation")],
@@ -87,7 +103,8 @@ export const interpretationRegression = (stats, alpha, yMeta, xMeta, t) => {
     modelType,
     t,
     confidenceIntervals,
-    alpha
+    alpha,
+    { fillFor, slopeStats: slopes, adjRSqStat: adjustedRSquared }
   );
   interpretationSlopes.forEach((row) => interpretation.push(row));
 

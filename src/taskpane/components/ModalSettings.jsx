@@ -123,7 +123,7 @@ const ModalSettings = ({ open, onClose }) => {
                 value={draft.interpretation}
                 onChange={(_, data) => setDraft((d) => ({ ...d, interpretation: data.value }))}
               >
-                <Radio value="EXTENDED" label={t("settings.interpretation.extended")} />
+                <Radio value="STUDENT" label={t("settings.interpretation.student")} />
                 <Radio value="COMPACT" label={t("settings.interpretation.compact")} />
               </RadioGroup>
             </div>
