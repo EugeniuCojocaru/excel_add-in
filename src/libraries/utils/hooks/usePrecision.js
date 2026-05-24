@@ -5,7 +5,7 @@ const usePrecision = () => {
 
   const toUINumber = (num) => {
     const number = typeof num === "number" ? num : num.toNumber();
-    if (number <= 0.001) return number;
+    if (Math.abs(number) < 0.001) return number;
     return Number(number.toFixed(decimals));
   };
 
