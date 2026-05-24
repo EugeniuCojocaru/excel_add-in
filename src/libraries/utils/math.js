@@ -99,6 +99,11 @@ export const calculateRegression = (yData, xData, modelType, toUINumber, alpha =
   const k = xData.data[0].length;
   const df = n - k - 1;
 
+  for (let i = 0; i < k; i++) {
+    const isDummy = xData.data.every((row) => row[i] === 0 || row[i] === 1);
+    if (xData.meta[i]) xData.meta[i].isDummy = isDummy;
+  }
+
   const { Y, X } = transformDataForModel(yData, xData, modelType);
 
   const X_T = math.transpose(X);

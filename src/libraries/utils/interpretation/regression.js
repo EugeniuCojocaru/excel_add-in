@@ -305,10 +305,14 @@ const getInterpretation = (
 
   for (let i = 0; i < slopes.length; i++) {
     const xName = xMeta[i]?.name || `X${i + 1}`;
+    const isDummy = xMeta[i]?.isDummy === true;
     const { xUnit, yUnit } = unitBasedOnModelType(i);
     const yValue = getYValueBasedOnModelType(i);
-    const directionKey =
-      yValue >= 0
+    const directionKey = isDummy
+      ? yValue >= 0
+        ? "regression.interpretation.thirdStep.interpretationVariableDummy"
+        : "regression.interpretation.thirdStep.interpretationVariableDummyDecrease"
+      : yValue >= 0
         ? "regression.interpretation.thirdStep.interpretationVariable"
         : "regression.interpretation.thirdStep.interpretationVariableDecrease";
     interpretation.push(
