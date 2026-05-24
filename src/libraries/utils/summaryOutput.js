@@ -193,37 +193,34 @@ export const generateSummaryOutput = (
   if (stats.k.value > 1) {
     addRowData(rawData, toUIData([""]));
 
-    // VIF table — hidden in COMPACT mode
-    if (mode !== "COMPACT") {
+    addRowData(
+      rawData,
+      toUIData(
+        [t("regression.summaryOutput.vifTitle")],
+        [{ ...EXCEL_FORMATS.h1Title, fullWidth: true }]
+      )
+    );
+    addRowData(rawData, toUIData([""]));
+    addRowData(
+      rawData,
+      toUIData(["", t("regression.summaryOutput.vifValue")], [null, EXCEL_FORMATS.tableColHeader])
+    );
+    for (let i = 0; i < stats.k.value; i++) {
       addRowData(
         rawData,
-        toUIData(
-          [t("regression.summaryOutput.vifTitle")],
-          [{ ...EXCEL_FORMATS.h1Title, fullWidth: true }]
-        )
+        toUIData([xNames[i], stats.vifValues[i].value], [EXCEL_FORMATS.tableRowHeader, null])
       );
+    }
+    if (stats.hasMulticollinearity) {
       addRowData(rawData, toUIData([""]));
       addRowData(
         rawData,
-        toUIData(["", t("regression.summaryOutput.vifValue")], [null, EXCEL_FORMATS.tableColHeader])
+        toUIData(
+          [t("regression.summaryOutput.multicollinearityWarning")],
+          [{ ...EXCEL_FORMATS.h3Subtitle, fullWidth: true }]
+        )
       );
-      for (let i = 0; i < stats.k.value; i++) {
-        addRowData(
-          rawData,
-          toUIData([xNames[i], stats.vifValues[i].value], [EXCEL_FORMATS.tableRowHeader, null])
-        );
-      }
-      if (stats.hasMulticollinearity) {
-        addRowData(rawData, toUIData([""]));
-        addRowData(
-          rawData,
-          toUIData(
-            [t("regression.summaryOutput.multicollinearityWarning")],
-            [{ ...EXCEL_FORMATS.h3Subtitle, fullWidth: true }]
-          )
-        );
-        addRowData(rawData, toUIData([t("regression.summaryOutput.multicollinearityEffect")]));
-      }
+      addRowData(rawData, toUIData([t("regression.summaryOutput.multicollinearityEffect")]));
     }
 
     // Correlation matrix — always shown

@@ -6,7 +6,14 @@ const { getEquation, getMultipleRegressionSignificance, getInterpretation } =
   REGRESSION_INTEPRETATION;
 
 // Accepts pre-wrapped uiStats (from toUIStats) and optional { mode, fillFor } for colored output.
-export const interpretationRegression = (uiStats, alpha, yMeta, xMeta, t, { mode = "STUDENT", fillFor = () => null } = {}) => {
+export const interpretationRegression = (
+  uiStats,
+  alpha,
+  yMeta,
+  xMeta,
+  t,
+  { mode = "STUDENT", fillFor = () => null } = {}
+) => {
   const {
     k,
     b0,
@@ -43,32 +50,44 @@ export const interpretationRegression = (uiStats, alpha, yMeta, xMeta, t, { mode
     )
   );
   interpretation.push(toUIData([""]));
-
-  // Model stats inline so we can apply per-cell fills
-  if (k.value === 1) {
-    interpretation.push(
-      toUIData(["pValue = ", pValues[1].value], [EXCEL_FORMATS.tableRowHeader, fillFor(pValues[1])])
-    );
-  } else {
-    interpretation.push(
-      toUIData(["pValue = ", fSignificance.value], [EXCEL_FORMATS.tableRowHeader, fillFor(fSignificance)])
-    );
-    for (let i = 0; i < k.value; i++) {
+  if (mode !== "COMPACT") {
+    // Model stats inline so we can apply per-cell fills
+    if (k.value === 1) {
       interpretation.push(
-        toUIData([`p${i + 1} = `, pValues[i + 1].value], [EXCEL_FORMATS.tableRowHeader, fillFor(pValues[i + 1])])
+        toUIData(
+          ["pValue = ", pValues[1].value],
+          [EXCEL_FORMATS.tableRowHeader, fillFor(pValues[1])]
+        )
+      );
+    } else {
+      interpretation.push(
+        toUIData(
+          ["pValue = ", fSignificance.value],
+          [EXCEL_FORMATS.tableRowHeader, fillFor(fSignificance)]
+        )
+      );
+      for (let i = 0; i < k.value; i++) {
+        interpretation.push(
+          toUIData(
+            [`p${i + 1} = `, pValues[i + 1].value],
+            [EXCEL_FORMATS.tableRowHeader, fillFor(pValues[i + 1])]
+          )
+        );
+      }
+    }
+    interpretation.push(
+      toUIData(["R² = ", rSquared.value], [EXCEL_FORMATS.tableRowHeader, fillFor(rSquared)])
+    );
+    if (k.value > 1) {
+      interpretation.push(
+        toUIData(
+          ["R² adj = ", adjustedRSquared.value],
+          [EXCEL_FORMATS.tableRowHeader, fillFor(adjustedRSquared)]
+        )
       );
     }
+    interpretation.push(toUIData([""]));
   }
-  interpretation.push(
-    toUIData(["R² = ", rSquared.value], [EXCEL_FORMATS.tableRowHeader, fillFor(rSquared)])
-  );
-  if (k.value > 1) {
-    interpretation.push(
-      toUIData(["R² adj = ", adjustedRSquared.value], [EXCEL_FORMATS.tableRowHeader, fillFor(adjustedRSquared)])
-    );
-  }
-  interpretation.push(toUIData([""]));
-
   // 2. Significance
   interpretation.push(
     toUIData(

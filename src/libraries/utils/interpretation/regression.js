@@ -127,25 +127,24 @@ const getSignificance = (
     ),
   ];
 
-  if (b > 0) {
-    significance.push(
-      toUIData(
-        ["", t("regression.interpretation.secondStep.notZeroHypothesisRight", { bNumber, b })],
-        [null, fillFor(bStat)]
-      )
-    );
-  }
-  if (b < 0) {
-    significance.push(
-      toUIData(
-        ["", t("regression.interpretation.secondStep.notZeroHypothesisLeft", { bNumber, b })],
-        [null, fillFor(bStat)]
-      )
-    );
-  }
-
-  // Step-by-step alpha comparison — hidden in COMPACT mode
   if (mode !== "COMPACT") {
+    if (b > 0) {
+      significance.push(
+        toUIData(
+          ["", t("regression.interpretation.secondStep.notZeroHypothesisRight", { bNumber, b })],
+          [null, fillFor(bStat)]
+        )
+      );
+    }
+    if (b < 0) {
+      significance.push(
+        toUIData(
+          ["", t("regression.interpretation.secondStep.notZeroHypothesisLeft", { bNumber, b })],
+          [null, fillFor(bStat)]
+        )
+      );
+    }
+
     buildAlphaSet(alpha).forEach((level) => {
       const isSig = pValue < level;
       significance.push(
