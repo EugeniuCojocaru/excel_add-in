@@ -50,17 +50,25 @@
           "info": "! Info: ",
           "infoText": "because we calculated a two-tailed p-value, to test the significance of b, we must divide the p-value by 2 and compare it with alpha, and to determine the direction of the relationship (positive or negative) we look at the sign of b.",
           "pValueText": "We compare the pValue with the significance level α = ",
-          "significantTrue": "We reject H0, b{bNumber} is significantly different from 0",
-          "significantFalse": "H0 cannot be rejected",
+          "significantTrue": "Reject H0: B{bNumber} ≠ 0 is supported at α = {level}.",
+          "significantFalse": "Fail to reject H0: no sufficient evidence that B{bNumber} ≠ 0 at α = {level}.",
           "multipleVariableSignificance": "Overall model significance (all variables):",
           "notAllZeroHypothesis": "H1: not all parameters are 0",
-          "significantMultipleTrue": "We reject H0, the {variablesNumber} variables ({variableNames}), together, significantly influence the dependent variable {yName}",
-          "significantMultipleFalse": "H0 cannot be rejected",
+          "significantMultipleTrue": "Reject H0 at α = {level}: the {variablesNumber} variables ({variableNames}) jointly influence {yName}.",
+          "significantMultipleFalse": "Fail to reject H0 at α = {level}: insufficient evidence of joint significance.",
           "conclusion": "Conclusion: ",
-          "conclusionSignificant": "With a {percentage}% confidence, {xName} directly influences {yName}",
-          "conclusionNotSignificant": "We do not have enough evidence to conclude that {xName} significantly influences {yName}",
-          "signicantBasicTrue": "Yes, {pValue} is smaller than the significance level α",
-          "signicantBasicFalse": "No, {pValue} is not smaller than the significance level α"
+          "conclusionSignificant": "At α = {alpha}, we reject H0: {xName} has a statistically significant effect on {yName} (p = {pValue}).",
+          "conclusionNotSignificant": "At α = {alpha}, we fail to reject H0: no sufficient evidence that {xName} influences {yName} (p = {pValue}).",
+          "significantBasicTrue": "H0 rejected",
+          "significantBasicFalse": "H0 not rejected",
+          "conclusionMarginal": "At α = {alpha}, H0 is not rejected (p = {pValue}), but the result is borderline. Interpret with caution — consider collecting more data before drawing conclusions about {xName} → {yName}.",
+          "conclusionConventionalHigh": "The evidence is strong: significant at all conventional levels (0.01, 0.05, 0.10).",
+          "conclusionConventionalMod": "The evidence is moderate: significant at 0.05 and 0.10, but not at 0.01.",
+          "conclusionConventionalMarg": "The evidence is weak: significant only at the 0.10 level, not at 0.05 or 0.01.",
+          "conclusionConventionalNone": "The evidence is absent at all conventional levels (0.01, 0.05, 0.10).",
+          "conclusionMultipleSignificant": "At α = {alpha}, we reject H0: the model ({variableNames}) has a statistically significant overall effect on {yName} (F-p = {pValue}).",
+          "conclusionMultipleNotSignificant": "At α = {alpha}, we fail to reject H0: insufficient evidence that ({variableNames}) collectively influence {yName} (F-p = {pValue}).",
+          "conclusionMultipleMarginal": "At α = {alpha}, H0 is not rejected (F-p = {pValue}), but the model is borderline. Interpret with caution — consider collecting more data or reviewing the model specification."
         },
         "thirdStep": {
           "interpretation": "3. Model interpretation",
@@ -205,8 +213,14 @@
       "label__extra_options": "Opțiuni suplimentare:",
       "checkbox__only_values": "Doar valori, fara interpretare.",
       "switch__interpretation": "Interpretare econometrică",
-      "input__alpha": { "label": "Nivel de semnificație (α):", "placeholder": "Ex: 0.05" },
-      "combobox__model_type": { "label": "Tip model:", "placeholder": "Selectează opțiunea..." },
+      "input__alpha": {
+        "label": "Nivel de semnificație (α):",
+        "placeholder": "Ex: 0.05"
+      },
+      "combobox__model_type": {
+        "label": "Tip model:",
+        "placeholder": "Selectează opțiunea..."
+      },
       "interpretation": {
         "firstStep": {
           "model": "1. Model",
@@ -220,17 +234,25 @@
           "info": "! Info: ",
           "infoText": "deoarece am calculat p-value bilateral, pentru a testa semnificatia lui b, trebuie sa impartim p-value la 2 si sa comparam cu alpha, iar pentru a stabili directia relatiei (pozitiva sau negativa) ne uitam la semnul lui b.",
           "pValueText": "Comparam pValue cu nivelul de semnificatie α = ",
-          "significantTrue": "Respingem H0, b{bNumber} nu este semnificativ diferit de 0",
-          "significantFalse": "H0 nu poate fi respinsa",
+          "significantTrue": "Respingem H0: B{bNumber} ≠ 0 este susținut la α = {level}.",
+          "significantFalse": "Nu respingem H0: dovezi insuficiente că B{bNumber} ≠ 0 la α = {level}.",
           "multipleVariableSignificance": "Semnificatia in raport cu ansamblul variabilelor:",
           "notAllZeroHypothesis": "H1: nu toti parametrii sunt 0",
-          "significantMultipleTrue": "Respingem H0, cele {variablesNumber} variabile ({variableNames}), impreuna, influenteaza in mod semnificativ variabila dependenta {yName}",
-          "significantMultipleFalse": "H0 nu poate fi respinsa",
+          "significantMultipleTrue": "Respingem H0 la α = {level}: cele {variablesNumber} variabile ({variableNames}) influențează împreuna {yName}.",
+          "significantMultipleFalse": "Nu respingem H0 la α = {level}: dovezi insuficiente de semnificație colectivă.",
           "conclusion": "Concluzie: ",
-          "conclusionSignificant": "Cu o probabiliate de {percentage}%, {xName} influenteaza in mod direct {yName}",
-          "conclusionNotSignificant": "Nu avem suficiente dovezi pentru a concluziona ca {xName} influenteaza in mod semnificativ {yName}",
-          "signicantBasicTrue": "Da, {pValue} este mai mic decat nivelul de semnificatie α",
-          "signicantBasicFalse": "Nu, {pValue} nu este mai mic decat nivelul de semnificatie α"
+          "conclusionSignificant": "La α = {alpha}, respingem H0: {xName} are un efect statistic semnificativ asupra lui {yName} (p = {pValue}).",
+          "conclusionNotSignificant": "La α = {alpha}, nu respingem H0: dovezi insuficiente că {xName} influențează {yName} (p = {pValue}).",
+          "significantBasicTrue": "H0 respinsă",
+          "significantBasicFalse": "H0 nerespinsă",
+          "conclusionMarginal": "La α = {alpha}, H0 nu este respinsă (p = {pValue}), dar rezultatul este la limită. Interpretați cu prudență — luați în considerare colectarea mai multor date înainte de a trage concluzii despre {xName} → {yName}.",
+          "conclusionConventionalHigh": "Evidența este puternică: semnificativ la toate nivelurile convenționale (0,01; 0,05; 0,10).",
+          "conclusionConventionalMod": "Evidența este moderată: semnificativ la 0,05 şi 0,10, dar nu la 0,01.",
+          "conclusionConventionalMarg": "Evidența este slabă: semnificativ doar la nivelul 0,10, nu la 0,05 sau 0,01.",
+          "conclusionConventionalNone": "Nicio evidență la niciun nivel convențional (0,01; 0,05; 0,10).",
+          "conclusionMultipleSignificant": "La α = {alpha}, respingem H0: modelul ({variableNames}) are un efect global statistic semnificativ asupra lui {yName} (pValue = {pValue}).",
+          "conclusionMultipleNotSignificant": "La α = {alpha}, nu respingem H0: dovezi insuficiente că ({variableNames}) influențează colectiv {yName} (pValue = {pValue}).",
+          "conclusionMultipleMarginal": "La α = {alpha}, H0 nu este respinsă (F-p = {pValue}), dar modelul este la limită. Interpretați cu prudență — luați în considerare colectarea mai multor date sau revizuirea specificației modelului."
         },
         "thirdStep": {
           "interpretation": "3. Interpretarea modelului",
@@ -293,7 +315,10 @@
       "label__y_input": "Selectează variabila Y:",
       "label__x_input": "Selectează variabila X:",
       "label__output": "Selectează celula de început pentru rezultate:",
-      "input__alpha": { "label": "Nivel de semnificație (α):", "placeholder": "Ex: 0.05" },
+      "input__alpha": {
+        "label": "Nivel de semnificație (α):",
+        "placeholder": "Ex: 0.05"
+      },
       "interpretation": {
         "title": "Comparare modele"
       }
