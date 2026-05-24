@@ -224,7 +224,7 @@ const getInterpretation = (
   confidenceIntervals,
   alpha
 ) => {
-  const interpretation = [];
+  const interpretation = [toUIData([""])];
   const yName = yMeta[0]?.name || "Y";
 
   const unitBasedOnModelType = (index) => {
@@ -264,29 +264,38 @@ const getInterpretation = (
       yValue >= 0
         ? "regression.interpretation.thirdStep.interpretationVariable"
         : "regression.interpretation.thirdStep.interpretationVariableDecrease";
-    interpretation.push([
-      `b${i + 1} = ${slopes[i]}`,
-      `${t(directionKey, { xName, xUnit, yName })}${Math.abs(yValue)}${yUnit}`,
-    ]);
-    if (confidence !== null) {
+    interpretation.push(
+      toUIData(
+        [`b${i + 1} = ${slopes[i]}`, `${t(directionKey, { xName, xUnit, yName })}${Math.abs(yValue)}${yUnit}`],
+        [EXCEL_FORMATS.tableRowHeader, null]
+      )
+    );
+    if (confidence !== null && confidenceIntervals) {
       const ci = confidenceIntervals[i + 1]; // [0] is intercept
-      interpretation.push([
-        "",
-        t("regression.interpretation.thirdStep.ciSentence", {
-          confidence,
-          lower: ci[0],
-          upper: ci[1],
-          yUnit: yUnit.trim(),
-        }),
-      ]);
+      interpretation.push(
+        toUIData([
+          "",
+          t("regression.interpretation.thirdStep.ciSentence", {
+            confidence,
+            lower: ci[0].value,
+            upper: ci[1].value,
+            yUnit: yUnit.trim(),
+          }),
+        ])
+      );
     }
   }
   const variableNames = xMeta.map((meta, index) => meta.name || `X${index + 1}`).join(", ");
 
-  interpretation.push([
-    `R^2 ${t("regression.interpretation.thirdStep.r2Adjusted")} = ${adjustedRSquared}`,
-    `${(adjustedRSquared * 100).toFixed(2)}% ${t("regression.interpretation.thirdStep.interpretationR2Adjusted", { yName, variableNames })}`,
-  ]);
+  interpretation.push(
+    toUIData(
+      [
+        `R² ${t("regression.interpretation.thirdStep.r2Adjusted")} = ${adjustedRSquared}`,
+        `${(adjustedRSquared * 100).toFixed(2)}% ${t("regression.interpretation.thirdStep.interpretationR2Adjusted", { yName, variableNames })}`,
+      ],
+      [EXCEL_FORMATS.tableRowHeader, null]
+    )
+  );
 
   return interpretation;
 };

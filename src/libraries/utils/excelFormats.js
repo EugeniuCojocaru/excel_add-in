@@ -10,7 +10,7 @@ export const EXCEL_FORMATS = {
       color: "#1C1B1A",
     },
     fill: { color: "#E9F5ED" }, // Primary Light
-    horizontalAlignment: "Center",
+    horizontalAlignment: "Left",
     verticalAlignment: "Center",
     rowHeight: 40,
     border: {

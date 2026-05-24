@@ -71,18 +71,24 @@ export const interpretationRegression = (stats, alpha, yMeta, xMeta, t) => {
   significance.forEach((row) => interpretation.push(row));
   interpretation.push(toUIData([""]));
 
-  // interpretation.push([t("regression.interpretation.thirdStep.interpretation"), ""]); // 3. Interpretare
-  // const interpretationSlopes = getInterpretation(
-  //   slopes,
-  //   adjustedRSquared,
-  //   yMeta,
-  //   xMeta,
-  //   modelType,
-  //   t,
-  //   confidenceIntervals,
-  //   alpha
-  // );
-  // interpretationSlopes.forEach((value) => interpretation.push(value));
-  console.log({ interpretation });
+  // 3. Interpretare
+  interpretation.push(
+    toUIData(
+      [t("regression.interpretation.thirdStep.interpretation")],
+      [{ ...EXCEL_FORMATS.h1Title, fullWidth: true }]
+    )
+  );
+  const interpretationSlopes = getInterpretation(
+    slopes.map((s) => s.value),
+    adjustedRSquared.value,
+    yMeta,
+    xMeta,
+    modelType,
+    t,
+    confidenceIntervals,
+    alpha
+  );
+  interpretationSlopes.forEach((row) => interpretation.push(row));
+
   return interpretation;
 };
