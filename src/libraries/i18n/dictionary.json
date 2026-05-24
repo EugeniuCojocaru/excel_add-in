@@ -137,7 +137,11 @@
         "placeholder": "Ex: 0.05"
       },
       "interpretation": {
-        "title": "Model Comparison"
+        "title": "Model Comparison",
+        "bestRSquared": "Best R²:",
+        "bestRSS": "Lowest RSS:",
+        "conclusion": "Based on the studied algorithm, if values are comparable, the best model is chosen based on the lowest RSS. Recommended model: {modelType}.",
+        "conclusionCompact": "Recommended model: {modelType}."
       }
     },
     "dummyVariables": {
@@ -322,7 +326,11 @@
         "placeholder": "Ex: 0.05"
       },
       "interpretation": {
-        "title": "Comparare modele"
+        "title": "Comparare modele",
+        "bestRSquared": "Cel mai mare R²:",
+        "bestRSS": "Cel mai mic RSS:",
+        "conclusion": "Pe baza algoritmului studiat, dacă valorile sunt comparabile, cel mai bun model se alege în funcție de cel mai mic RSS. Modelul recomandat: {modelType}.",
+        "conclusionCompact": "Modelul recomandat: {modelType}."
       }
     },
     "dummyVariables": {

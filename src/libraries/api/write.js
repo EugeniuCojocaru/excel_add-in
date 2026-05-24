@@ -20,6 +20,9 @@ export async function insertColumnTo(array, sheetName, positions) {
       const startCell = sheet.getRange(positions).getCell(0, 0);
       const targetRange = startCell.getResizedRange(numRows - 1, numCols - 1);
 
+      targetRange.clear();
+      await context.sync();
+
       targetRange.values = excelData;
       targetRange.format.autofitColumns();
 
@@ -41,15 +44,16 @@ export async function insertColumn(array, positions) {
   try {
     await Excel.run(async (context) => {
       const sheet = context.workbook.worksheets.getActiveWorksheet();
-      // const data = standardizeDataToWrite(array);
       const { excelData, formats } = splitAndCompleteRawData(array);
 
-      console.log("!!!!!", { array });
       const numRows = excelData.length;
       const numCols = excelData[0].length;
 
       const startCell = sheet.getRange(positions).getCell(0, 0);
       const targetRange = startCell.getResizedRange(numRows - 1, numCols - 1);
+
+      targetRange.clear();
+      await context.sync();
 
       targetRange.values = excelData;
       targetRange.format.autofitColumns();

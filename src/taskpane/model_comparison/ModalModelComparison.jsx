@@ -16,9 +16,11 @@ import {
 } from "@fluentui/react-components";
 import RangeSelector from "../components/RangeSelector";
 
-import { getColumnMatrix, insertColumn } from "@api";
+import { getColumnMatrix, insertColumn, insertColumnTo } from "@api";
 import { calculateRegression } from "@utils/math";
-import { usePrecision } from "@utils/hooks";
+import { usePrecision, useInterpretation } from "@utils/hooks";
+import { toUIData, toUIStats } from "@utils/ui";
+import { EXCEL_FORMATS } from "@utils/excelFormats";
 import { generateSummaryOutput } from "@utils/summaryOutput";
 
 import { useLanguage } from "@i18n";
@@ -103,6 +105,7 @@ const ModalModelComparison = () => {
   const styles = useStyles();
   const { t } = useLanguage();
   const { toUINumber } = usePrecision();
+  const { mode, isCompact, fillFor } = useInterpretation();
 
   const [open, setOpen] = useState(false);
   const [YColumnAdress, setYColumnAddress] = useState("Sheet1!A1:A23");
@@ -118,24 +121,60 @@ const ModalModelComparison = () => {
 
     if (modelKeys.length < 2) return;
 
-    const stats = modelKeys.map((modelKey) => {
-      const statsModel = calculateRegression(yData, xData, modelKey, toUINumber, alpha);
-      const modelInterpretation = econometricInterpretation
-        ? interpretationRegression(statsModel, parseFloat(alpha), yData.meta, xData.meta, t)
-        : null;
-      return { ...statsModel, interpretation: modelInterpretation };
-    });
-
-    const comparation = COMPARISSON_INTERPRETATION.comparisonInterpretation(stats, t);
-    const dataToWrite = stats.map((model) => {
-      const uiData = generateSummaryOutput(model, yData.meta, xData.meta, t);
-      return [...uiData, [" "], [" "]];
-    });
-
-    await insertColumn(
-      [...comparation, [" "], [" "], ...dataToWrite.flat()],
-      resultDestinationAddress
+    const rawStatsArray = modelKeys.map((modelKey) =>
+      calculateRegression(yData, xData, modelKey, toUINumber, alpha)
     );
+
+    const comparationRawData = COMPARISSON_INTERPRETATION.comparisonInterpretation(
+      rawStatsArray,
+      t,
+      mode
+    );
+
+    const modelRawDataArray = rawStatsArray.map((rawStats) => {
+      const uiStats = toUIStats(rawStats);
+      const modelInterpretation = econometricInterpretation
+        ? interpretationRegression(uiStats, parseFloat(alpha), yData.meta, xData.meta, t, {
+            mode,
+            fillFor,
+          })
+        : null;
+      return generateSummaryOutput(
+        { ...uiStats, interpretation: modelInterpretation },
+        yData.meta,
+        xData.meta,
+        t,
+        { mode, fillFor, extend: econometricInterpretation }
+      );
+    });
+
+    const separator = {
+      maxColumns: 1,
+      dataToWrite: [
+        toUIData([""]),
+        toUIData([""], [{ ...EXCEL_FORMATS.sectionDivider, fullWidth: true }]),
+        toUIData([""]),
+      ],
+    };
+    const merged = [
+      comparationRawData,
+      separator,
+      ...modelRawDataArray.flatMap((rd, i) =>
+        i < modelRawDataArray.length - 1 ? [rd, separator] : [rd]
+      ),
+    ].reduce(
+      (acc, rd) => ({
+        maxColumns: Math.max(acc.maxColumns, rd.maxColumns),
+        dataToWrite: [...acc.dataToWrite, ...rd.dataToWrite],
+      }),
+      { maxColumns: 0, dataToWrite: [] }
+    );
+
+    if (isCompact) {
+      await insertColumnTo(merged, "Discussion", "A1");
+    } else {
+      await insertColumn(merged, resultDestinationAddress);
+    }
   };
 
   return (
@@ -167,11 +206,12 @@ const ModalModelComparison = () => {
             />
             <RangeSelector
               label={t("modelComparison.label__output")}
-              placeholder="Ex: A1"
+              placeholder={isCompact ? t("regression.label__output_compact_disabled") : "Ex: A1"}
               onRangeChanged={setResultDestinationAddress}
-              value={resultDestinationAddress}
+              value={isCompact ? "" : resultDestinationAddress}
               size="large"
               input={false}
+              disabled={isCompact}
             />
 
             <div className={styles.optionsRow}>

@@ -19,6 +19,7 @@ import { TableAddFilled, ChevronRightFilled } from "@fluentui/react-icons";
 import RangeSelector from "../components/RangeSelector";
 import { getColumnStringMatrix, insertColumn } from "@api";
 import { preprocessDummyVariables, createNewTableRows } from "@utils/dummyVariables";
+import { toUIData } from "@utils/ui";
 import { useLanguage } from "@i18n";
 import ActionButton from "../components/ActionButton";
 
@@ -145,7 +146,11 @@ const ModalDummyVariables = () => {
 
   const handleGenerate = async () => {
     const processedDummy = preprocessDummyVariables(xData, { referenceCategories: [baseline] });
-    const newColumns = createNewTableRows(processedDummy);
+    const rows = createNewTableRows(processedDummy);
+    const newColumns = {
+      maxColumns: Math.max(...rows.map((r) => r.length)),
+      dataToWrite: rows.map((row) => toUIData(row)),
+    };
     await insertColumn(newColumns, DColumnAddress);
     setOpen(false);
     setStep(1);
@@ -249,7 +254,10 @@ const ModalDummyVariables = () => {
                 {uniqueValues.length === 0 ? (
                   <Button
                     appearance="primary"
-                    onClick={() => { setOpen(false); setStep(1); }}
+                    onClick={() => {
+                      setOpen(false);
+                      setStep(1);
+                    }}
                   >
                     {t("dummyVariables.button__cancel")}
                   </Button>

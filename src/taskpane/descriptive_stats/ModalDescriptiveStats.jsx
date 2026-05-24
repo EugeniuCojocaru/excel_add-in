@@ -13,9 +13,10 @@ import {
 } from "@fluentui/react-components";
 import RangeSelector from "../components/RangeSelector";
 
-import { getColumnMatrix, insertColumn } from "@api";
+import { getColumnMatrix, insertColumn, insertColumnTo } from "@api";
 import { calculateDescriptiveStats } from "@utils/math";
-import usePrecision from "@utils/hooks/usePrecision";
+import { usePrecision, useInterpretation } from "@utils/hooks";
+import { toUIData } from "@utils/ui";
 
 import { useLanguage } from "@i18n";
 import ActionButton from "../components/ActionButton";
@@ -103,6 +104,7 @@ const ModalDescriptiveStats = () => {
   const styles = useStyles();
   const { t } = useLanguage();
   const { toUINumber } = usePrecision();
+  const { isCompact } = useInterpretation();
 
   const [open, setOpen] = useState(false);
   const [adresaX, setAdresaX] = useState("");
@@ -113,9 +115,17 @@ const ModalDescriptiveStats = () => {
     if (!columnMatrix?.data?.length) return;
 
     const statLabels = STAT_FIELDS.map((key) => t(`descriptiveStats.${key}`));
-    const dataToWrite = buildDescriptiveStatsMatrix(columnMatrix, statLabels, toUINumber);
+    const rows = buildDescriptiveStatsMatrix(columnMatrix, statLabels, toUINumber);
+    const dataToWrite = {
+      maxColumns: Math.max(...rows.map((r) => r.length)),
+      dataToWrite: rows.map((row) => toUIData(row)),
+    };
 
-    await insertColumn(dataToWrite, adresaY);
+    if (isCompact) {
+      await insertColumnTo(dataToWrite, "Discussion", "A1");
+    } else {
+      await insertColumn(dataToWrite, adresaY);
+    }
   };
 
   return (
@@ -140,10 +150,12 @@ const ModalDescriptiveStats = () => {
             />
             <RangeSelector
               label={t("descriptiveStats.label__output")}
-              placeholder="Ex: A1"
+              placeholder={isCompact ? t("regression.label__output_compact_disabled") : "Ex: A1"}
               onRangeChanged={setAdresaY}
+              value={isCompact ? "" : adresaY}
               size="large"
               input={false}
+              disabled={isCompact}
             />
           </DialogContent>
 

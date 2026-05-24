@@ -122,14 +122,17 @@ const ModalSimpleRegression = () => {
     const rawStats = calculateRegression(yData, xData, modelTypeKey, toUINumber, alpha);
     const uiStats = toUIStats(rawStats);
     const interpretation = econometricInterpretation
-      ? interpretationRegression(uiStats, parseFloat(alpha), yData.meta, xData.meta, t, { mode, fillFor })
+      ? interpretationRegression(uiStats, parseFloat(alpha), yData.meta, xData.meta, t, {
+          mode,
+          fillFor,
+        })
       : null;
     const rawFullData = generateSummaryOutput(
       { interpretation, ...uiStats },
       yData.meta,
       xData.meta,
       t,
-      { mode, fillFor }
+      { mode, fillFor, extended: econometricInterpretation }
     );
 
     if (isCompact) {

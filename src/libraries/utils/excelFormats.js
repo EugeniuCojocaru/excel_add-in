@@ -31,6 +31,16 @@ export const EXCEL_FORMATS = {
   },
 
   // ──────────────────────────────────────────
+  // Section divider — muted fill, no border, no text
+  // ──────────────────────────────────────────
+  sectionDivider: {
+    fill: { color: "#EDEBE9" },
+    rowHeight: 28,
+    horizontalAlignment: "Left",
+    verticalAlignment: "Center",
+  },
+
+  // ──────────────────────────────────────────
   // H3 — Section heading, lighter touch
   // ──────────────────────────────────────────
   h3Subtitle: {

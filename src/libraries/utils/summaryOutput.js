@@ -13,7 +13,7 @@ export const generateSummaryOutput = (
   _yMeta,
   xMeta,
   t,
-  { mode = "STUDENT", fillFor = () => null } = {}
+  { mode = "STUDENT", fillFor = () => null, extended = false } = {}
 ) => {
   const rawData = { dataToWrite: [], maxColumns: 0 };
   const n = stats.df.value + stats.k.value + 1;
@@ -183,152 +183,152 @@ export const generateSummaryOutput = (
   }
 
   // 4. Interpretation
-  if (stats.interpretation) {
+  if (extended) {
     stats.interpretation.forEach((row) => {
       addRowData(rawData, row);
     });
-  }
 
-  // 5. VIF & Correlation Matrix (only meaningful for multiple regression)
-  if (stats.k.value > 1) {
-    addRowData(rawData, toUIData([""]));
+    // 5. VIF & Correlation Matrix (only meaningful for multiple regression)
+    if (stats.k.value > 1) {
+      addRowData(rawData, toUIData([""]));
 
-    addRowData(
-      rawData,
-      toUIData(
-        [t("regression.summaryOutput.vifTitle")],
-        [{ ...EXCEL_FORMATS.h1Title, fullWidth: true }]
-      )
-    );
-    addRowData(rawData, toUIData([""]));
-    addRowData(
-      rawData,
-      toUIData(["", t("regression.summaryOutput.vifValue")], [null, EXCEL_FORMATS.tableColHeader])
-    );
-    for (let i = 0; i < stats.k.value; i++) {
       addRowData(
         rawData,
-        toUIData([xNames[i], stats.vifValues[i].value], [EXCEL_FORMATS.tableRowHeader, null])
+        toUIData(
+          [t("regression.summaryOutput.vifTitle")],
+          [{ ...EXCEL_FORMATS.h1Title, fullWidth: true }]
+        )
       );
-    }
-    if (stats.hasMulticollinearity) {
       addRowData(rawData, toUIData([""]));
       addRowData(
         rawData,
-        toUIData(
-          [t("regression.summaryOutput.multicollinearityWarning")],
-          [{ ...EXCEL_FORMATS.h3Subtitle, fullWidth: true }]
-        )
+        toUIData(["", t("regression.summaryOutput.vifValue")], [null, EXCEL_FORMATS.tableColHeader])
       );
-      addRowData(rawData, toUIData([t("regression.summaryOutput.multicollinearityEffect")]));
-    }
-
-    // Correlation matrix — always shown
-    addRowData(rawData, toUIData([""]));
-    addRowData(
-      rawData,
-      toUIData(
-        [t("regression.summaryOutput.correlationMatrixTitle")],
-        [{ ...EXCEL_FORMATS.h1Title, fullWidth: true }]
-      )
-    );
-    addRowData(rawData, toUIData([""]));
-    addRowData(
-      rawData,
-      toUIData(["", ...xNames], [null, ...xNames.map(() => EXCEL_FORMATS.tableColHeader)])
-    );
-    for (let i = 0; i < stats.k.value; i++) {
-      addRowData(
-        rawData,
-        toUIData(
-          [xNames[i], ...stats.correlationMatrix[i].map((c) => c.value)],
-          [EXCEL_FORMATS.tableRowHeader, null]
-        )
-      );
-    }
-
-    // High-correlation pairs observation
-    const highPairs = [];
-    for (let i = 0; i < stats.k.value; i++) {
-      for (let j = i + 1; j < stats.k.value; j++) {
-        const r = stats.correlationMatrix[i][j].value;
-        if (Math.abs(r) > 0.8) highPairs.push({ nameI: xNames[i], nameJ: xNames[j], r });
+      for (let i = 0; i < stats.k.value; i++) {
+        addRowData(
+          rawData,
+          toUIData([xNames[i], stats.vifValues[i].value], [EXCEL_FORMATS.tableRowHeader, null])
+        );
       }
-    }
-    if (highPairs.length > 0) {
+      if (stats.hasMulticollinearity) {
+        addRowData(rawData, toUIData([""]));
+        addRowData(
+          rawData,
+          toUIData(
+            [t("regression.summaryOutput.multicollinearityWarning")],
+            [{ ...EXCEL_FORMATS.h3Subtitle, fullWidth: true }]
+          )
+        );
+        addRowData(rawData, toUIData([t("regression.summaryOutput.multicollinearityEffect")]));
+      }
+
+      // Correlation matrix — always shown
       addRowData(rawData, toUIData([""]));
       addRowData(
         rawData,
-        toUIData([t("regression.summaryOutput.observation")], [EXCEL_FORMATS.h3Subtitle])
+        toUIData(
+          [t("regression.summaryOutput.correlationMatrixTitle")],
+          [{ ...EXCEL_FORMATS.h1Title, fullWidth: true }]
+        )
       );
-      highPairs.forEach(({ nameI, nameJ, r }) => {
-        const label =
-          Math.abs(r) > 0.9
-            ? t("regression.summaryOutput.veryStrongCorrelation")
-            : t("regression.summaryOutput.strongCorrelation");
-        addRowData(rawData, toUIData([`r(${nameI},${nameJ}) = ${r} → ${label}.`]));
-      });
-      addRowData(rawData, toUIData([t("regression.summaryOutput.multicollinearityEffect")]));
-    }
+      addRowData(rawData, toUIData([""]));
+      addRowData(
+        rawData,
+        toUIData(["", ...xNames], [null, ...xNames.map(() => EXCEL_FORMATS.tableColHeader)])
+      );
+      for (let i = 0; i < stats.k.value; i++) {
+        addRowData(
+          rawData,
+          toUIData(
+            [xNames[i], ...stats.correlationMatrix[i].map((c) => c.value)],
+            [EXCEL_FORMATS.tableRowHeader, null]
+          )
+        );
+      }
 
-    // 6. Executive Summary — always shown
-    const adjRSqNum = Number(stats.adjustedRSquared.value);
-    const adjRSqPct = Math.round(adjRSqNum * 100);
-    const powerLabel =
-      adjRSqNum < 0.3
-        ? t("regression.summaryOutput.powerWeak")
-        : adjRSqNum < 0.7
-          ? t("regression.summaryOutput.powerModerate")
-          : t("regression.summaryOutput.powerStrong");
+      // High-correlation pairs observation
+      const highPairs = [];
+      for (let i = 0; i < stats.k.value; i++) {
+        for (let j = i + 1; j < stats.k.value; j++) {
+          const r = stats.correlationMatrix[i][j].value;
+          if (Math.abs(r) > 0.8) highPairs.push({ nameI: xNames[i], nameJ: xNames[j], r });
+        }
+      }
+      if (highPairs.length > 0) {
+        addRowData(rawData, toUIData([""]));
+        addRowData(
+          rawData,
+          toUIData([t("regression.summaryOutput.observation")], [EXCEL_FORMATS.h3Subtitle])
+        );
+        highPairs.forEach(({ nameI, nameJ, r }) => {
+          const label =
+            Math.abs(r) > 0.9
+              ? t("regression.summaryOutput.veryStrongCorrelation")
+              : t("regression.summaryOutput.strongCorrelation");
+          addRowData(rawData, toUIData([`r(${nameI},${nameJ}) = ${r} → ${label}.`]));
+        });
+        addRowData(rawData, toUIData([t("regression.summaryOutput.multicollinearityEffect")]));
+      }
 
-    const strongestIdx = stats.betaWeights.reduce(
-      (maxIdx, val, i) =>
-        Math.abs(val.value) > Math.abs(stats.betaWeights[maxIdx].value) ? i : maxIdx,
-      0
-    );
+      // 6. Executive Summary — always shown
+      const adjRSqNum = Number(stats.adjustedRSquared.value);
+      const adjRSqPct = Math.round(adjRSqNum * 100);
+      const powerLabel =
+        adjRSqNum < 0.3
+          ? t("regression.summaryOutput.powerWeak")
+          : adjRSqNum < 0.7
+            ? t("regression.summaryOutput.powerModerate")
+            : t("regression.summaryOutput.powerStrong");
 
-    addRowData(rawData, toUIData([""]));
-    addRowData(
-      rawData,
-      toUIData(
-        [t("regression.summaryOutput.executiveSummaryTitle")],
-        [{ ...EXCEL_FORMATS.h1Title, fullWidth: true }]
-      )
-    );
-    addRowData(rawData, toUIData([""]));
-    if (!stats.fIsSignificant) {
+      const strongestIdx = stats.betaWeights.reduce(
+        (maxIdx, val, i) =>
+          Math.abs(val.value) > Math.abs(stats.betaWeights[maxIdx].value) ? i : maxIdx,
+        0
+      );
+
+      addRowData(rawData, toUIData([""]));
+      addRowData(
+        rawData,
+        toUIData(
+          [t("regression.summaryOutput.executiveSummaryTitle")],
+          [{ ...EXCEL_FORMATS.h1Title, fullWidth: true }]
+        )
+      );
+      addRowData(rawData, toUIData([""]));
+      if (!stats.fIsSignificant) {
+        addRowData(
+          rawData,
+          toUIData([
+            t("regression.summaryOutput.executiveSummaryNotSignificant", {
+              pValue: stats.fSignificance.value,
+            }),
+          ])
+        );
+      } else {
+        addRowData(
+          rawData,
+          toUIData([
+            t("regression.summaryOutput.executiveSummarySignificant", {
+              power: powerLabel,
+              pct: adjRSqPct,
+            }),
+          ])
+        );
+      }
       addRowData(
         rawData,
         toUIData([
-          t("regression.summaryOutput.executiveSummaryNotSignificant", {
-            pValue: stats.fSignificance.value,
+          t("regression.summaryOutput.executiveSummaryStrongestPredictor", {
+            name: xNames[strongestIdx],
           }),
         ])
       );
-    } else {
-      addRowData(
-        rawData,
-        toUIData([
-          t("regression.summaryOutput.executiveSummarySignificant", {
-            power: powerLabel,
-            pct: adjRSqPct,
-          }),
-        ])
-      );
-    }
-    addRowData(
-      rawData,
-      toUIData([
-        t("regression.summaryOutput.executiveSummaryStrongestPredictor", {
-          name: xNames[strongestIdx],
-        }),
-      ])
-    );
-    if (stats.hasMulticollinearity) {
-      addRowData(
-        rawData,
-        toUIData([t("regression.summaryOutput.executiveSummaryMulticollinearity")])
-      );
+      if (stats.hasMulticollinearity) {
+        addRowData(
+          rawData,
+          toUIData([t("regression.summaryOutput.executiveSummaryMulticollinearity")])
+        );
+      }
     }
   }
 
