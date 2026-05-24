@@ -290,7 +290,7 @@
         "intercept": "Termenul liber (Intercept / b0)",
         "variableX": "Variabila X{index}",
         "interpretation": "Interpretare model:",
-        "executiveSummaryTitle": "Sumar Executiv",
+        "executiveSummaryTitle": "Concluzie generala",
         "executiveSummarySignificant": "Modelul este semnificativ statistic, având o putere de predicție {power}, explicând {pct}% din variația variabilei dependente.",
         "executiveSummaryNotSignificant": "Modelul nu este semnificativ statistic (p-valoare F = {pValue}), deci nu poate fi utilizat pentru predicții fiabile.",
         "executiveSummaryStrongestPredictor": "Pe baza coeficienților standardizați, variabila {name} este cel mai important factor de influență.",
