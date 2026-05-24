@@ -52,17 +52,24 @@ export const interpretationRegression = (stats, alpha, yMeta, xMeta, t) => {
   model.forEach((row) => interpretation.push(toUIData(row, [EXCEL_FORMATS.tableRowHeader, null])));
   interpretation.push(toUIData([""]));
 
-  // interpretation.push([t("regression.interpretation.secondStep.significance"), ""]); // 2. Semnificatie
-  // const significance = getMultipleRegressionSignificance(
-  //   slopes,
-  //   pValues,
-  //   fSignificance,
-  //   alpha,
-  //   yMeta,
-  //   xMeta,
-  //   t
-  // );
-  // significance.forEach((value) => interpretation.push(value));
+  // 2. Semnificatie
+  interpretation.push(
+    toUIData(
+      [t("regression.interpretation.secondStep.significance")],
+      [{ ...EXCEL_FORMATS.h1Title, fullWidth: true }]
+    )
+  );
+  const significance = getMultipleRegressionSignificance(
+    slopes.map((s) => s.value),
+    pValues.map((p) => p.value),
+    fSignificance.value,
+    alpha,
+    yMeta,
+    xMeta,
+    t
+  );
+  significance.forEach((row) => interpretation.push(row));
+  interpretation.push(toUIData([""]));
 
   // interpretation.push([t("regression.interpretation.thirdStep.interpretation"), ""]); // 3. Interpretare
   // const interpretationSlopes = getInterpretation(

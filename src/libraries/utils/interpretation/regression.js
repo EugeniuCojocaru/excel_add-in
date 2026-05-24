@@ -1,3 +1,6 @@
+import { EXCEL_FORMATS } from "../excelFormats";
+import { toUIData } from "../ui";
+
 const getEquation = (k, b0, b, yMeta, xMeta, modelType) => {
   const getYName = () => {
     const isLog = modelType === "log-linear" || modelType === "semi-log";
@@ -49,47 +52,79 @@ const buildAlphaSet = (userAlpha) => {
   return levels.sort((a, b) => a - b);
 };
 
+const getConclusion = (isSignificant, bNumber, alpha, yMeta, xMeta, t) => {
+  const percentage = (1 - alpha) * 100;
+  const yName = yMeta[0]?.name || "Y";
+  const xName = xMeta[bNumber - 1]?.name || `X${bNumber}`;
+  if (isSignificant) {
+    return toUIData(
+      [
+        t("regression.interpretation.secondStep.conclusion"),
+        t("regression.interpretation.secondStep.conclusionSignificant", {
+          percentage,
+          yName,
+          xName,
+        }),
+      ],
+      [EXCEL_FORMATS.tableRowHeader, null]
+    );
+  }
+  return toUIData(
+    [
+      t("regression.interpretation.secondStep.conclusion"),
+      t("regression.interpretation.secondStep.conclusionNotSignificant", { yName, xName }),
+    ],
+    [EXCEL_FORMATS.tableRowHeader, null]
+  );
+};
+
 const getSignificance = (b, pValue, alpha, bNumber, yMeta, xMeta, t) => {
   const xName = xMeta[bNumber - 1]?.name || `X${bNumber}`;
   const pLabel = bNumber === 1 && xMeta.length === 1 ? "pValue" : `p${bNumber}`;
   const significance = [
-    [
-      t("regression.interpretation.secondStep.significanceBasedOnVariable", { xName }),
-      `H0: B${bNumber} = 0 `,
-    ],
+    toUIData(
+      [
+        t("regression.interpretation.secondStep.significanceBasedOnVariable", { xName }),
+        `H0: B${bNumber} = 0`,
+      ],
+      [EXCEL_FORMATS.h3Subtitle, null]
+    ),
   ];
 
   if (b > 0) {
-    significance.push([
-      "",
-      t("regression.interpretation.secondStep.notZeroHypothesisRight", { bNumber, b }),
-    ]);
+    significance.push(
+      toUIData([
+        "",
+        t("regression.interpretation.secondStep.notZeroHypothesisRight", { bNumber, b }),
+      ])
+    );
   }
   if (b < 0) {
-    significance.push([
-      "",
-      t("regression.interpretation.secondStep.notZeroHypothesisLeft", { bNumber, b }),
-    ]);
+    significance.push(
+      toUIData([
+        "",
+        t("regression.interpretation.secondStep.notZeroHypothesisLeft", { bNumber, b }),
+      ])
+    );
   }
-  //TODO: add info as checkbox in UI and uncomment this!
-  // significance.push([
-  //   t("regression.interpretation.secondStep.info"),
-  //   t("regression.interpretation.secondStep.infoText"),
-  // ]);
 
   buildAlphaSet(alpha).forEach((level) => {
     const isSig = pValue < level;
-    significance.push([
-      `${t("regression.interpretation.secondStep.pValueText")}${level}:`,
-      `${pLabel} = ${pValue} ?< α = ${level} => ${isSig ? t("regression.interpretation.secondStep.signicantBasicTrue", { pValue }) : t("regression.interpretation.secondStep.signicantBasicFalse", { pValue })}`,
-    ]);
+    significance.push(
+      toUIData([
+        `${t("regression.interpretation.secondStep.pValueText")}${level}:`,
+        `${pLabel} = ${pValue} ?< α = ${level} => ${isSig ? t("regression.interpretation.secondStep.signicantBasicTrue", { pValue }) : t("regression.interpretation.secondStep.signicantBasicFalse", { pValue })}`,
+      ])
+    );
+    significance.push(
+      toUIData([
+        "",
+        `${isSig ? t("regression.interpretation.secondStep.significantTrue", { bNumber }) : t("regression.interpretation.secondStep.significantFalse")}`,
+      ])
+    );
   });
 
   const isSignificant = pValue < alpha;
-  significance.push([
-    "",
-    `${isSignificant ? t("regression.interpretation.secondStep.significantTrue", { bNumber }) : t("regression.interpretation.secondStep.significantFalse")}`,
-  ]);
   significance.push(getConclusion(isSignificant, bNumber, alpha, yMeta, xMeta, t));
 
   return significance;
@@ -104,14 +139,14 @@ const getMultipleRegressionSignificance = (
   xMeta,
   t
 ) => {
-  const significance = [["", ""]];
+  const significance = [toUIData([""])];
 
   slopes.forEach((b, index) => {
     const bNumber = index + 1;
     const pValue = pValues[bNumber];
     const bSignificance = getSignificance(b, pValue, alpha, bNumber, yMeta, xMeta, t);
     bSignificance.forEach((row) => significance.push(row));
-    significance.push(["", ""]);
+    significance.push(toUIData([""]));
   });
 
   if (slopes.length > 1) {
@@ -120,46 +155,38 @@ const getMultipleRegressionSignificance = (
       nullHypothesis += `B${i + 1} = `;
     }
     nullHypothesis += "0";
-    significance.push([
-      t("regression.interpretation.secondStep.multipleVariableSignificance"),
-      nullHypothesis,
-    ]);
-    significance.push(["", t("regression.interpretation.secondStep.notAllZeroHypothesis")]);
-
-    buildAlphaSet(alpha).forEach((level) => {
-      const isSig = fSignificance < level;
-      significance.push([
-        `${t("regression.interpretation.secondStep.pValueText")}${level}:`,
-        `pValue = ${fSignificance} ?< α = ${level} => ${isSig ? t("regression.interpretation.secondStep.signicantBasicTrue", { pValue: fSignificance }) : t("regression.interpretation.secondStep.signicantBasicFalse", { pValue: fSignificance })}`,
-      ]);
-    });
-    const isSignificant = fSignificance < alpha;
+    significance.push(
+      toUIData(
+        [t("regression.interpretation.secondStep.multipleVariableSignificance"), nullHypothesis],
+        [EXCEL_FORMATS.h3Subtitle, null]
+      )
+    );
+    significance.push(
+      toUIData(["", t("regression.interpretation.secondStep.notAllZeroHypothesis")], [null, null])
+    );
 
     const variableNames = xMeta.map((meta, index) => meta.name || `X${index + 1}`).join(", ");
     const yName = yMeta[0]?.name || "Y";
-    significance.push([
-      "",
-      `${isSignificant ? t("regression.interpretation.secondStep.significantMultipleTrue", { variablesNumber: slopes.length, variableNames, yName }) : t("regression.interpretation.secondStep.significantMultipleFalse")}`,
-    ]);
-    significance.push(["", ""]);
+
+    buildAlphaSet(alpha).forEach((level) => {
+      const isSig = fSignificance < level;
+      significance.push(
+        toUIData([
+          `${t("regression.interpretation.secondStep.pValueText")}${level}:`,
+          `pValue = ${fSignificance} ?< α = ${level} => ${isSig ? t("regression.interpretation.secondStep.signicantBasicTrue", { pValue: fSignificance }) : t("regression.interpretation.secondStep.signicantBasicFalse", { pValue: fSignificance })}`,
+        ])
+      );
+      significance.push(
+        toUIData([
+          "",
+          `${isSig ? t("regression.interpretation.secondStep.significantMultipleTrue", { variablesNumber: slopes.length, variableNames, yName }) : t("regression.interpretation.secondStep.significantMultipleFalse")}`,
+        ])
+      );
+    });
+
+    significance.push(toUIData([""]));
   }
   return significance;
-};
-
-const getConclusion = (isSignificant, bNumber, alpha, yMeta, xMeta, t) => {
-  const percentage = (1 - alpha) * 100;
-  const yName = yMeta[0]?.name || "Y";
-  const xName = xMeta[bNumber - 1]?.name || `X${bNumber}`;
-  if (isSignificant) {
-    return [
-      t("regression.interpretation.secondStep.conclusion"),
-      t("regression.interpretation.secondStep.conclusionSignificant", { percentage, yName, xName }),
-    ];
-  }
-  return [
-    t("regression.interpretation.secondStep.conclusion"),
-    t("regression.interpretation.secondStep.conclusionNotSignificant", { yName, xName }),
-  ];
 };
 
 const getInterpretation = (
