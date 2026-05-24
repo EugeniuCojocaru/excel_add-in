@@ -266,7 +266,10 @@ const getInterpretation = (
         : "regression.interpretation.thirdStep.interpretationVariableDecrease";
     interpretation.push(
       toUIData(
-        [`b${i + 1} = ${slopes[i]}`, `${t(directionKey, { xName, xUnit, yName })}${Math.abs(yValue)}${yUnit}`],
+        [
+          `b${i + 1} = ${slopes[i]}`,
+          `${t(directionKey, { xName, xUnit, yName })}${Math.abs(yValue)}${yUnit}`,
+        ],
         [EXCEL_FORMATS.tableRowHeader, null]
       )
     );

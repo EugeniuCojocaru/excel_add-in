@@ -27,6 +27,7 @@ export const interpretationRegression = (stats, alpha, yMeta, xMeta, t) => {
       [{ ...EXCEL_FORMATS.h1Title, fullWidth: true }]
     )
   );
+  interpretation.push(toUIData([""]));
   const equation = getEquation(
     k.value,
     b0.value,
@@ -41,6 +42,7 @@ export const interpretationRegression = (stats, alpha, yMeta, xMeta, t) => {
       [{ ...EXCEL_FORMATS.h3Subtitle, fullWidth: true }]
     )
   );
+  interpretation.push(toUIData([""]));
 
   const model = getModel(
     k.value,
@@ -69,7 +71,6 @@ export const interpretationRegression = (stats, alpha, yMeta, xMeta, t) => {
     t
   );
   significance.forEach((row) => interpretation.push(row));
-  interpretation.push(toUIData([""]));
 
   // 3. Interpretare
   interpretation.push(

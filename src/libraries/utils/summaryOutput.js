@@ -1,4 +1,5 @@
-import { toExcelData } from "./ui";
+import { EXCEL_FORMATS } from "./excelFormats";
+import { toUIData } from "./ui";
 
 const addRowData = (rowData, newRow) => {
   const newRowColumns = newRow.row.length;
@@ -7,93 +8,163 @@ const addRowData = (rowData, newRow) => {
 };
 
 export const generateSummaryOutput = (stats, yMeta, xMeta, t) => {
-  // const n = stats.df + stats.k + 1;
   const rawData = { dataToWrite: [], maxColumns: 0 };
+  const n = stats.df + stats.k + 1;
+  const confidence = (1 - stats.alpha) * 100;
+  const xNames = Array.from(
+    { length: stats.k },
+    (_, i) => xMeta[i]?.name || t("regression.summaryOutput.variableX", { index: i + 1 })
+  );
 
-  // let dataToWrite = [
-  //   // 1. Tabelul "Regression Statistics"
-  //   [
-  //     t("regression.summaryOutput.summary"),
-  //     t("regression.summaryOutput.modelType", { modelType: stats.modelType }),
-  //     "",
-  //     "",
-  //     "",
-  //   ],
-  //   ["", "", "", "", ""],
-  //   [t("regression.summaryOutput.n"), n, "", "", ""],
-  //   [t("regression.summaryOutput.rSquared"), stats.rSquared, "", "", ""],
-  //   [t("regression.summaryOutput.adjustedRSquared"), stats.adjustedRSquared, "", "", ""],
-  //   [t("regression.summaryOutput.standardError"), stats.ese, "", "", ""],
-  //   [t("regression.summaryOutput.ssRes"), stats.ssRes, "", "", ""],
-  //   ["", "", "", "", ""],
+  // 1. Regression Statistics
+  addRowData(
+    rawData,
+    toUIData(
+      [
+        t("regression.summaryOutput.summary"),
+        "",
+        t("regression.summaryOutput.modelType", { modelType: stats.modelType }),
+      ],
+      [{ ...EXCEL_FORMATS.h1Title, fullWidth: true }, null, EXCEL_FORMATS.h1Subtitle]
+    )
+  );
+  addRowData(rawData, toUIData([""]));
+  addRowData(
+    rawData,
+    toUIData([t("regression.summaryOutput.n"), n], [EXCEL_FORMATS.tableRowHeader, null])
+  );
+  addRowData(
+    rawData,
+    toUIData(
+      [t("regression.summaryOutput.rSquared"), stats.rSquared],
+      [EXCEL_FORMATS.tableRowHeader, null]
+    )
+  );
+  addRowData(
+    rawData,
+    toUIData(
+      [t("regression.summaryOutput.adjustedRSquared"), stats.adjustedRSquared],
+      [EXCEL_FORMATS.tableRowHeader, null]
+    )
+  );
+  addRowData(
+    rawData,
+    toUIData(
+      [t("regression.summaryOutput.standardError"), stats.ese],
+      [EXCEL_FORMATS.tableRowHeader, null]
+    )
+  );
+  addRowData(
+    rawData,
+    toUIData(
+      [t("regression.summaryOutput.ssRes"), stats.ssRes],
+      [EXCEL_FORMATS.tableRowHeader, null]
+    )
+  );
+  addRowData(rawData, toUIData([""]));
 
-  //   // 2. Tabelul "ANOVA"
-  //   [t("regression.summaryOutput.anova"), "", "", "", ""],
-  //   [
-  //     "",
-  //     t("regression.summaryOutput.df"),
-  //     t("regression.summaryOutput.f"),
-  //     t("regression.summaryOutput.significanceF"),
-  //     "",
-  //   ],
-  //   [t("regression.summaryOutput.regression"), stats.k, stats.fStat, stats.fSignificance, ""],
-  //   [t("regression.summaryOutput.residual"), stats.df, "", "", ""],
-  //   [t("regression.summaryOutput.total"), stats.df + stats.k, "", "", ""],
-  //   ["", "", "", "", ""],
+  // 2. ANOVA
+  addRowData(
+    rawData,
+    toUIData([t("regression.summaryOutput.anova")], [{ ...EXCEL_FORMATS.h1Title, fullWidth: true }])
+  );
+  addRowData(rawData, toUIData([""]));
+  addRowData(
+    rawData,
+    toUIData(
+      [
+        "",
+        t("regression.summaryOutput.df"),
+        t("regression.summaryOutput.f"),
+        t("regression.summaryOutput.significanceF"),
+      ],
+      [
+        null,
+        EXCEL_FORMATS.tableColHeader,
+        EXCEL_FORMATS.tableColHeader,
+        EXCEL_FORMATS.tableColHeader,
+      ]
+    )
+  );
+  addRowData(
+    rawData,
+    toUIData(
+      [t("regression.summaryOutput.regression"), stats.k, stats.fStat, stats.fSignificance],
+      [EXCEL_FORMATS.tableRowHeader, null, null, null]
+    )
+  );
+  addRowData(
+    rawData,
+    toUIData(
+      [t("regression.summaryOutput.residual"), stats.df, "", ""],
+      [EXCEL_FORMATS.tableRowHeader, null, null, null]
+    )
+  );
+  addRowData(
+    rawData,
+    toUIData(
+      [t("regression.summaryOutput.total"), stats.df + stats.k, "", ""],
+      [EXCEL_FORMATS.tableRowHeader, null, null, null]
+    )
+  );
+  addRowData(rawData, toUIData([""]));
 
-  //   // 3. Tabelul "Coefficients"
-  //   [
-  //     "",
-  //     t("regression.summaryOutput.coefficients"),
-  //     t("regression.summaryOutput.standardErrorCoef"),
-  //     t("regression.summaryOutput.tStat"),
-  //     t("regression.summaryOutput.pValue"),
-  //     t("regression.summaryOutput.lowerCI", { confidence: (1 - stats.alpha) * 100 }),
-  //     t("regression.summaryOutput.upperCI", { confidence: (1 - stats.alpha) * 100 }),
-  //     t("regression.summaryOutput.betaWeight"),
-  //   ],
-  //   [
-  //     t("regression.summaryOutput.intercept"),
-  //     stats.b0,
-  //     stats.standardErrors[0],
-  //     stats.tStats[0],
-  //     stats.pValues[0],
-  //     stats.confidenceIntervals[0][0],
-  //     stats.confidenceIntervals[0][1],
-  //     "",
-  //   ],
-  // ];
+  // 3. Coefficients
+  addRowData(
+    rawData,
+    toUIData(
+      [
+        "",
+        t("regression.summaryOutput.coefficients"),
+        t("regression.summaryOutput.standardErrorCoef"),
+        t("regression.summaryOutput.tStat"),
+        t("regression.summaryOutput.pValue"),
+        t("regression.summaryOutput.lowerCI", { confidence }),
+        t("regression.summaryOutput.upperCI", { confidence }),
+        t("regression.summaryOutput.betaWeight"),
+      ],
+      [null, ...Array(7).fill(EXCEL_FORMATS.tableColHeader)]
+    )
+  );
+  addRowData(
+    rawData,
+    toUIData(
+      [
+        t("regression.summaryOutput.intercept"),
+        stats.b0,
+        stats.standardErrors[0],
+        stats.tStats[0],
+        stats.pValues[0],
+        stats.confidenceIntervals[0][0],
+        stats.confidenceIntervals[0][1],
+        "",
+      ],
+      [EXCEL_FORMATS.tableRowHeader, ...Array(7).fill(null)]
+    )
+  );
+  for (let i = 0; i < stats.k; i++) {
+    addRowData(
+      rawData,
+      toUIData(
+        [
+          `${xNames[i]} (b${i + 1})`,
+          stats.slopes[i],
+          stats.standardErrors[i + 1],
+          stats.tStats[i + 1],
+          stats.pValues[i + 1],
+          stats.confidenceIntervals[i + 1][0],
+          stats.confidenceIntervals[i + 1][1],
+          stats.betaWeights[i],
+        ],
+        [EXCEL_FORMATS.tableRowHeader, ...Array(7).fill(null)]
+      )
+    );
+  }
 
-  // const xNames = Array.from(
-  //   { length: stats.k },
-  //   (_, i) => xMeta[i]?.name || t("regression.summaryOutput.variableX", { index: i + 1 })
-  // );
-
-  // // Adăugăm rândurile pentru variabilele X1, X2...
-  // for (let i = 0; i < stats.k; i++) {
-  //   const index = i + 1;
-  //   const xName = xNames[i];
-  //   dataToWrite.push([
-  //     `${xName} (b${index})`,
-  //     stats.slopes[i],
-  //     stats.standardErrors[index],
-  //     stats.tStats[index],
-  //     stats.pValues[index],
-  //     stats.confidenceIntervals[index][0],
-  //     stats.confidenceIntervals[index][1],
-  //     stats.betaWeights[i],
-  //   ]);
-  // }
-
-  // 4. Adăugăm interpretarea, dacă există
+  // 4. Interpretation
   if (stats.interpretation) {
-    // dataToWrite.push([""]);
-    // dataToWrite.push([t("regression.summaryOutput.interpretation")]);
-
-    stats.interpretation.forEach((row, index) => {
-      console.log({ index });
+    stats.interpretation.forEach((row) => {
       addRowData(rawData, row);
-      console.log({ rawData });
     });
   }
 
@@ -206,6 +277,5 @@ export const generateSummaryOutput = (stats, yMeta, xMeta, t) => {
   //   ]);
   // }
 
-  console.log({ rawData });
   return rawData;
 };

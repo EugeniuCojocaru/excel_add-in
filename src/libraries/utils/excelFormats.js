@@ -17,6 +17,18 @@ export const EXCEL_FORMATS = {
       EdgeBottom: { color: "#217346", style: "Continuous", weight: "Medium" },
     },
   },
+  h1Subtitle: {
+    font: {
+      name: "Libre Franklin",
+      bold: true,
+      size: 13,
+      color: "#217346", // Primary green carries the emphasis
+    },
+    // No fill — keeps the sheet breathable
+    horizontalAlignment: "Left",
+    verticalAlignment: "Center",
+    rowHeight: 26,
+  },
 
   // ──────────────────────────────────────────
   // H3 — Section heading, lighter touch
