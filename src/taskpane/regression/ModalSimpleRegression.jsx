@@ -136,7 +136,7 @@ const ModalSimpleRegression = () => {
     );
 
     if (isCompact) {
-      await insertColumnTo(rawFullData, "Discussion", "A1");
+      await insertColumnTo(rawFullData, "Discussion_Regression", "A1");
     } else {
       await insertColumn(rawFullData, resultDestinationAddress);
     }

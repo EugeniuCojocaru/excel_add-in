@@ -302,7 +302,7 @@
         "interpretation": "Interpretare model:",
         "executiveSummaryTitle": "6. Concluzie generală",
         "executiveSummarySignificant": "Modelul este semnificativ statistic, având o putere de predicție {power}, explicând {pct}% din variația variabilei dependente.",
-        "executiveSummaryNotSignificant": "Modelul nu este semnificativ statistic (p-valoare F = {pValue}), deci nu poate fi utilizat pentru predicții fiabile.",
+        "executiveSummaryNotSignificant": "Modelul nu este semnificativ statistic (p-value F = {pValue}), deci nu poate fi utilizat pentru predicții fiabile.",
         "executiveSummaryStrongestPredictor": "Pe baza coeficienților standardizați, variabila {name} este cel mai important factor de influență.",
         "executiveSummaryMulticollinearity": "Totuși, estimările individuale trebuie tratate cu precauție din cauza multicoliniarității severe (VIF > 5) detectate între predictori.",
         "powerWeak": "slabă",

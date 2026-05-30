@@ -171,7 +171,7 @@ const ModalModelComparison = () => {
     );
 
     if (isCompact) {
-      await insertColumnTo(merged, "Discussion", "A1");
+      await insertColumnTo(merged, "Discussion_Comparison", "A1");
     } else {
       await insertColumn(merged, resultDestinationAddress);
     }
