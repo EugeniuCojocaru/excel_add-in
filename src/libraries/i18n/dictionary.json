@@ -69,7 +69,12 @@
           "conclusionConventionalNone": "The evidence is absent at all conventional levels (0.01, 0.05, 0.10).",
           "conclusionMultipleSignificant": "At α = {alpha}, we reject H0: the model ({variableNames}) has a statistically significant overall effect on {yName} (F-p = {pValue}).",
           "conclusionMultipleNotSignificant": "At α = {alpha}, we fail to reject H0: insufficient evidence that ({variableNames}) collectively influence {yName} (F-p = {pValue}).",
-          "conclusionMultipleMarginal": "At α = {alpha}, H0 is not rejected (F-p = {pValue}), but the model is borderline. Interpret with caution — consider collecting more data or reviewing the model specification."
+          "conclusionMultipleMarginal": "At α = {alpha}, H0 is not rejected (F-p = {pValue}), but the model is borderline. Interpret with caution — consider collecting more data or reviewing the model specification.",
+          "theModel": "The model",
+          "conclusionAlphaInsightSignificant": "Even though {subject} is significant at α = {alpha}, it is also significant at the stricter standard level α = {bestDefault}",
+          "conclusionAlphaInsightNotSignificant": "Even though {subject} is not significant at α = {alpha}, it is significant at the standard level α = {bestDefault}",
+          "conclusionAlphaInsightNoStandard": "{subject} is not significant at any standard level (α = 0.01, α = 0.05, α = 0.1)",
+          "conclusionAlphaInsightPrecise": " (or more precisely at α = {preciseBest})"
         },
         "thirdStep": {
           "interpretation": "3. Model interpretation",
@@ -260,7 +265,12 @@
           "conclusionConventionalNone": "Nicio evidență la niciun nivel convențional (0,01; 0,05; 0,10).",
           "conclusionMultipleSignificant": "La α = {alpha}, respingem H0: modelul ({variableNames}) are un efect global statistic semnificativ asupra lui {yName} (pValue = {pValue}).",
           "conclusionMultipleNotSignificant": "La α = {alpha}, nu respingem H0: dovezi insuficiente că ({variableNames}) influențează colectiv {yName} (pValue = {pValue}).",
-          "conclusionMultipleMarginal": "La α = {alpha}, H0 nu este respinsă (F-p = {pValue}), dar modelul este la limită. Interpretați cu prudență — luați în considerare colectarea mai multor date sau revizuirea specificației modelului."
+          "conclusionMultipleMarginal": "La α = {alpha}, H0 nu este respinsă (F-p = {pValue}), dar modelul este la limită. Interpretați cu prudență — luați în considerare colectarea mai multor date sau revizuirea specificației modelului.",
+          "theModel": "Modelul",
+          "conclusionAlphaInsightSignificant": "Chiar dacă {subject} este semnificativ la α = {alpha}, acesta este semnificativ și la nivelul standard mai strict α = {bestDefault}",
+          "conclusionAlphaInsightNotSignificant": "Chiar dacă {subject} nu este semnificativ la α = {alpha}, acesta este semnificativ la nivelul standard α = {bestDefault}",
+          "conclusionAlphaInsightNoStandard": "{subject} nu este semnificativ la niciun nivel standard (α = 0,01; α = 0,05; α = 0,10)",
+          "conclusionAlphaInsightPrecise": " (sau mai precis la α = {preciseBest})"
         },
         "thirdStep": {
           "interpretation": "3. Interpretarea modelului",

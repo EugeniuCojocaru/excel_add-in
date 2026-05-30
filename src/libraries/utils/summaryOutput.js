@@ -298,35 +298,47 @@ export const generateSummaryOutput = (
       if (!stats.fIsSignificant) {
         addRowData(
           rawData,
-          toUIData([
-            t("regression.summaryOutput.executiveSummaryNotSignificant", {
-              pValue: stats.fSignificance.value,
-            }),
-          ])
+          toUIData(
+            [
+              t("regression.summaryOutput.executiveSummaryNotSignificant", {
+                pValue: stats.fSignificance.value,
+              }),
+            ],
+            [{ ...EXCEL_FORMATS.h3Subtitle, fullWidth: true }]
+          )
         );
       } else {
         addRowData(
           rawData,
-          toUIData([
-            t("regression.summaryOutput.executiveSummarySignificant", {
-              power: powerLabel,
-              pct: adjRSqPct,
-            }),
-          ])
+          toUIData(
+            [
+              t("regression.summaryOutput.executiveSummarySignificant", {
+                power: powerLabel,
+                pct: adjRSqPct,
+              }),
+            ],
+            [{ ...EXCEL_FORMATS.h3Subtitle, fullWidth: true }]
+          )
         );
       }
       addRowData(
         rawData,
-        toUIData([
-          t("regression.summaryOutput.executiveSummaryStrongestPredictor", {
-            name: xNames[strongestIdx],
-          }),
-        ])
+        toUIData(
+          [
+            t("regression.summaryOutput.executiveSummaryStrongestPredictor", {
+              name: xNames[strongestIdx],
+            }),
+          ],
+          [{ ...EXCEL_FORMATS.h3Subtitle, fullWidth: true }]
+        )
       );
       if (stats.hasMulticollinearity) {
         addRowData(
           rawData,
-          toUIData([t("regression.summaryOutput.executiveSummaryMulticollinearity")])
+          toUIData(
+            [t("regression.summaryOutput.executiveSummaryMulticollinearity")],
+            [{ ...EXCEL_FORMATS.h3Subtitle, fullWidth: true }]
+          )
         );
       }
     }

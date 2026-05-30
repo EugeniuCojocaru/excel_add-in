@@ -38,6 +38,48 @@ const buildAlphaSet = (userAlpha) => {
   return levels.sort((a, b) => a - b);
 };
 
+const buildAlphaInsight = (pValue, alpha, subject, t, fillFor, pValueStat) => {
+  const isSig = pValue < alpha;
+  const bestDefaultAlpha = DEFAULT_ALPHA_LEVELS.find((level) => pValue < level) ?? null;
+
+  let preciseBestAlpha = null;
+  for (let a = 1; a <= 10; a++) {
+    if (pValue < a / 100) {
+      preciseBestAlpha = a / 100;
+      break;
+    }
+  }
+
+  // No insight when model is significant and user alpha is at least as strict as any passing standard
+  if (isSig && (bestDefaultAlpha === null || bestDefaultAlpha >= alpha)) return null;
+
+  const preciseSuffix =
+    preciseBestAlpha !== null && bestDefaultAlpha !== null && preciseBestAlpha < bestDefaultAlpha
+      ? t("regression.interpretation.secondStep.conclusionAlphaInsightPrecise", { preciseBest: preciseBestAlpha })
+      : "";
+
+  let insightText;
+  if (isSig) {
+    insightText =
+      t("regression.interpretation.secondStep.conclusionAlphaInsightSignificant", {
+        subject,
+        alpha,
+        bestDefault: bestDefaultAlpha,
+      }) + preciseSuffix;
+  } else if (bestDefaultAlpha !== null) {
+    insightText =
+      t("regression.interpretation.secondStep.conclusionAlphaInsightNotSignificant", {
+        subject,
+        alpha,
+        bestDefault: bestDefaultAlpha,
+      }) + preciseSuffix;
+  } else {
+    insightText = t("regression.interpretation.secondStep.conclusionAlphaInsightNoStandard", { subject });
+  }
+
+  return toUIData(["", insightText], [null, fillFor(pValueStat)]);
+};
+
 // Merges a fill color into an existing format object without mutating it.
 const withFill = (baseFormat, stat, fillFor) => {
   const fill = fillFor(stat);
@@ -169,6 +211,9 @@ const getSignificance = (
     getConclusion({ pValue, alpha, bNumber, yMeta, xMeta, t, fillFor, pValueStat })
   );
 
+  const insight = buildAlphaInsight(pValue, alpha, `B${bNumber}`, t, fillFor, pValueStat);
+  if (insight) significance.push(insight);
+
   return significance;
 };
 
@@ -216,31 +261,33 @@ const getMultipleRegressionSignificance = (
         [EXCEL_FORMATS.h3Subtitle, null]
       )
     );
-    significance.push(
-      toUIData(["", t("regression.interpretation.secondStep.notAllZeroHypothesis")], [null, null])
-    );
-
     const variableNames = xMeta.map((meta, index) => meta.name || `X${index + 1}`).join(", ");
     const yName = yMeta[0]?.name || "Y";
 
-    buildAlphaSet(alpha).forEach((level) => {
-      const isSig = fSignificance < level;
+    if (mode !== "COMPACT") {
       significance.push(
-        toUIData(
-          [
-            `${t("regression.interpretation.secondStep.pValueText")}${level}:`,
-            `pValue = ${fSignificance} ?< α = ${level} => ${isSig ? t("regression.interpretation.secondStep.significantBasicTrue", { pValue: fSignificance }) : t("regression.interpretation.secondStep.significantBasicFalse", { pValue: fSignificance })}`,
-          ],
-          [null, fillFor(fSigStat)]
-        )
+        toUIData(["", t("regression.interpretation.secondStep.notAllZeroHypothesis")], [null, null])
       );
-      significance.push(
-        toUIData([
-          "",
-          `${isSig ? t("regression.interpretation.secondStep.significantMultipleTrue", { variablesNumber: slopes.length, variableNames, yName, level }) : t("regression.interpretation.secondStep.significantMultipleFalse", { variablesNumber: slopes.length, variableNames, yName, level })}`,
-        ])
-      );
-    });
+
+      buildAlphaSet(alpha).forEach((level) => {
+        const isSig = fSignificance < level;
+        significance.push(
+          toUIData(
+            [
+              `${t("regression.interpretation.secondStep.pValueText")}${level}:`,
+              `pValue = ${fSignificance} ?< α = ${level} => ${isSig ? t("regression.interpretation.secondStep.significantBasicTrue", { pValue: fSignificance }) : t("regression.interpretation.secondStep.significantBasicFalse", { pValue: fSignificance })}`,
+            ],
+            [null, fillFor(fSigStat)]
+          )
+        );
+        significance.push(
+          toUIData([
+            "",
+            `${isSig ? t("regression.interpretation.secondStep.significantMultipleTrue", { variablesNumber: slopes.length, variableNames, yName, level }) : t("regression.interpretation.secondStep.significantMultipleFalse", { variablesNumber: slopes.length, variableNames, yName, level })}`,
+          ])
+        );
+      });
+    }
 
     significance.push(
       getConclusion({
@@ -254,6 +301,16 @@ const getMultipleRegressionSignificance = (
         pValueStat: fSigStat,
       })
     );
+
+    const modelInsight = buildAlphaInsight(
+      fSignificance,
+      alpha,
+      t("regression.interpretation.secondStep.theModel"),
+      t,
+      fillFor,
+      fSigStat
+    );
+    if (modelInsight) significance.push(modelInsight);
     significance.push(toUIData([""]));
   }
   return significance;
