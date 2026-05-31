@@ -4,7 +4,8 @@
     "paths": {
       "@components/*": ["src/components/*"],
       "@utils/*": ["src/libraries/utils/*"],
-      "@i18n/*": ["src/libraries/i18n/*"]
+      "@i18n/*": ["src/libraries/i18n/*"],
+      "@math/*": ["src/libraries/math/*"]
     }
   }
 }
