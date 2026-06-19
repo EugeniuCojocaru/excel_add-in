@@ -24,7 +24,8 @@
     "stop": "office-addin-debugging stop manifest.xml",
     "validate": "office-addin-manifest validate manifest.xml",
     "watch": "webpack --mode development --watch",
-    "test": "jest"
+    "test": "jest",
+    "test:watch": "jest --watch"
   },
   "jest": {
     "testEnvironment": "node",
@@ -38,7 +39,8 @@
     "moduleNameMapper": {
       "^@utils/(.*)$": "<rootDir>/src/libraries/utils/$1",
       "^@components/(.*)$": "<rootDir>/src/components/$1",
-      "^@i18n/(.*)$": "<rootDir>/src/libraries/i18n/$1"
+      "^@i18n/(.*)$": "<rootDir>/src/libraries/i18n/$1",
+      "^@math/(.*)$": "<rootDir>/src/libraries/math/$1"
     }
   },
   "dependencies": {
