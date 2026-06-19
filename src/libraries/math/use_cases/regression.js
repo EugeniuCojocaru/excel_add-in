@@ -11,6 +11,22 @@ export const solveCoefficients = (X_T_X, X_T_Y) => {
   return { Beta, coefficients, b0, slopes };
 };
 
+export const computeStandardErrors = (X_T_X, eseSq, k) => {
+  const standardErrors = [];
+  for (let i = 0; i < k + 1; i++) {
+    const e_i = [];
+    for (let j = 0; j < k + 1; j++) {
+      e_i.push([math.bignumber(i === j ? 1 : 0)]);
+    }
+    const v_i_raw = math.lusolve(X_T_X, e_i);
+    const v_i = v_i_raw.toArray ? v_i_raw.toArray() : v_i_raw;
+    const diagElement = Array.isArray(v_i[i]) ? v_i[i][0] : v_i[i];
+    const variance_i = math.multiply(eseSq, diagElement);
+    standardErrors.push(math.sqrt(variance_i));
+  }
+  return standardErrors;
+};
+
 export const computeSumOfSquares = (X, Y, Beta, n) => {
   const Y_predRaw = math.multiply(X, Beta);
   const Y_pred = Y_predRaw.toArray ? Y_predRaw.toArray() : Y_predRaw;
@@ -67,26 +83,8 @@ export const regression = (yData, xData, alpha = 0.05, modelType, { toUINumber }
   const ese = math.sqrt(math.divide(ssRes, math.bignumber(df)));
   const eseSq = math.square(ese);
 
-  // 4. FIX CRITIC: Calculăm doar elementele de pe diagonală ale inversei
-  const standardErrors = [];
-  for (let i = 0; i < k + 1; i++) {
-    // Creăm vectorul coloană e_i (plin cu 0, și 1 la poziția i)
-    const e_i = [];
-    for (let j = 0; j < k + 1; j++) {
-      e_i.push([math.bignumber(i === j ? 1 : 0)]);
-    }
-
-    // Rezolvăm X_T_X * v_i = e_i (acum trimitem strict un vector, eroarea dispare)
-    const v_i_raw = math.lusolve(X_T_X, e_i);
-    const v_i = v_i_raw.toArray ? v_i_raw.toArray() : v_i_raw;
-
-    // Elementul de pe diagonală este elementul "i" din vectorul calculat
-    const diagElement = Array.isArray(v_i[i]) ? v_i[i][0] : v_i[i];
-
-    // sb = sqrt( ESE^2 * element_diagonală )
-    const variance_i = math.multiply(eseSq, diagElement);
-    standardErrors.push(math.sqrt(variance_i));
-  }
+  // 4. Calculăm doar elementele de pe diagonală ale inversei
+  const standardErrors = computeStandardErrors(X_T_X, eseSq, k);
 
   // 5. Confidence Intervals (two-tailed, user alpha)
   const tCritical = math.bignumber(Math.abs(jStat.studentt.inv(alpha / 2, df)));

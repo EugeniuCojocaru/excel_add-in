@@ -1,5 +1,5 @@
 import math from "@math/config";
-import { solveCoefficients, setDummyColumns, computeSumOfSquares } from "@math/use_cases/regression";
+import { solveCoefficients, setDummyColumns, computeSumOfSquares, computeStandardErrors } from "@math/use_cases/regression";
 
 const toNum = (v) => Number(v);
 
@@ -142,5 +142,48 @@ describe("computeSumOfSquares", () => {
     test("ssTotal is unchanged regardless of Beta", () => {
       expect(toNum(ssT)).toBeCloseTo(8, 10);
     });
+  });
+});
+
+// ─── computeStandardErrors ───────────────────────────────────────────────────
+// Y = 1 + 2X, n=3, df=1
+// X = [[1,1],[1,2],[1,3]]  →  XᵀX = [[3,6],[6,14]]
+// ssRes = 0 (perfect fit)  →  ese = 0  →  all SE = 0
+//
+// Imperfect case: manually set eseSq=1 and verify SE = sqrt(diag of (XᵀX)⁻¹)
+// (XᵀX)⁻¹ = (1/6) * [[14,-6],[-6,3]]  →  diag = [14/6, 3/6]
+// SE[0] = sqrt(14/6) ≈ 1.5275, SE[1] = sqrt(3/6) = sqrt(0.5) ≈ 0.7071
+
+describe("computeStandardErrors", () => {
+  const X_T_X = math.matrix([
+    [3, 6],
+    [6, 14],
+  ]);
+
+  test("returns array of length k+1", () => {
+    const se = computeStandardErrors(X_T_X, math.bignumber(1), 1);
+    expect(se.length).toBe(2);
+  });
+
+  test("all SEs are 0 when eseSq is 0 (perfect fit)", () => {
+    const se = computeStandardErrors(X_T_X, math.bignumber(0), 1);
+    se.forEach((s) => expect(toNum(s)).toBeCloseTo(0, 10));
+  });
+
+  test("SE[0] equals sqrt(diag[0] of (XᵀX)⁻¹) when eseSq=1", () => {
+    const se = computeStandardErrors(X_T_X, math.bignumber(1), 1);
+    expect(toNum(se[0])).toBeCloseTo(Math.sqrt(14 / 6), 8);
+  });
+
+  test("SE[1] equals sqrt(diag[1] of (XᵀX)⁻¹) when eseSq=1", () => {
+    const se = computeStandardErrors(X_T_X, math.bignumber(1), 1);
+    expect(toNum(se[1])).toBeCloseTo(Math.sqrt(3 / 6), 8);
+  });
+
+  test("SEs scale with eseSq", () => {
+    const se1 = computeStandardErrors(X_T_X, math.bignumber(1), 1);
+    const se4 = computeStandardErrors(X_T_X, math.bignumber(4), 1);
+    expect(toNum(se4[0])).toBeCloseTo(toNum(se1[0]) * 2, 8);
+    expect(toNum(se4[1])).toBeCloseTo(toNum(se1[1]) * 2, 8);
   });
 });
