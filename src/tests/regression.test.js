@@ -12,6 +12,7 @@ import {
   computeVIF,
   computeRSquared,
   computeFStat,
+  regression,
 } from "@math/use_cases/regression";
 
 const toNum = (v) => Number(v);
@@ -127,7 +128,11 @@ describe("setDummyColumns", () => {
 describe("computeSumOfSquares", () => {
   // Y = 1 + 2X  →  perfect fit, ssRes = 0
   // X (design): [[1,1],[1,2],[1,3]], Y: [[3],[5],[7]], Beta: [[1],[2]]
-  const X = [[1, 1], [1, 2], [1, 3]];
+  const X = [
+    [1, 1],
+    [1, 2],
+    [1, 3],
+  ];
   const Y = [[3], [5], [7]];
   const Beta = [[1], [2]];
   const n = 3;
@@ -210,7 +215,13 @@ describe("computeConfidenceIntervals", () => {
   const toUINumber = (v) => Number(v);
 
   test("returns one interval per coefficient", () => {
-    const ci = computeConfidenceIntervals(0.05, 30, [1, 2], [math.bignumber(0), math.bignumber(0)], toUINumber);
+    const ci = computeConfidenceIntervals(
+      0.05,
+      30,
+      [1, 2],
+      [math.bignumber(0), math.bignumber(0)],
+      toUINumber
+    );
     expect(ci.length).toBe(2);
   });
 
@@ -232,12 +243,18 @@ describe("computeConfidenceIntervals", () => {
 
   test("wider interval with larger alpha (less confidence)", () => {
     const ci95 = computeConfidenceIntervals(0.05, 30, [0], [math.bignumber(1)], toUINumber);
-    const ci90 = computeConfidenceIntervals(0.10, 30, [0], [math.bignumber(1)], toUINumber);
+    const ci90 = computeConfidenceIntervals(0.1, 30, [0], [math.bignumber(1)], toUINumber);
     expect(ci90[0][1]).toBeLessThan(ci95[0][1]);
   });
 
   test("lower bound is always less than upper bound", () => {
-    const ci = computeConfidenceIntervals(0.05, 10, [3, -1], [math.bignumber(0.5), math.bignumber(0.2)], toUINumber);
+    const ci = computeConfidenceIntervals(
+      0.05,
+      10,
+      [3, -1],
+      [math.bignumber(0.5), math.bignumber(0.2)],
+      toUINumber
+    );
     ci.forEach(([lo, hi]) => expect(lo).toBeLessThan(hi));
   });
 });
@@ -253,7 +270,8 @@ describe("computeTStats", () => {
     const { tStats } = computeTStats(
       [math.bignumber(4), math.bignumber(6)],
       [math.bignumber(2), math.bignumber(3)],
-      100, 0.05
+      100,
+      0.05
     );
     expect(toNum(tStats[0])).toBeCloseTo(2, 8);
     expect(toNum(tStats[1])).toBeCloseTo(2, 8);
@@ -278,7 +296,8 @@ describe("computeTStats", () => {
     const { tStats, pValues, isSignificant } = computeTStats(
       [math.bignumber(1), math.bignumber(2), math.bignumber(3)],
       [math.bignumber(1), math.bignumber(1), math.bignumber(1)],
-      50, 0.05
+      50,
+      0.05
     );
     expect(tStats.length).toBe(3);
     expect(pValues.length).toBe(3);
@@ -329,7 +348,8 @@ describe("computeBetaWeights", () => {
       [math.bignumber(2)],
       [math.bignumber(4)],
       math.bignumber(16),
-      3, toUINumber
+      3,
+      toUINumber
     );
     expect(weights[0]).toBeCloseTo(1, 8);
   });
@@ -339,7 +359,8 @@ describe("computeBetaWeights", () => {
       [math.bignumber(0)],
       [math.bignumber(4)],
       math.bignumber(16),
-      3, toUINumber
+      3,
+      toUINumber
     );
     expect(weights[0]).toBeCloseTo(0, 8);
   });
@@ -349,7 +370,8 @@ describe("computeBetaWeights", () => {
       [math.bignumber(1), math.bignumber(2)],
       [math.bignumber(4), math.bignumber(4)],
       math.bignumber(16),
-      3, toUINumber
+      3,
+      toUINumber
     );
     expect(weights.length).toBe(2);
   });
@@ -379,7 +401,12 @@ describe("computeRSquared", () => {
   });
 
   test("adjustedRSquared < rSquared when fit is imperfect", () => {
-    const { rSquared, adjustedRSquared } = computeRSquared(math.bignumber(4), math.bignumber(8), 5, 3);
+    const { rSquared, adjustedRSquared } = computeRSquared(
+      math.bignumber(4),
+      math.bignumber(8),
+      5,
+      3
+    );
     expect(toNum(adjustedRSquared)).toBeLessThan(toNum(rSquared));
   });
 });
@@ -460,7 +487,14 @@ describe("computeVIF", () => {
   const toUINumber = (v) => Number(v);
 
   test("k=1 always returns VIF=1 without regression", () => {
-    const { vifValues, hasMulticollinearity } = computeVIF([], [[]], [math.bignumber(1)], 3, 1, toUINumber);
+    const { vifValues, hasMulticollinearity } = computeVIF(
+      [],
+      [[]],
+      [math.bignumber(1)],
+      3,
+      1,
+      toUINumber
+    );
     expect(vifValues[0]).toBe(1);
     expect(hasMulticollinearity).toBe(false);
   });
@@ -478,9 +512,152 @@ describe("computeVIF", () => {
       [math.bignumber(2), math.bignumber(1), math.bignumber(4), math.bignumber(3)],
     ];
     const predictorSS = [math.bignumber(5), math.bignumber(5)];
-    const { vifValues, hasMulticollinearity } = computeVIF(X, predictorCols, predictorSS, 4, 2, toUINumber);
+    const { vifValues, hasMulticollinearity } = computeVIF(
+      X,
+      predictorCols,
+      predictorSS,
+      4,
+      2,
+      toUINumber
+    );
     expect(vifValues.length).toBe(2);
     vifValues.forEach((v) => expect(v).toBeLessThan(5));
     expect(hasMulticollinearity).toBe(false);
+  });
+});
+
+// ─── regression (end-to-end) ─────────────────────────────────────────────────
+
+describe("regression", () => {
+  const toUINumber = (v) => Number(v);
+
+  // Perfect linear relationship: Y = 2X + 1
+  const makeLinear = () => ({
+    yData: { data: [[3], [5], [7], [9], [11]], meta: [{ name: "Y", unit: "" }] },
+    xData: { data: [[1], [2], [3], [4], [5]], meta: [{ name: "X", unit: "" }] },
+  });
+
+  // Near-linear with small noise: Y ≈ 2X, n=8, df=6 → non-zero SE, valid p-values
+  const makeNoisy = () => ({
+    yData: {
+      data: [[2.1], [4.0], [6.1], [8.0], [10.1], [12.0], [14.0], [16.1]],
+      meta: [{ name: "Y", unit: "" }],
+    },
+    xData: {
+      data: [[1], [2], [3], [4], [5], [6], [7], [8]],
+      meta: [{ name: "X", unit: "" }],
+    },
+  });
+
+  test("recovers intercept b0 ≈ 1 for Y = 2X + 1", () => {
+    const { yData, xData } = makeLinear();
+    const result = regression(yData, xData, 0.05, "linear", { toUINumber });
+    expect(result.b0).toBeCloseTo(1, 6);
+  });
+
+  test("recovers slope ≈ 2 for Y = 2X + 1", () => {
+    const { yData, xData } = makeLinear();
+    const result = regression(yData, xData, 0.05, "linear", { toUINumber });
+    expect(result.slopes[0]).toBeCloseTo(2, 6);
+  });
+
+  test("R² ≈ 1 for a perfect linear fit", () => {
+    const { yData, xData } = makeLinear();
+    const result = regression(yData, xData, 0.05, "linear", { toUINumber });
+    expect(result.rSquared).toBeCloseTo(1, 6);
+  });
+
+  test("adjusted R² ≈ 1 for a perfect linear fit", () => {
+    const { yData, xData } = makeLinear();
+    const result = regression(yData, xData, 0.05, "linear", { toUINumber });
+    expect(result.adjustedRSquared).toBeCloseTo(1, 6);
+  });
+
+  test("ssRes ≈ 0 for a perfect linear fit", () => {
+    const { yData, xData } = makeLinear();
+    const result = regression(yData, xData, 0.05, "linear", { toUINumber });
+    expect(Math.abs(result.ssRes)).toBeLessThan(1e-8);
+  });
+
+  test("returns correct k and df", () => {
+    const { yData, xData } = makeLinear();
+    const result = regression(yData, xData, 0.05, "linear", { toUINumber });
+    expect(result.k).toBe(1);
+    expect(result.df).toBe(3);
+  });
+
+  test("VIF = 1 for a single predictor", () => {
+    const { yData, xData } = makeLinear();
+    const result = regression(yData, xData, 0.05, "linear", { toUINumber });
+    expect(result.vifValues[0]).toBeCloseTo(1, 6);
+  });
+
+  test("hasMulticollinearity is false for a single predictor", () => {
+    const { yData, xData } = makeLinear();
+    const result = regression(yData, xData, 0.05, "linear", { toUINumber });
+    expect(result.hasMulticollinearity).toBe(false);
+  });
+
+  test("pValue for the slope is very small for a strongly linear dataset", () => {
+    const { yData, xData } = makeNoisy();
+    const result = regression(yData, xData, 0.05, "linear", { toUINumber });
+    expect(result.pValues[1]).toBeLessThan(0.001);
+  });
+
+  test("slope is flagged as significant at alpha=0.05 for a strongly linear dataset", () => {
+    const { yData, xData } = makeNoisy();
+    const result = regression(yData, xData, 0.05, "linear", { toUINumber });
+    expect(result.isSignificant[1]).toBe(true);
+  });
+
+  test("confidence interval for slope contains the true value 2", () => {
+    const { yData, xData } = makeNoisy();
+    const result = regression(yData, xData, 0.05, "linear", { toUINumber });
+    const [lower, upper] = result.confidenceIntervals[1];
+    expect(lower).toBeLessThanOrEqual(2);
+    expect(upper).toBeGreaterThanOrEqual(2);
+  });
+
+  test("multiple regression: near-perfect fit with independent predictors", () => {
+    const yData = {
+      data: [[6.1], [9.0], [7.9], [11.1], [13.0], [6.0], [11.1], [15.9]],
+      meta: [{ name: "Y", unit: "" }],
+    };
+    const xData = {
+      data: [
+        [1, 1],
+        [1, 2],
+        [2, 1],
+        [2, 2],
+        [3, 2],
+        [1, 1],
+        [2, 2],
+        [3, 3],
+      ],
+      meta: [
+        { name: "X1", unit: "" },
+        { name: "X2", unit: "" },
+      ],
+    };
+    const result = regression(yData, xData, 0.05, "linear", { toUINumber });
+    expect(result.rSquared).toBeGreaterThan(0.99);
+    expect(result.k).toBe(2);
+    expect(result.slopes.length).toBe(2);
+  });
+
+  test("log-linear model achieves near-perfect fit for power-law data", () => {
+    const xs = [1, 2, 3, 4, 5];
+    const yData = { data: xs.map((x) => [Math.E * x * x]), meta: [{ name: "Y", unit: "" }] };
+    const xData = { data: xs.map((x) => [x]), meta: [{ name: "X", unit: "" }] };
+    const result = regression(yData, xData, 0.05, "log-linear", { toUINumber });
+    expect(result.rSquared).toBeCloseTo(1, 4);
+    expect(result.b0).toBeCloseTo(1, 4);
+    expect(result.slopes[0]).toBeCloseTo(2, 4);
+  });
+
+  test("throws when log-linear model receives non-positive Y values", () => {
+    const yData = { data: [[-1], [2], [3]], meta: [{ name: "Y", unit: "" }] };
+    const xData = { data: [[1], [2], [3]], meta: [{ name: "X", unit: "" }] };
+    expect(() => regression(yData, xData, 0.05, "log-linear", { toUINumber })).toThrow();
   });
 });

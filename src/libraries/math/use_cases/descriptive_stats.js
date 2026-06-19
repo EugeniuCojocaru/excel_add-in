@@ -3,10 +3,20 @@ import math from "../config";
 
 /**
  * Calculează indicatorii statistici de bază și intervalul de încredere.
- * @param {number[]} data - Array cu valorile eșantionului
- * @param {number} alpha - Nivelul de semnificație (implicit 0.05 pentru 95% încredere).
+ * @param {number[]} data
+ * @param {number} alpha
+ * @param {{ toUINumber: (v: BigNumber) => number }} options
+ * @returns {{
+ *   n: number,
+ *   mean: number,
+ *   stdDev: number,
+ *   standardError: number,
+ *   confidenceLevel: number,
+ *   lowerBound: number,
+ *   upperBound: number
+ * }}
  */
-const descriptiveStats = (data, alpha = 0.05, { toUINumber }) => {
+export const descriptiveStats = (data, alpha = 0.05, { toUINumber }) => {
   const bn = data.map((val) => math.bignumber(val));
 
   const n = bn.length;
@@ -30,4 +40,4 @@ const descriptiveStats = (data, alpha = 0.05, { toUINumber }) => {
   };
 };
 
-export default descriptiveStats;
+
