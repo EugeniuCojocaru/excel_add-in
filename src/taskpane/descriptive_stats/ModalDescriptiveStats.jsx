@@ -14,7 +14,7 @@ import {
 import RangeSelector from "../components/RangeSelector";
 
 import { getColumnMatrix, insertColumn, insertColumnTo } from "@api";
-import { calculateDescriptiveStats } from "@utils/math";
+import { descriptiveStats } from "@math/use_cases/descriptive_stats";
 import { usePrecision, useInterpretation } from "@utils/hooks";
 import { toUIData } from "@utils/ui";
 
@@ -76,26 +76,18 @@ const STAT_FIELDS = [
 ];
 
 export const buildDescriptiveStatsMatrix = (columnMatrix, statLabels, toUINumber) => {
-  const k = columnMatrix.data[0].length;
-  const meta = columnMatrix.meta;
+  const { data, meta } = columnMatrix;
 
-  const allStats = Array.from({ length: k }, (_, j) => {
-    const colValues = columnMatrix.data.map((row) => row[j]);
-    return calculateDescriptiveStats(colValues);
+  const columns = Array.from({ length: data[0].length }, (_, j) => {
+    const { name, unit } = meta[j] ?? { name: `X${j + 1}`, unit: null };
+    return {
+      header: unit ? `${name} <${unit}>` : name,
+      stats: descriptiveStats(data.map((row) => row[j]), 0.05, { toUINumber }),
+    };
   });
 
-  const headerRow = [
-    "",
-    ...Array.from({ length: k }, (_, j) => {
-      const { name, unit } = meta[j] ?? { name: `X${j + 1}`, unit: null };
-      return unit ? `${name} <${unit}>` : name;
-    }),
-  ];
-
-  const statRows = STAT_FIELDS.map((field, i) => [
-    statLabels[i],
-    ...allStats.map((s) => (field === "n" ? s[field] : toUINumber(s[field]))),
-  ]);
+  const headerRow = ["", ...columns.map((c) => c.header)];
+  const statRows = STAT_FIELDS.map((field, i) => [statLabels[i], ...columns.map((c) => c.stats[field])]);
 
   return [headerRow, ...statRows];
 };

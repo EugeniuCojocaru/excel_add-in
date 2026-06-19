@@ -17,7 +17,7 @@ import {
 import RangeSelector from "../components/RangeSelector";
 
 import { getColumnMatrix, insertColumn, insertColumnTo } from "@api";
-import { calculateRegression } from "@utils/math";
+import { regression } from "@math/use_cases/regression";
 import { usePrecision, useInterpretation } from "@utils/hooks";
 import { toUIData, toUIStats } from "@utils/ui";
 import { EXCEL_FORMATS } from "@utils/excelFormats";
@@ -122,7 +122,7 @@ const ModalModelComparison = () => {
     if (modelKeys.length < 2) return;
 
     const rawStatsArray = modelKeys.map((modelKey) =>
-      calculateRegression(yData, xData, modelKey, toUINumber, alpha)
+      regression(yData, xData, alpha, modelKey, { toUINumber })
     );
 
     const comparationRawData = COMPARISSON_INTERPRETATION.comparisonInterpretation(

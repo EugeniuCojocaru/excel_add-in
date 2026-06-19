@@ -19,7 +19,7 @@ import {
 import RangeSelector from "../components/RangeSelector";
 
 import { getColumnMatrix, insertColumn, insertColumnTo } from "@api";
-import { calculateRegression } from "@utils/math";
+import { regression } from "@math/use_cases/regression";
 import { usePrecision, useInterpretation } from "@utils/hooks";
 import { generateSummaryOutput } from "@utils/summaryOutput";
 import { toUIStats } from "@utils/ui";
@@ -119,7 +119,7 @@ const ModalSimpleRegression = () => {
     const yData = await getColumnMatrix(YColumnAdress);
 
     const modelTypeKey = MODEL_TYPES.find((type) => type.label === modelType)?.key || "linear";
-    const rawStats = calculateRegression(yData, xData, modelTypeKey, toUINumber, alpha);
+    const rawStats = regression(yData, xData, alpha, modelTypeKey, { toUINumber });
     const uiStats = toUIStats(rawStats);
     const interpretation = econometricInterpretation
       ? interpretationRegression(uiStats, parseFloat(alpha), yData.meta, xData.meta, t, {
