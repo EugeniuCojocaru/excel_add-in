@@ -2,7 +2,17 @@ import { jStat } from "jstat";
 import math from "../config";
 import { buildDesignMatrices } from "../helpers/morph";
 
-const testIfDummy = (xColumns) => {
+export const solveCoefficients = (X_T_X, X_T_Y) => {
+  const BetaRaw = math.lusolve(X_T_X, X_T_Y);
+  const Beta = BetaRaw.toArray ? BetaRaw.toArray() : BetaRaw;
+  const coefficients = Beta.map((row) => (Array.isArray(row) ? row[0] : row));
+  const b0 = coefficients[0];
+  const slopes = coefficients.slice(1);
+  return { Beta, coefficients, b0, slopes };
+};
+
+export const setDummyColumns = (xColumns) => {
+  const k = xColumns.data[0].length;
   for (let i = 0; i < k; i++) {
     const isDummy = xColumns.data.every((row) => row[i] === 0 || row[i] === 1);
     if (xColumns.meta[i]) xColumns.meta[i].isDummy = isDummy;
@@ -19,7 +29,7 @@ export const regression = (yData, xData, alpha = 0.05, modelType, { toUINumber }
   const k = xData.data[0].length;
   const df = n - k - 1;
 
-  testIfDummy(xData);
+  setDummyColumns(xData);
 
   const { Y, X } = buildDesignMatrices(yData, xData, modelType);
 
@@ -29,12 +39,7 @@ export const regression = (yData, xData, alpha = 0.05, modelType, { toUINumber }
 
   // 1. Aflăm coeficienții direct (Beta = X_T_X \ X_T_Y)
   // X_T_Y este un vector coloană, deci lusolve funcționează perfect
-  const BetaRaw = math.lusolve(X_T_X, X_T_Y);
-  const Beta = BetaRaw.toArray ? BetaRaw.toArray() : BetaRaw;
-
-  const coefficients = Beta.map((row) => (Array.isArray(row) ? row[0] : row));
-  const b0 = coefficients[0];
-  const slopes = coefficients.slice(1);
+  const { Beta, coefficients, b0, slopes } = solveCoefficients(X_T_X, X_T_Y);
 
   // 2. Valorile Prezise și Reziduurile
   const Y_predRaw = math.multiply(X, Beta);
