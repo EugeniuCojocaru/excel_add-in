@@ -1,5 +1,5 @@
 import math from "@math/config";
-import { solveCoefficients, setDummyColumns, computeSumOfSquares, computeStandardErrors } from "@math/use_cases/regression";
+import { solveCoefficients, setDummyColumns, computeSumOfSquares, computeStandardErrors, computeConfidenceIntervals } from "@math/use_cases/regression";
 
 const toNum = (v) => Number(v);
 
@@ -185,5 +185,46 @@ describe("computeStandardErrors", () => {
     const se4 = computeStandardErrors(X_T_X, math.bignumber(4), 1);
     expect(toNum(se4[0])).toBeCloseTo(toNum(se1[0]) * 2, 8);
     expect(toNum(se4[1])).toBeCloseTo(toNum(se1[1]) * 2, 8);
+  });
+});
+
+// ─── computeConfidenceIntervals ──────────────────────────────────────────────
+// coefficients = [1, 2], standardErrors = [0, 0]  →  CI = [[1,1], [2,2]]
+// coefficients = [0],    standardErrors = [1],  alpha=0.05, df=30
+//   tCritical ≈ 2.042  →  CI ≈ [-2.042, 2.042]
+
+describe("computeConfidenceIntervals", () => {
+  const toUINumber = (v) => Number(v);
+
+  test("returns one interval per coefficient", () => {
+    const ci = computeConfidenceIntervals(0.05, 30, [1, 2], [math.bignumber(0), math.bignumber(0)], toUINumber);
+    expect(ci.length).toBe(2);
+  });
+
+  test("each interval is [lower, upper] pair", () => {
+    const ci = computeConfidenceIntervals(0.05, 30, [1], [math.bignumber(0)], toUINumber);
+    expect(ci[0].length).toBe(2);
+  });
+
+  test("interval collapses to point when SE is 0", () => {
+    const ci = computeConfidenceIntervals(0.05, 30, [5], [math.bignumber(0)], toUINumber);
+    expect(ci[0][0]).toBeCloseTo(5, 8);
+    expect(ci[0][1]).toBeCloseTo(5, 8);
+  });
+
+  test("interval is symmetric around the coefficient", () => {
+    const ci = computeConfidenceIntervals(0.05, 30, [0], [math.bignumber(1)], toUINumber);
+    expect(ci[0][0]).toBeCloseTo(-ci[0][1], 8);
+  });
+
+  test("wider interval with larger alpha (less confidence)", () => {
+    const ci95 = computeConfidenceIntervals(0.05, 30, [0], [math.bignumber(1)], toUINumber);
+    const ci90 = computeConfidenceIntervals(0.10, 30, [0], [math.bignumber(1)], toUINumber);
+    expect(ci90[0][1]).toBeLessThan(ci95[0][1]);
+  });
+
+  test("lower bound is always less than upper bound", () => {
+    const ci = computeConfidenceIntervals(0.05, 10, [3, -1], [math.bignumber(0.5), math.bignumber(0.2)], toUINumber);
+    ci.forEach(([lo, hi]) => expect(lo).toBeLessThan(hi));
   });
 });

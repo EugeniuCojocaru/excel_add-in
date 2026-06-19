@@ -27,6 +27,14 @@ export const computeStandardErrors = (X_T_X, eseSq, k) => {
   return standardErrors;
 };
 
+export const computeConfidenceIntervals = (alpha, df, coefficients, standardErrors, toUINumber) => {
+  const tCritical = math.bignumber(Math.abs(jStat.studentt.inv(alpha / 2, df)));
+  return coefficients.map((b, i) => {
+    const margin = math.multiply(tCritical, standardErrors[i]);
+    return [toUINumber(math.subtract(b, margin)), toUINumber(math.add(b, margin))];
+  });
+};
+
 export const computeSumOfSquares = (X, Y, Beta, n) => {
   const Y_predRaw = math.multiply(X, Beta);
   const Y_pred = Y_predRaw.toArray ? Y_predRaw.toArray() : Y_predRaw;
@@ -87,11 +95,7 @@ export const regression = (yData, xData, alpha = 0.05, modelType, { toUINumber }
   const standardErrors = computeStandardErrors(X_T_X, eseSq, k);
 
   // 5. Confidence Intervals (two-tailed, user alpha)
-  const tCritical = math.bignumber(Math.abs(jStat.studentt.inv(alpha / 2, df)));
-  const confidenceIntervals = coefficients.map((b, i) => {
-    const margin = math.multiply(tCritical, standardErrors[i]);
-    return [toUINumber(math.subtract(b, margin)), toUINumber(math.add(b, margin))];
-  });
+  const confidenceIntervals = computeConfidenceIntervals(alpha, df, coefficients, standardErrors, toUINumber);
 
   // 6. Statistica t și p-value (two-tailed)
   const tStats = coefficients.map((b, i) => math.divide(b, standardErrors[i]));
