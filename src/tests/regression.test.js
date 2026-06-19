@@ -1,5 +1,18 @@
 import math from "@math/config";
-import { solveCoefficients, setDummyColumns, computeSumOfSquares, computeStandardErrors, computeConfidenceIntervals } from "@math/use_cases/regression";
+import {
+  solveCoefficients,
+  setDummyColumns,
+  computeSumOfSquares,
+  computeStandardErrors,
+  computeConfidenceIntervals,
+  computeTStats,
+  computePredictorStats,
+  computeBetaWeights,
+  computeCorrelationMatrix,
+  computeVIF,
+  computeRSquared,
+  computeFStat,
+} from "@math/use_cases/regression";
 
 const toNum = (v) => Number(v);
 
@@ -226,5 +239,248 @@ describe("computeConfidenceIntervals", () => {
   test("lower bound is always less than upper bound", () => {
     const ci = computeConfidenceIntervals(0.05, 10, [3, -1], [math.bignumber(0.5), math.bignumber(0.2)], toUINumber);
     ci.forEach(([lo, hi]) => expect(lo).toBeLessThan(hi));
+  });
+});
+
+// ─── computeTStats ───────────────────────────────────────────────────────────
+// coefficients=[4], standardErrors=[2], df=100, alpha=0.05
+//   tStat = 2, pValue = 2*(1 - cdf(2,100)) ≈ 0.048 → significant
+// coefficients=[0], standardErrors=[1]
+//   tStat = 0, pValue = 1 → not significant
+
+describe("computeTStats", () => {
+  test("tStats = coefficients / standardErrors", () => {
+    const { tStats } = computeTStats(
+      [math.bignumber(4), math.bignumber(6)],
+      [math.bignumber(2), math.bignumber(3)],
+      100, 0.05
+    );
+    expect(toNum(tStats[0])).toBeCloseTo(2, 8);
+    expect(toNum(tStats[1])).toBeCloseTo(2, 8);
+  });
+
+  test("pValue is 1 when coefficient is 0", () => {
+    const { pValues } = computeTStats([math.bignumber(0)], [math.bignumber(1)], 30, 0.05);
+    expect(pValues[0]).toBeCloseTo(1, 8);
+  });
+
+  test("isSignificant true when p < alpha", () => {
+    const { isSignificant } = computeTStats([math.bignumber(4)], [math.bignumber(2)], 100, 0.05);
+    expect(isSignificant[0]).toBe(true);
+  });
+
+  test("isSignificant false when p >= alpha", () => {
+    const { isSignificant } = computeTStats([math.bignumber(0)], [math.bignumber(1)], 30, 0.05);
+    expect(isSignificant[0]).toBe(false);
+  });
+
+  test("returns one entry per coefficient", () => {
+    const { tStats, pValues, isSignificant } = computeTStats(
+      [math.bignumber(1), math.bignumber(2), math.bignumber(3)],
+      [math.bignumber(1), math.bignumber(1), math.bignumber(1)],
+      50, 0.05
+    );
+    expect(tStats.length).toBe(3);
+    expect(pValues.length).toBe(3);
+    expect(isSignificant.length).toBe(3);
+  });
+});
+
+// ─── computePredictorStats ───────────────────────────────────────────────────
+// X = [[1,1,2],[1,2,1],[1,3,4],[1,4,3]], k=2
+// predictorCols[0]=[1,2,3,4], predictorCols[1]=[2,1,4,3]
+// predictorMeans = [2.5, 2.5], predictorSS = [5, 5]
+
+describe("computePredictorStats", () => {
+  const X = [
+    [math.bignumber(1), math.bignumber(1), math.bignumber(2)],
+    [math.bignumber(1), math.bignumber(2), math.bignumber(1)],
+    [math.bignumber(1), math.bignumber(3), math.bignumber(4)],
+    [math.bignumber(1), math.bignumber(4), math.bignumber(3)],
+  ];
+  const { predictorCols, predictorMeans, predictorSS } = computePredictorStats(X, 2);
+
+  test("predictorCols extracts columns after intercept", () => {
+    expect(predictorCols[0].map(toNum)).toEqual([1, 2, 3, 4]);
+    expect(predictorCols[1].map(toNum)).toEqual([2, 1, 4, 3]);
+  });
+
+  test("predictorMeans are correct", () => {
+    expect(toNum(predictorMeans[0])).toBeCloseTo(2.5, 8);
+    expect(toNum(predictorMeans[1])).toBeCloseTo(2.5, 8);
+  });
+
+  test("predictorSS are correct", () => {
+    expect(toNum(predictorSS[0])).toBeCloseTo(5, 8);
+    expect(toNum(predictorSS[1])).toBeCloseTo(5, 8);
+  });
+});
+
+// ─── computeBetaWeights ──────────────────────────────────────────────────────
+// slopes=[2], predictorSS=[4], ssTotal=16, n=3
+// sdXi = sqrt(4/2) = sqrt(2), sdY = sqrt(16/2) = 2√2
+// betaWeight = 2 * sqrt(2) / (2√2) = 1
+
+describe("computeBetaWeights", () => {
+  const toUINumber = (v) => Number(v);
+
+  test("betaWeight = 1 when b·sdX = sdY", () => {
+    const weights = computeBetaWeights(
+      [math.bignumber(2)],
+      [math.bignumber(4)],
+      math.bignumber(16),
+      3, toUINumber
+    );
+    expect(weights[0]).toBeCloseTo(1, 8);
+  });
+
+  test("betaWeight = 0 when slope is 0", () => {
+    const weights = computeBetaWeights(
+      [math.bignumber(0)],
+      [math.bignumber(4)],
+      math.bignumber(16),
+      3, toUINumber
+    );
+    expect(weights[0]).toBeCloseTo(0, 8);
+  });
+
+  test("returns one weight per slope", () => {
+    const weights = computeBetaWeights(
+      [math.bignumber(1), math.bignumber(2)],
+      [math.bignumber(4), math.bignumber(4)],
+      math.bignumber(16),
+      3, toUINumber
+    );
+    expect(weights.length).toBe(2);
+  });
+});
+
+// ─── computeRSquared ─────────────────────────────────────────────────────────
+
+describe("computeRSquared", () => {
+  test("rSquared = 1 for perfect fit (ssRes=0)", () => {
+    const { rSquared } = computeRSquared(math.bignumber(0), math.bignumber(8), 3, 1);
+    expect(toNum(rSquared)).toBeCloseTo(1, 10);
+  });
+
+  test("rSquared = 0 when model explains nothing (ssRes=ssTotal)", () => {
+    const { rSquared } = computeRSquared(math.bignumber(8), math.bignumber(8), 5, 3);
+    expect(toNum(rSquared)).toBeCloseTo(0, 10);
+  });
+
+  test("rSquared = 0.5 when ssRes is half of ssTotal", () => {
+    const { rSquared } = computeRSquared(math.bignumber(4), math.bignumber(8), 5, 3);
+    expect(toNum(rSquared)).toBeCloseTo(0.5, 8);
+  });
+
+  test("adjustedRSquared = 1 for perfect fit", () => {
+    const { adjustedRSquared } = computeRSquared(math.bignumber(0), math.bignumber(8), 3, 1);
+    expect(toNum(adjustedRSquared)).toBeCloseTo(1, 10);
+  });
+
+  test("adjustedRSquared < rSquared when fit is imperfect", () => {
+    const { rSquared, adjustedRSquared } = computeRSquared(math.bignumber(4), math.bignumber(8), 5, 3);
+    expect(toNum(adjustedRSquared)).toBeLessThan(toNum(rSquared));
+  });
+});
+
+// ─── computeFStat ────────────────────────────────────────────────────────────
+// rSquared=0.9, k=1, df=10, alpha=0.05
+// fStat = (0.9/1) / (0.1/10) = 90 → very significant
+
+describe("computeFStat", () => {
+  test("fStat is correct", () => {
+    const { fStat } = computeFStat(math.bignumber(0.9), 1, 10, 0.05);
+    expect(toNum(fStat)).toBeCloseTo(90, 6);
+  });
+
+  test("fIsSignificant true for large fStat", () => {
+    const { fIsSignificant } = computeFStat(math.bignumber(0.9), 1, 10, 0.05);
+    expect(fIsSignificant).toBe(true);
+  });
+
+  test("fIsSignificant false when rSquared is near 0", () => {
+    const { fIsSignificant } = computeFStat(math.bignumber(0.01), 1, 5, 0.05);
+    expect(fIsSignificant).toBe(false);
+  });
+
+  test("fSignificance is between 0 and 1", () => {
+    const { fSignificance } = computeFStat(math.bignumber(0.5), 2, 10, 0.05);
+    expect(fSignificance).toBeGreaterThanOrEqual(0);
+    expect(fSignificance).toBeLessThanOrEqual(1);
+  });
+});
+
+// ─── computeCorrelationMatrix ────────────────────────────────────────────────
+// Single predictor → [[1]]
+// Two predictors: X1=[1,2,3,4], X2=[4,3,2,1] → perfectly negatively correlated → r=-1
+
+describe("computeCorrelationMatrix", () => {
+  const toUINumber = (v) => Number(v);
+  const n = 4;
+
+  test("single predictor returns 1×1 matrix with value 1", () => {
+    const cols = [[math.bignumber(1), math.bignumber(2), math.bignumber(3), math.bignumber(4)]];
+    const means = [math.bignumber(2.5)];
+    const ss = [math.bignumber(5)];
+    const m = computeCorrelationMatrix(cols, means, ss, n, toUINumber);
+    expect(m).toEqual([[1]]);
+  });
+
+  test("diagonal is always 1", () => {
+    const cols = [
+      [math.bignumber(1), math.bignumber(2), math.bignumber(3), math.bignumber(4)],
+      [math.bignumber(4), math.bignumber(3), math.bignumber(2), math.bignumber(1)],
+    ];
+    const means = [math.bignumber(2.5), math.bignumber(2.5)];
+    const ss = [math.bignumber(5), math.bignumber(5)];
+    const m = computeCorrelationMatrix(cols, means, ss, n, toUINumber);
+    expect(m[0][0]).toBe(1);
+    expect(m[1][1]).toBe(1);
+  });
+
+  test("perfectly negatively correlated predictors give r=-1", () => {
+    const cols = [
+      [math.bignumber(1), math.bignumber(2), math.bignumber(3), math.bignumber(4)],
+      [math.bignumber(4), math.bignumber(3), math.bignumber(2), math.bignumber(1)],
+    ];
+    const means = [math.bignumber(2.5), math.bignumber(2.5)];
+    const ss = [math.bignumber(5), math.bignumber(5)];
+    const m = computeCorrelationMatrix(cols, means, ss, n, toUINumber);
+    expect(m[0][1]).toBeCloseTo(-1, 8);
+    expect(m[1][0]).toBeCloseTo(-1, 8);
+  });
+});
+
+// ─── computeVIF ──────────────────────────────────────────────────────────────
+// k=1 → VIF=[1], hasMulticollinearity=false
+// k=2, orthogonal predictors → VIF≈1
+
+describe("computeVIF", () => {
+  const toUINumber = (v) => Number(v);
+
+  test("k=1 always returns VIF=1 without regression", () => {
+    const { vifValues, hasMulticollinearity } = computeVIF([], [[]], [math.bignumber(1)], 3, 1, toUINumber);
+    expect(vifValues[0]).toBe(1);
+    expect(hasMulticollinearity).toBe(false);
+  });
+
+  test("k=2 uncorrelated predictors → VIF≈1, no multicollinearity", () => {
+    // X1=[1,2,3,4], X2=[2,1,4,3] — low correlation
+    const X = [
+      [math.bignumber(1), math.bignumber(1), math.bignumber(2)],
+      [math.bignumber(1), math.bignumber(2), math.bignumber(1)],
+      [math.bignumber(1), math.bignumber(3), math.bignumber(4)],
+      [math.bignumber(1), math.bignumber(4), math.bignumber(3)],
+    ];
+    const predictorCols = [
+      [math.bignumber(1), math.bignumber(2), math.bignumber(3), math.bignumber(4)],
+      [math.bignumber(2), math.bignumber(1), math.bignumber(4), math.bignumber(3)],
+    ];
+    const predictorSS = [math.bignumber(5), math.bignumber(5)];
+    const { vifValues, hasMulticollinearity } = computeVIF(X, predictorCols, predictorSS, 4, 2, toUINumber);
+    expect(vifValues.length).toBe(2);
+    vifValues.forEach((v) => expect(v).toBeLessThan(5));
+    expect(hasMulticollinearity).toBe(false);
   });
 });
