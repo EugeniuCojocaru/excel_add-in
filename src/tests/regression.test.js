@@ -1,5 +1,5 @@
 import math from "@math/config";
-import { solveCoefficients, setDummyColumns } from "@math/use_cases/regression";
+import { solveCoefficients, setDummyColumns, computeSumOfSquares } from "@math/use_cases/regression";
 
 const toNum = (v) => Number(v);
 
@@ -104,5 +104,43 @@ describe("setDummyColumns", () => {
       meta: [],
     };
     expect(() => setDummyColumns(xColumns)).not.toThrow();
+  });
+});
+
+// ─── computeSumOfSquares ─────────────────────────────────────────────────────
+// Perfect fit: Y = 1 + 2X, data [[1,3],[1,2,5],[1,3,7]]
+// ssRes should be 0, ssTotal = Σ(Yi - meanY)²
+
+describe("computeSumOfSquares", () => {
+  // Y = 1 + 2X  →  perfect fit, ssRes = 0
+  // X (design): [[1,1],[1,2],[1,3]], Y: [[3],[5],[7]], Beta: [[1],[2]]
+  const X = [[1, 1], [1, 2], [1, 3]];
+  const Y = [[3], [5], [7]];
+  const Beta = [[1], [2]];
+  const n = 3;
+  const { ssRes, ssTotal } = computeSumOfSquares(X, Y, Beta, n);
+
+  test("ssRes is 0 for a perfect fit", () => {
+    expect(toNum(ssRes)).toBeCloseTo(0, 10);
+  });
+
+  test("ssTotal equals Σ(Yi - meanY)²", () => {
+    // meanY = 5, deviations: [-2, 0, 2] → ssTotal = 4+0+4 = 8
+    expect(toNum(ssTotal)).toBeCloseTo(8, 10);
+  });
+
+  describe("imperfect fit", () => {
+    // Y = [3, 5, 7], Beta = [[2],[2]] → Y_pred = [4, 6, 8]
+    // residuals: [-1, -1, -1] → ssRes = 3
+    const BetaOff = [[2], [2]];
+    const { ssRes: ssR, ssTotal: ssT } = computeSumOfSquares(X, Y, BetaOff, n);
+
+    test("ssRes accumulates squared residuals", () => {
+      expect(toNum(ssR)).toBeCloseTo(3, 10);
+    });
+
+    test("ssTotal is unchanged regardless of Beta", () => {
+      expect(toNum(ssT)).toBeCloseTo(8, 10);
+    });
   });
 });

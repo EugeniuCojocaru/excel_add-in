@@ -11,6 +11,25 @@ export const solveCoefficients = (X_T_X, X_T_Y) => {
   return { Beta, coefficients, b0, slopes };
 };
 
+export const computeSumOfSquares = (X, Y, Beta, n) => {
+  const Y_predRaw = math.multiply(X, Beta);
+  const Y_pred = Y_predRaw.toArray ? Y_predRaw.toArray() : Y_predRaw;
+
+  let ssRes = math.bignumber(0);
+  let ssTotal = math.bignumber(0);
+  const meanY = math.mean(Y.map((row) => row[0]));
+
+  for (let i = 0; i < n; i++) {
+    const resid = math.subtract(Y[i][0], Y_pred[i][0]);
+    ssRes = math.add(ssRes, math.square(resid));
+
+    const devY = math.subtract(Y[i][0], meanY);
+    ssTotal = math.add(ssTotal, math.square(devY));
+  }
+
+  return { ssRes, ssTotal };
+};
+
 export const setDummyColumns = (xColumns) => {
   const k = xColumns.data[0].length;
   for (let i = 0; i < k; i++) {
@@ -42,20 +61,7 @@ export const regression = (yData, xData, alpha = 0.05, modelType, { toUINumber }
   const { Beta, coefficients, b0, slopes } = solveCoefficients(X_T_X, X_T_Y);
 
   // 2. Valorile Prezise și Reziduurile
-  const Y_predRaw = math.multiply(X, Beta);
-  const Y_pred = Y_predRaw.toArray ? Y_predRaw.toArray() : Y_predRaw;
-
-  let ssRes = math.bignumber(0);
-  let ssTotal = math.bignumber(0);
-  const meanY = math.mean(Y.map((row) => row[0]));
-
-  for (let i = 0; i < n; i++) {
-    const resid = math.subtract(Y[i][0], Y_pred[i][0]);
-    ssRes = math.add(ssRes, math.square(resid));
-
-    const devY = math.subtract(Y[i][0], meanY);
-    ssTotal = math.add(ssTotal, math.square(devY));
-  }
+  const { ssRes, ssTotal } = computeSumOfSquares(X, Y, Beta, n);
 
   // 3. Eroarea Standard a Estimării (ESE)
   const ese = math.sqrt(math.divide(ssRes, math.bignumber(df)));
