@@ -1,4 +1,5 @@
 import math from "@math/config";
+import { regression } from "@math/use_cases/regression";
 import {
   solveCoefficients,
   setDummyColumns,
@@ -12,8 +13,7 @@ import {
   computeVIF,
   computeRSquared,
   computeFStat,
-  regression,
-} from "@math/use_cases/regression";
+} from "@math/helpers/regression_steps";
 
 const toNum = (v) => Number(v);
 
