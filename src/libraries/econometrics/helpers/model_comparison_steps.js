@@ -1,5 +1,5 @@
-import { EXCEL_FORMATS } from "@utils/excelFormats";
-import { toUIData } from "@utils/ui";
+import { EXCEL_FORMATS } from "@excel/formats";
+import { toUIData } from "@excel/helpers/morph_steps";
 
 /**
  * @param {{ modelType: string, rSquared: number, ssRes: number }[]} modelsStats

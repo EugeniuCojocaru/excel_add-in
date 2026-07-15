@@ -97,34 +97,3 @@ export const EXCEL_FORMATS = {
     },
   },
 };
-
-export const applyStyle = (range, style, row = null, col = null) => {
-  let target;
-
-  if (row !== null && col !== null) {
-    target = range.getCell(row, col); // specific cell
-  } else if (row !== null) {
-    target = range.getRow(row); // whole row
-  } else {
-    target = range; // whole range
-  }
-
-  if (style.font) Object.assign(target.format.font, style.font);
-  if (style.fill) Object.assign(target.format.fill, style.fill);
-  if (style.horizontalAlignment) target.format.horizontalAlignment = style.horizontalAlignment;
-  if (style.verticalAlignment) target.format.verticalAlignment = style.verticalAlignment;
-  if (style.wrapText !== undefined) target.format.wrapText = style.wrapText;
-  if (style.indentLevel !== undefined) target.format.indentLevel = style.indentLevel;
-  if (style.rowHeight) target.format.rowHeight = style.rowHeight;
-  if (style.columnWidth) target.format.columnWidth = style.columnWidth;
-  if (style.numberFormat) target.numberFormat = [[style.numberFormat]];
-
-  if (style.border) {
-    for (const [edge, spec] of Object.entries(style.border)) {
-      const b = target.format.borders.getItem(edge);
-      if (spec.style) b.style = spec.style;
-      if (spec.color) b.color = spec.color;
-      if (spec.weight) b.weight = spec.weight;
-    }
-  }
-};

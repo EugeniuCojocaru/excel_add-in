@@ -13,10 +13,9 @@ import {
 } from "@fluentui/react-components";
 import RangeSelector from "../components/RangeSelector";
 
-import { getColumnMatrix, insertColumn, insertColumnTo } from "@api";
+import { getColumnMatrix, insertColumn, insertColumnTo, toUIData } from "@excel";
 import { descriptiveStats } from "@math/use_cases/descriptive_stats";
 import { usePrecision, useInterpretation } from "../hooks";
-import { toUIData } from "@utils/ui";
 
 import { useLanguage } from "@i18n";
 import ActionButton from "../components/ActionButton";

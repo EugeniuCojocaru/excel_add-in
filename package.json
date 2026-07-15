@@ -37,7 +37,6 @@
       "/node_modules/(?!(mathjs|decimal\\.js)/)"
     ],
     "moduleNameMapper": {
-      "^@utils/(.*)$": "<rootDir>/src/libraries/utils/$1",
       "^@components/(.*)$": "<rootDir>/src/components/$1",
       "^@i18n/(.*)$": "<rootDir>/src/libraries/i18n/$1",
       "^@math/(.*)$": "<rootDir>/src/libraries/math/$1"

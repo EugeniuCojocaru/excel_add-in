@@ -1,5 +1,5 @@
-import { EXCEL_FORMATS } from "@utils/excelFormats";
-import { toUIData } from "@utils/ui";
+import { EXCEL_FORMATS } from "@excel/formats";
+import { toUIData } from "@excel/helpers/morph_steps";
 
 // TODO: bug — `b[0] >= 0 && "+"` evaluates to `false` (not `"-"`) when b[0] is
 // negative, so a negative single-predictor slope renders the literal string

@@ -7,7 +7,7 @@ import {
   buildCorrelationMatrixSection,
   buildExecutiveSummary,
 } from "../helpers/summary_output_steps";
-import { toRawData } from "@utils/rawData";
+import { toRawData } from "@excel/helpers/raw_data_steps";
 
 /**
  * Generează raportul complet de tip "Excel Summary Output" pentru o regresie.

@@ -1,9 +1,9 @@
-import { EXCEL_FORMATS } from "./excelFormats";
-import { toUIData } from "./ui";
+import { EXCEL_FORMATS } from "../formats";
+import { toUIData } from "./morph_steps";
 
 /**
  * Concatenates row sections into the { dataToWrite, maxColumns } shape consumed
- * by @utils/ui's splitAndCompleteRawData and by the Excel write pipeline.
+ * by splitAndCompleteRawData and by the Excel write pipeline.
  * @param {{ row: any[], format: (object|null)[] }[]} rows
  * @returns {{ dataToWrite: { row: any[], format: (object|null)[] }[], maxColumns: number }}
  */

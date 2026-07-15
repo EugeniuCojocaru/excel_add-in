@@ -17,9 +17,8 @@ import {
 } from "@fluentui/react-components";
 import { TableAddFilled, ChevronRightFilled } from "@fluentui/react-icons";
 import RangeSelector from "../components/RangeSelector";
-import { getColumnStringMatrix, insertColumn } from "@api";
+import { getColumnStringMatrix, insertColumn, toUIData } from "@excel";
 import { preprocessDummyVariables, buildDummyTableRows } from "@econometrics/use_cases/dummy_variables";
-import { toUIData } from "@utils/ui";
 import { useLanguage } from "@i18n";
 import ActionButton from "../components/ActionButton";
 

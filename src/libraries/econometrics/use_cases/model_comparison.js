@@ -1,5 +1,5 @@
-import { toUIData } from "@utils/ui";
-import { toRawData } from "@utils/rawData";
+import { toUIData } from "@excel/helpers/morph_steps";
+import { toRawData } from "@excel/helpers/raw_data_steps";
 import { getBestModels, buildComparisonTable, buildComparisonConclusion } from "../helpers/model_comparison_steps";
 
 /**

@@ -1,5 +1,5 @@
-import { toRawData, buildRawDataGrid } from "@utils/rawData";
-import { EXCEL_FORMATS } from "@utils/excelFormats";
+import { toRawData, buildRawDataGrid } from "@excel/helpers/raw_data_steps";
+import { EXCEL_FORMATS } from "@excel/formats";
 
 describe("toRawData", () => {
   test("wraps rows and computes maxColumns as the widest row", () => {

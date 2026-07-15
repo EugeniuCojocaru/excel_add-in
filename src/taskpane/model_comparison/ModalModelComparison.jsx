@@ -16,12 +16,10 @@ import {
 } from "@fluentui/react-components";
 import RangeSelector from "../components/RangeSelector";
 
-import { getColumnMatrix, insertColumn, insertColumnTo } from "@api";
+import { getColumnMatrix, insertColumn, insertColumnTo, toUIData, EXCEL_FORMATS, buildRawDataGrid } from "@excel";
 import { regression } from "@math/use_cases/regression";
 import { usePrecision, useInterpretation } from "../hooks";
-import { toUIData, toUIStats } from "@utils/ui";
-import { EXCEL_FORMATS } from "@utils/excelFormats";
-import { buildRawDataGrid } from "@utils/rawData";
+import { toUIStats } from "@econometrics";
 import { generateSummaryOutput } from "@econometrics/use_cases/summary_output";
 
 import { useLanguage } from "@i18n";

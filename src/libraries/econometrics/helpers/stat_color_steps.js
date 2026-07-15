@@ -1,29 +1,44 @@
-import { randColor } from "./colors";
-
-export const standardizeDataToWrite = (array) => {
-  let max = array[0].length;
-
-  array.forEach((row) => {
-    if (row.length > max) max = row.length;
-  });
-
-  const finishedData = array.map((row) => {
-    const diff = max - row.length;
-    if (diff !== 0) row.push(...Array(diff).fill(""));
-    return row;
-  });
-  console.log(finishedData);
-  return finishedData;
+const hslToHex = (h, s, l) => {
+  s /= 100;
+  l /= 100;
+  const a = s * Math.min(l, 1 - l);
+  const f = (n) => {
+    const k = (n + h / 30) % 12;
+    const value = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
+    return Math.round(255 * value).toString(16).padStart(2, "0");
+  };
+  return `#${f(0)}${f(8)}${f(4)}`;
 };
 
-export const toUIData = (data, format = null) => {
-  if ((data === null || data === undefined) && Boolean(format))
-    return { data: [""], format: [...format] };
-  let formatData = [];
-  if (format === null) formatData = data.map(() => null);
-  return { row: data, format: format || formatData };
+/**
+ * Generates a consistent, pseudo-random hex color based on the inputs. Uses full
+ * hue rotation at fixed high lightness so colors are visually distinct while
+ * remaining light enough for black text.
+ * @param {number} num
+ * @param {string} str
+ * @returns {string} a hex color code
+ */
+export const randColor = (num, str) => {
+  const combined = `${str}-${num}`;
+
+  let hash = 0;
+  for (let i = 0; i < combined.length; i++) {
+    hash = combined.charCodeAt(i) + ((hash << 5) - hash);
+  }
+
+  // Spread hue across the full 360° spectrum for maximum distinction.
+  // Saturation 60% keeps colors rich; lightness 83% keeps black text readable.
+  const hue = (((hash & 0xffff) % 360) + 360) % 360;
+  return hslToHex(hue, 60, 83);
 };
 
+/**
+ * Wraps every numeric field of a raw regression() result in { value, color }, the
+ * internal representation the econometrics interpretation/summary steps consume —
+ * the color feeds the injected `fillFor` collaborator for Excel cell highlighting.
+ * @param {object} stats - raw output of @math's regression()
+ * @returns {object} the same shape with every numeric leaf wrapped as { value, color }
+ */
 export const toUIStats = (stats) => {
   return {
     alpha: stats.alpha,
@@ -75,48 +90,4 @@ export const toUIStats = (stats) => {
     })),
     hasMulticollinearity: stats.hasMulticollinearity,
   };
-};
-
-export const toExcelData = (uiData) => {
-  const rows = [];
-  const formats = [];
-  uiData.forEach((row, index) => {
-    const { data, format } = row;
-    rows.push(data);
-
-    format.forEach((cellFormat, cellIndex) => {
-      if (cellFormat !== null) {
-        formats.push({
-          row: index,
-          column: cellIndex,
-          format: cellFormat.richTextSettings,
-        });
-      }
-    });
-  });
-  return { rows, formats };
-};
-
-export const splitAndCompleteRawData = (rawData) => {
-  const { maxColumns, dataToWrite } = rawData;
-  const formats = [];
-
-  const excelData = dataToWrite.map((data, rowIndex) => {
-    const { row, format } = data;
-    format.forEach((cellFormat, columnIndex) => {
-      if (cellFormat !== null && cellFormat !== "") {
-        formats.push({
-          row: rowIndex,
-          column: columnIndex,
-          format: cellFormat,
-        });
-      }
-    });
-    const diff = maxColumns - row.length;
-    if (diff !== 0) row.push(...Array(diff).fill(""));
-
-    return row;
-  });
-
-  return { excelData, formats };
 };
