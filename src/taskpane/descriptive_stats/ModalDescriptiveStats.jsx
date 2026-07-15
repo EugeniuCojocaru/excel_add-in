@@ -15,7 +15,7 @@ import RangeSelector from "../components/RangeSelector";
 
 import { getColumnMatrix, insertColumn, insertColumnTo } from "@api";
 import { descriptiveStats } from "@math/use_cases/descriptive_stats";
-import { usePrecision, useInterpretation } from "@utils/hooks";
+import { usePrecision, useInterpretation } from "../hooks";
 import { toUIData } from "@utils/ui";
 
 import { useLanguage } from "@i18n";

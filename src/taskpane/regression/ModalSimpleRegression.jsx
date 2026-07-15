@@ -20,7 +20,7 @@ import RangeSelector from "../components/RangeSelector";
 
 import { getColumnMatrix, insertColumn, insertColumnTo } from "@api";
 import { regression } from "@math/use_cases/regression";
-import { usePrecision, useInterpretation } from "@utils/hooks";
+import { usePrecision, useInterpretation } from "../hooks";
 import { generateSummaryOutput } from "@econometrics/use_cases/summary_output";
 import { toUIStats } from "@utils/ui";
 

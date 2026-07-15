@@ -18,7 +18,7 @@ import RangeSelector from "../components/RangeSelector";
 
 import { getColumnMatrix, insertColumn, insertColumnTo } from "@api";
 import { regression } from "@math/use_cases/regression";
-import { usePrecision, useInterpretation } from "@utils/hooks";
+import { usePrecision, useInterpretation } from "../hooks";
 import { toUIData, toUIStats } from "@utils/ui";
 import { EXCEL_FORMATS } from "@utils/excelFormats";
 import { buildRawDataGrid } from "@utils/rawData";

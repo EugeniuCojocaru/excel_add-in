@@ -1,4 +1,4 @@
-import { useSettings } from "../../../taskpane/context/SettingsContext";
+import { useSettings } from "../context/SettingsContext";
 
 const usePrecision = () => {
   const { decimals } = useSettings();
