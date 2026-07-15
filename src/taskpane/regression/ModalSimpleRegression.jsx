@@ -21,11 +21,11 @@ import RangeSelector from "../components/RangeSelector";
 import { getColumnMatrix, insertColumn, insertColumnTo } from "@api";
 import { regression } from "@math/use_cases/regression";
 import { usePrecision, useInterpretation } from "@utils/hooks";
-import { generateSummaryOutput } from "@utils/summaryOutput";
+import { generateSummaryOutput } from "@econometrics/use_cases/summary_output";
 import { toUIStats } from "@utils/ui";
 
 import { useLanguage } from "@i18n";
-import { interpretationRegression } from "@utils/econometrics";
+import { interpretationRegression } from "@econometrics/use_cases/regression_interpretation";
 import { DataTrendingFilled } from "@fluentui/react-icons";
 import ActionButton from "../components/ActionButton";
 

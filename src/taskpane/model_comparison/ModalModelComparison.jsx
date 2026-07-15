@@ -21,12 +21,12 @@ import { regression } from "@math/use_cases/regression";
 import { usePrecision, useInterpretation } from "@utils/hooks";
 import { toUIData, toUIStats } from "@utils/ui";
 import { EXCEL_FORMATS } from "@utils/excelFormats";
-import { generateSummaryOutput } from "@utils/summaryOutput";
+import { generateSummaryOutput } from "@econometrics/use_cases/summary_output";
 
 import { useLanguage } from "@i18n";
-import { interpretationRegression } from "@utils/econometrics";
+import { interpretationRegression } from "@econometrics/use_cases/regression_interpretation";
 import ComboboxTags from "../components/ComboboxTags";
-import { COMPARISSON_INTERPRETATION } from "@utils/interpretation";
+import { comparisonInterpretation } from "@econometrics/use_cases/model_comparison";
 import ActionButton from "../components/ActionButton";
 import { ScalesFilled } from "@fluentui/react-icons";
 
@@ -125,11 +125,7 @@ const ModalModelComparison = () => {
       regression(yData, xData, alpha, modelKey, { toUINumber })
     );
 
-    const comparationRawData = COMPARISSON_INTERPRETATION.comparisonInterpretation(
-      rawStatsArray,
-      t,
-      mode
-    );
+    const comparationRawData = comparisonInterpretation(rawStatsArray, t, mode);
 
     const modelRawDataArray = rawStatsArray.map((rawStats) => {
       const uiStats = toUIStats(rawStats);
@@ -144,7 +140,7 @@ const ModalModelComparison = () => {
         yData.meta,
         xData.meta,
         t,
-        { mode, fillFor, extend: econometricInterpretation }
+        { mode, fillFor, extended: econometricInterpretation }
       );
     });
 

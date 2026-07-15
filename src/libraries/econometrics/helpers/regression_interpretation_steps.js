@@ -1,7 +1,20 @@
-import { EXCEL_FORMATS } from "../excelFormats";
-import { toUIData } from "../ui";
+import { EXCEL_FORMATS } from "@utils/excelFormats";
+import { toUIData } from "@utils/ui";
 
-const getEquation = (k, b0, b, yMeta, xMeta, modelType) => {
+// TODO: bug — `b[0] >= 0 && "+"` evaluates to `false` (not `"-"`) when b[0] is
+// negative, so a negative single-predictor slope renders the literal string
+// "false" in the equation instead of a minus sign. Preserved as-is from the
+// pre-refactor implementation; fixing it is out of scope for this refactor.
+/**
+ * @param {number} k
+ * @param {number} b0
+ * @param {number[]} b
+ * @param {{ name: string, unit: string }[]} yMeta
+ * @param {{ name: string, unit: string }[]} xMeta
+ * @param {string} modelType
+ * @returns {string}
+ */
+export const getEquation = (k, b0, b, yMeta, xMeta, modelType) => {
   const getYName = () => {
     const isLog = modelType === "log-linear" || modelType === "semi-log";
     const baseName = yMeta[0]?.name || "Y";
@@ -31,14 +44,27 @@ const getEquation = (k, b0, b, yMeta, xMeta, modelType) => {
 
 const DEFAULT_ALPHA_LEVELS = [0.01, 0.05, 0.1];
 
-const buildAlphaSet = (userAlpha) => {
+/**
+ * @param {number} userAlpha
+ * @returns {number[]}
+ */
+export const buildAlphaSet = (userAlpha) => {
   const levels = DEFAULT_ALPHA_LEVELS.includes(userAlpha)
     ? [...DEFAULT_ALPHA_LEVELS]
     : [...DEFAULT_ALPHA_LEVELS, userAlpha];
   return levels.sort((a, b) => a - b);
 };
 
-const buildAlphaInsight = (pValue, alpha, subject, t, fillFor, pValueStat) => {
+/**
+ * @param {number} pValue
+ * @param {number} alpha
+ * @param {string} subject
+ * @param {(key: string, params?: object) => string} t
+ * @param {(stat: {value:number,color?:string}|null) => object|null} fillFor
+ * @param {{value:number,color?:string}|null} pValueStat
+ * @returns {{ row: any[], format: (object|null)[] }|null}
+ */
+export const buildAlphaInsight = (pValue, alpha, subject, t, fillFor, pValueStat) => {
   const isSig = pValue < alpha;
   const bestDefaultAlpha = DEFAULT_ALPHA_LEVELS.find((level) => pValue < level) ?? null;
 
@@ -53,10 +79,12 @@ const buildAlphaInsight = (pValue, alpha, subject, t, fillFor, pValueStat) => {
   // No insight when model is significant and user alpha is at least as strict as any passing standard
   if (isSig && (bestDefaultAlpha === null || bestDefaultAlpha >= alpha)) return null;
 
-  const preciseSuffix =
-    preciseBestAlpha !== null && bestDefaultAlpha !== null && preciseBestAlpha < bestDefaultAlpha
-      ? t("regression.interpretation.secondStep.conclusionAlphaInsightPrecise", { preciseBest: preciseBestAlpha })
-      : "";
+  let preciseSuffix = "";
+  if (preciseBestAlpha !== null && bestDefaultAlpha !== null && preciseBestAlpha < bestDefaultAlpha) {
+    preciseSuffix = t("regression.interpretation.secondStep.conclusionAlphaInsightPrecise", {
+      preciseBest: preciseBestAlpha,
+    });
+  }
 
   let insightText;
   if (isSig) {
@@ -80,14 +108,30 @@ const buildAlphaInsight = (pValue, alpha, subject, t, fillFor, pValueStat) => {
   return toUIData(["", insightText], [null, fillFor(pValueStat)]);
 };
 
-// Merges a fill color into an existing format object without mutating it.
-const withFill = (baseFormat, stat, fillFor) => {
+/**
+ * Merges a fill color into an existing format object without mutating it.
+ * @param {object|null} baseFormat
+ * @param {{value:number,color?:string}|null} stat
+ * @param {(stat: {value:number,color?:string}|null) => object|null} fillFor
+ * @returns {object|null}
+ */
+export const withFill = (baseFormat, stat, fillFor) => {
   const fill = fillFor(stat);
   if (!fill || !baseFormat) return baseFormat;
   return { ...baseFormat, ...fill };
 };
 
-const getConclusion = ({
+/**
+ * @param {{
+ *   pValue: number, alpha: number, bNumber?: number|null, slopes?: number[]|null,
+ *   yMeta: {name:string,unit:string}[], xMeta: {name:string,unit:string}[],
+ *   t: (key: string, params?: object) => string,
+ *   fillFor?: (stat: {value:number,color?:string}|null) => object|null,
+ *   pValueStat?: {value:number,color?:string}|null
+ * }} params
+ * @returns {{ row: any[], format: (object|null)[] }}
+ */
+export const getConclusion = ({
   pValue,
   alpha,
   bNumber = null,
@@ -146,8 +190,23 @@ const getConclusion = ({
   );
 };
 
-// { mode, fillFor, bStat, pValueStat } — bStat and pValueStat are { value, color } objects
-const getSignificance = (
+/**
+ * @param {number} b
+ * @param {number} pValue
+ * @param {number} alpha
+ * @param {number} bNumber
+ * @param {{name:string,unit:string}[]} yMeta
+ * @param {{name:string,unit:string}[]} xMeta
+ * @param {(key: string, params?: object) => string} t
+ * @param {{
+ *   mode?: string,
+ *   fillFor?: (stat: {value:number,color?:string}|null) => object|null,
+ *   bStat?: {value:number,color?:string}|null,
+ *   pValueStat?: {value:number,color?:string}|null
+ * }} [options]
+ * @returns {{ row: any[], format: (object|null)[] }[]}
+ */
+export const getSignificance = (
   b,
   pValue,
   alpha,
@@ -217,8 +276,24 @@ const getSignificance = (
   return significance;
 };
 
-// slopeStats / pValueStats / fSigStat are { value, color } objects for fills
-const getMultipleRegressionSignificance = (
+/**
+ * @param {number[]} slopes
+ * @param {number[]} pValues
+ * @param {number} fSignificance
+ * @param {number} alpha
+ * @param {{name:string,unit:string}[]} yMeta
+ * @param {{name:string,unit:string}[]} xMeta
+ * @param {(key: string, params?: object) => string} t
+ * @param {{
+ *   mode?: string,
+ *   fillFor?: (stat: {value:number,color?:string}|null) => object|null,
+ *   slopeStats?: {value:number,color?:string}[],
+ *   pValueStats?: {value:number,color?:string}[],
+ *   fSigStat?: {value:number,color?:string}|null
+ * }} [options]
+ * @returns {{ row: any[], format: (object|null)[] }[]}
+ */
+export const getMultipleRegressionSignificance = (
   slopes,
   pValues,
   fSignificance,
@@ -316,8 +391,23 @@ const getMultipleRegressionSignificance = (
   return significance;
 };
 
-// slopeStats / adjRSqStat are { value, color } objects for fills; confidenceIntervals are already wrapped
-const getInterpretation = (
+/**
+ * @param {number[]} slopes
+ * @param {number} adjustedRSquared
+ * @param {{name:string,unit:string}[]} yMeta
+ * @param {{name:string,unit:string,isDummy?:boolean}[]} xMeta
+ * @param {string} modelType
+ * @param {(key: string, params?: object) => string} t
+ * @param {[{value:number,color?:string}, {value:number,color?:string}][]} confidenceIntervals
+ * @param {number} alpha
+ * @param {{
+ *   fillFor?: (stat: {value:number,color?:string}|null) => object|null,
+ *   slopeStats?: {value:number,color?:string}[],
+ *   adjRSqStat?: {value:number,color?:string}|null
+ * }} [options]
+ * @returns {{ row: any[], format: (object|null)[] }[]}
+ */
+export const getInterpretation = (
   slopes,
   adjustedRSquared,
   yMeta,
@@ -333,17 +423,17 @@ const getInterpretation = (
 
   const unitBasedOnModelType = (index) => {
     const isXVariableLog = modelType === "log-linear" || modelType === "lin-log";
-    const xUnit = isXVariableLog
-      ? "1%"
-      : xMeta[index]?.unit
-        ? `1 ${xMeta[index].unit}`
-        : t("regression.interpretation.thirdStep.unit");
+    let xUnit;
+    if (isXVariableLog) xUnit = "1%";
+    else if (xMeta[index]?.unit) xUnit = `1 ${xMeta[index].unit}`;
+    else xUnit = t("regression.interpretation.thirdStep.unit");
+
     const isYVariableLog = modelType === "log-linear" || modelType === "semi-log";
-    const yUnit = isYVariableLog
-      ? "%"
-      : yMeta[0]?.unit
-        ? yMeta[0].unit
-        : ` ${t("regression.interpretation.thirdStep.units")}`;
+    let yUnit;
+    if (isYVariableLog) yUnit = "%";
+    else if (yMeta[0]?.unit) yUnit = yMeta[0].unit;
+    else yUnit = ` ${t("regression.interpretation.thirdStep.units")}`;
+
     return { xUnit, yUnit };
   };
 
@@ -365,13 +455,13 @@ const getInterpretation = (
     const isDummy = xMeta[i]?.isDummy === true;
     const { xUnit, yUnit } = unitBasedOnModelType(i);
     const yValue = getYValueBasedOnModelType(i);
-    const directionKey = isDummy
-      ? yValue >= 0
-        ? "regression.interpretation.thirdStep.interpretationVariableDummy"
-        : "regression.interpretation.thirdStep.interpretationVariableDummyDecrease"
-      : yValue >= 0
-        ? "regression.interpretation.thirdStep.interpretationVariable"
-        : "regression.interpretation.thirdStep.interpretationVariableDecrease";
+
+    let directionKey;
+    if (isDummy && yValue >= 0) directionKey = "regression.interpretation.thirdStep.interpretationVariableDummy";
+    else if (isDummy) directionKey = "regression.interpretation.thirdStep.interpretationVariableDummyDecrease";
+    else if (yValue >= 0) directionKey = "regression.interpretation.thirdStep.interpretationVariable";
+    else directionKey = "regression.interpretation.thirdStep.interpretationVariableDecrease";
+
     interpretation.push(
       toUIData(
         [
@@ -414,10 +504,58 @@ const getInterpretation = (
   return interpretation;
 };
 
-const REGRESSION_INTEPRETATION = {
-  getEquation,
-  getMultipleRegressionSignificance,
-  getInterpretation,
-};
+/**
+ * Builds the mode-gated model-stats block (pValue(s), R², R² adj) shown right
+ * under the equation. Returns an empty section in COMPACT mode.
+ * @param {{
+ *   k: {value:number}, pValues: {value:number,color?:string}[],
+ *   fSignificance: {value:number,color?:string}, rSquared: {value:number,color?:string},
+ *   adjustedRSquared: {value:number,color?:string}
+ * }} uiStats
+ * @param {{ mode?: string, fillFor?: (stat: {value:number,color?:string}|null) => object|null }} [options]
+ * @returns {{ row: any[], format: (object|null)[] }[]}
+ */
+export const buildModelStats = (
+  { k, pValues, fSignificance, rSquared, adjustedRSquared },
+  { mode = "STUDENT", fillFor = () => null } = {}
+) => {
+  if (mode === "COMPACT") return [];
 
-export default REGRESSION_INTEPRETATION;
+  const rows = [];
+
+  // Model stats inline so we can apply per-cell fills
+  if (k.value === 1) {
+    rows.push(
+      toUIData(["pValue = ", pValues[1].value], [EXCEL_FORMATS.tableRowHeader, fillFor(pValues[1])])
+    );
+  } else {
+    rows.push(
+      toUIData(
+        ["pValue = ", fSignificance.value],
+        [EXCEL_FORMATS.tableRowHeader, fillFor(fSignificance)]
+      )
+    );
+    for (let i = 0; i < k.value; i++) {
+      rows.push(
+        toUIData(
+          [`p${i + 1} = `, pValues[i + 1].value],
+          [EXCEL_FORMATS.tableRowHeader, fillFor(pValues[i + 1])]
+        )
+      );
+    }
+  }
+  rows.push(
+    toUIData(["R² = ", rSquared.value], [EXCEL_FORMATS.tableRowHeader, fillFor(rSquared)])
+  );
+  if (k.value > 1) {
+    rows.push(
+      toUIData(
+        ["R² adj = ", adjustedRSquared.value],
+        [EXCEL_FORMATS.tableRowHeader, fillFor(adjustedRSquared)]
+      )
+    );
+  }
+  rows.push(toUIData([""]));
+
+  return rows;
+};

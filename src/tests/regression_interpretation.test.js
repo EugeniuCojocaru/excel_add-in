@@ -1,4 +1,4 @@
-import { interpretationRegression } from "../libraries/utils/econometrics";
+import { interpretationRegression } from "@econometrics/use_cases/regression_interpretation";
 
 // Minimal translation stub — returns the key so assertions don't depend on locale strings
 const t = (key, params = {}) => {

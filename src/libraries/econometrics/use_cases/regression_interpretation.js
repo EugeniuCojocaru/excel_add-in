@@ -1,11 +1,22 @@
-import { EXCEL_FORMATS } from "./excelFormats";
-import { REGRESSION_INTEPRETATION } from "./interpretation";
-import { toUIData } from "./ui";
+import { EXCEL_FORMATS } from "@utils/excelFormats";
+import { toUIData } from "@utils/ui";
+import {
+  getEquation,
+  getMultipleRegressionSignificance,
+  getInterpretation,
+  buildModelStats,
+} from "../helpers/regression_interpretation_steps";
 
-const { getEquation, getMultipleRegressionSignificance, getInterpretation } =
-  REGRESSION_INTEPRETATION;
-
-// Accepts pre-wrapped uiStats (from toUIStats) and optional { mode, fillFor } for colored output.
+/**
+ * Construiește interpretarea narativă completă a unei regresii (model, semnificație, interpretare).
+ * @param {object} uiStats - Pre-wrapped uiStats (from toUIStats)
+ * @param {number} alpha
+ * @param {{name:string,unit:string}[]} yMeta
+ * @param {{name:string,unit:string,isDummy?:boolean}[]} xMeta
+ * @param {(key: string, params?: object) => string} t
+ * @param {{ mode?: string, fillFor?: (stat: {value:number,color?:string}|null) => object|null }} [options]
+ * @returns {{ row: any[], format: (object|null)[] }[]}
+ */
 export const interpretationRegression = (
   uiStats,
   alpha,
@@ -50,44 +61,10 @@ export const interpretationRegression = (
     )
   );
   interpretation.push(toUIData([""]));
-  if (mode !== "COMPACT") {
-    // Model stats inline so we can apply per-cell fills
-    if (k.value === 1) {
-      interpretation.push(
-        toUIData(
-          ["pValue = ", pValues[1].value],
-          [EXCEL_FORMATS.tableRowHeader, fillFor(pValues[1])]
-        )
-      );
-    } else {
-      interpretation.push(
-        toUIData(
-          ["pValue = ", fSignificance.value],
-          [EXCEL_FORMATS.tableRowHeader, fillFor(fSignificance)]
-        )
-      );
-      for (let i = 0; i < k.value; i++) {
-        interpretation.push(
-          toUIData(
-            [`p${i + 1} = `, pValues[i + 1].value],
-            [EXCEL_FORMATS.tableRowHeader, fillFor(pValues[i + 1])]
-          )
-        );
-      }
-    }
-    interpretation.push(
-      toUIData(["R² = ", rSquared.value], [EXCEL_FORMATS.tableRowHeader, fillFor(rSquared)])
-    );
-    if (k.value > 1) {
-      interpretation.push(
-        toUIData(
-          ["R² adj = ", adjustedRSquared.value],
-          [EXCEL_FORMATS.tableRowHeader, fillFor(adjustedRSquared)]
-        )
-      );
-    }
-    interpretation.push(toUIData([""]));
-  }
+  buildModelStats({ k, pValues, fSignificance, rSquared, adjustedRSquared }, { mode, fillFor }).forEach(
+    (row) => interpretation.push(row)
+  );
+
   // 2. Significance
   interpretation.push(
     toUIData(
