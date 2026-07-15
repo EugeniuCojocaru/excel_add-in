@@ -21,6 +21,7 @@ import { regression } from "@math/use_cases/regression";
 import { usePrecision, useInterpretation } from "@utils/hooks";
 import { toUIData, toUIStats } from "@utils/ui";
 import { EXCEL_FORMATS } from "@utils/excelFormats";
+import { buildRawDataGrid } from "@utils/rawData";
 import { generateSummaryOutput } from "@econometrics/use_cases/summary_output";
 
 import { useLanguage } from "@i18n";
@@ -149,16 +150,11 @@ const ModalModelComparison = () => {
       dataToWrite: [
         toUIData([""]),
         toUIData([""], [{ ...EXCEL_FORMATS.sectionDivider, fullWidth: true }]),
-        toUIData([""]),
       ],
     };
-    const merged = [
-      comparationRawData,
-      separator,
-      ...modelRawDataArray.flatMap((rd, i) =>
-        i < modelRawDataArray.length - 1 ? [rd, separator] : [rd]
-      ),
-    ].reduce(
+    const modelsGrid = buildRawDataGrid(modelRawDataArray, { columns: 2 });
+
+    const merged = [comparationRawData, separator, modelsGrid].reduce(
       (acc, rd) => ({
         maxColumns: Math.max(acc.maxColumns, rd.maxColumns),
         dataToWrite: [...acc.dataToWrite, ...rd.dataToWrite],
