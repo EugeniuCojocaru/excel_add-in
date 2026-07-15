@@ -18,7 +18,7 @@ import {
 import { TableAddFilled, ChevronRightFilled } from "@fluentui/react-icons";
 import RangeSelector from "../components/RangeSelector";
 import { getColumnStringMatrix, insertColumn } from "@api";
-import { preprocessDummyVariables, createNewTableRows } from "@utils/dummyVariables";
+import { preprocessDummyVariables, buildDummyTableRows } from "@econometrics/use_cases/dummy_variables";
 import { toUIData } from "@utils/ui";
 import { useLanguage } from "@i18n";
 import ActionButton from "../components/ActionButton";
@@ -146,7 +146,7 @@ const ModalDummyVariables = () => {
 
   const handleGenerate = async () => {
     const processedDummy = preprocessDummyVariables(xData, { referenceCategories: [baseline] });
-    const rows = createNewTableRows(processedDummy);
+    const rows = buildDummyTableRows(processedDummy);
     const newColumns = {
       maxColumns: Math.max(...rows.map((r) => r.length)),
       dataToWrite: rows.map((row) => toUIData(row)),
