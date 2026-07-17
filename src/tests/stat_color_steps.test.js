@@ -54,24 +54,32 @@ describe("toUIStats", () => {
 
   test("wraps a scalar field as { value, color }", () => {
     const result = toUIStats(stats);
-    expect(result.rSquared).toEqual({ value: 0.9, color: randColor(0.9, "rSquared") });
+    expect(result.rSquared).toEqual({ value: 0.9, color: "#FADADD" });
   });
 
   test("wraps an array field element-wise", () => {
     const result = toUIStats(stats);
-    expect(result.slopes).toEqual([{ value: 2, color: randColor(2, "slopes1") }]);
+    expect(result.slopes).toEqual([{ value: 2, color: "#BEE3F8" }]);
   });
 
-  test("wraps each confidence interval as a [lower, upper] pair of { value, color }", () => {
+  test("gives the headline stats a fixed pastel color instead of a random one", () => {
+    const result = toUIStats(stats);
+    expect(result.b0.color).toBe("#C1E7C1");
+    expect(result.adjustedRSquared.color).toBe("#FFE5B4");
+    expect(result.fSignificance.color).toBe("#FFF9B0");
+    expect(result.pValues[0].color).toBe("#D7C6EB");
+  });
+
+  test("wraps each confidence interval as a [lower, upper] pair with no color", () => {
     const result = toUIStats(stats);
     expect(result.confidenceIntervals).toEqual([
       [
-        { value: 0.8, color: randColor(0.8, "ci0Lower") },
-        { value: 1.2, color: randColor(1.2, "ci0Upper") },
+        { value: 0.8, color: null },
+        { value: 1.2, color: null },
       ],
       [
-        { value: 1.8, color: randColor(1.8, "ci1Lower") },
-        { value: 2.2, color: randColor(2.2, "ci1Upper") },
+        { value: 1.8, color: null },
+        { value: 2.2, color: null },
       ],
     ]);
   });

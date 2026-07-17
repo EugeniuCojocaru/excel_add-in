@@ -5,7 +5,9 @@ const hslToHex = (h, s, l) => {
   const f = (n) => {
     const k = (n + h / 30) % 12;
     const value = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
-    return Math.round(255 * value).toString(16).padStart(2, "0");
+    return Math.round(255 * value)
+      .toString(16)
+      .padStart(2, "0");
   };
   return `#${f(0)}${f(8)}${f(4)}`;
 };
@@ -32,6 +34,11 @@ export const randColor = (num, str) => {
   return hslToHex(hue, 60, 83);
 };
 
+// Fixed palette for the headline stats (R², adj. R², model p-value, b0, b1, b1's p-value) —
+// these get a stable, recognizable color instead of the value-hashed randColor so they
+// read consistently across every generated worksheet.
+const PASTEL_COLORS = ["#FADADD", "#FFE5B4", "#FFF9B0", "#C1E7C1", "#BEE3F8", "#D7C6EB"];
+
 /**
  * Wraps every numeric field of a raw regression() result in { value, color }, the
  * internal representation the econometrics interpretation/summary steps consume —
@@ -46,35 +53,35 @@ export const toUIStats = (stats) => {
     k: { value: stats.k, color: randColor(stats.k, "k") },
     df: { value: stats.df, color: randColor(stats.df, "df") },
     ssRes: { value: stats.ssRes, color: randColor(stats.ssRes, "ssRes") },
-    b0: { value: stats.b0, color: randColor(stats.b0, "b0") },
+    b0: { value: stats.b0, color: PASTEL_COLORS[3] },
     slopes: stats.slopes.map((b, index) => ({
       value: b,
-      color: randColor(b, `slopes${index + 1}`),
+      color: index === 0 ? PASTEL_COLORS[4] : randColor(b, `slopes${index + 1}`),
     })),
-    rSquared: { value: stats.rSquared, color: randColor(stats.rSquared, "rSquared") },
+    rSquared: { value: stats.rSquared, color: PASTEL_COLORS[0] },
     adjustedRSquared: {
       value: stats.adjustedRSquared,
-      color: randColor(stats.adjustedRSquared, "adjustedRSquared"),
+      color: PASTEL_COLORS[1],
     },
     ese: { value: stats.ese, color: randColor(stats.ese, "ese") },
     standardErrors: stats.standardErrors.map((se, index) => ({
       value: se,
       color: randColor(se, `standardErrors${index}`),
     })),
-    confidenceIntervals: stats.confidenceIntervals.map((interval, index) => [
-      { value: interval[0], color: randColor(interval[0], `ci${index}Lower`) },
-      { value: interval[1], color: randColor(interval[1], `ci${index}Upper`) },
+    confidenceIntervals: stats.confidenceIntervals.map((interval) => [
+      { value: interval[0], color: null },
+      { value: interval[1], color: null },
     ]),
     tStats: stats.tStats.map((t, index) => ({ value: t, color: randColor(t, `tStats${index}`) })),
     pValues: stats.pValues.map((pValue, index) => ({
       value: pValue,
-      color: randColor(pValue, `pValues${index}`),
+      color: index === 0 ? PASTEL_COLORS[5] : randColor(pValue, `pValues${index}`),
     })),
     isSignificant: stats.isSignificant,
     fStat: { value: stats.fStat, color: randColor(stats.fStat, "fStat") },
     fSignificance: {
       value: stats.fSignificance,
-      color: randColor(stats.fSignificance, "fSignificance"),
+      color: PASTEL_COLORS[2],
     },
     fIsSignificant: stats.fIsSignificant,
     betaWeights: stats.betaWeights.map((b, index) => ({
