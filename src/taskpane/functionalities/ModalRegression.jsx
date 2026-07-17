@@ -100,7 +100,7 @@ const useStyles = makeStyles({
   },
 });
 
-const ModalSimpleRegression = () => {
+const ModalRegression = () => {
   const styles = useStyles();
   const { t } = useLanguage();
   const { toUINumber } = usePrecision();
@@ -236,4 +236,4 @@ const ModalSimpleRegression = () => {
   );
 };
 
-export default ModalSimpleRegression;
+export default ModalRegression;
