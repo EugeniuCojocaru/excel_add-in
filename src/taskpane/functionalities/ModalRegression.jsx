@@ -28,13 +28,7 @@ import { useLanguage } from "@i18n";
 import { interpretationRegression } from "@econometrics/use_cases/regression_interpretation";
 import { DataTrendingFilled } from "@fluentui/react-icons";
 import ActionButton from "../components/ActionButton";
-
-const MODEL_TYPES = [
-  { key: "linear", label: "Linear" },
-  { key: "log-linear", label: "Log-Linear" },
-  { key: "semi-log", label: "Semi-Log" },
-  { key: "lin-log", label: "Lin-Log" },
-];
+import { MODEL_TYPES } from "@constants/model_types";
 
 const useStyles = makeStyles({
   surface: {

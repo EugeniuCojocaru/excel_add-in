@@ -19,7 +19,8 @@
           "@i18n": "./src/libraries/i18n",
           "@math": "./src/libraries/math",
           "@econometrics": "./src/libraries/econometrics",
-          "@excel": "./src/libraries/excel"
+          "@excel": "./src/libraries/excel",
+          "@constants": "./src/libraries/constants"
         }
       }
     ],

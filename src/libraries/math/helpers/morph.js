@@ -1,4 +1,9 @@
 import math from "../config";
+import {
+  MODEL_TYPE_LOG_LINEAR,
+  MODEL_TYPE_SEMI_LOG,
+  MODEL_TYPE_LIN_LOG,
+} from "@constants/model_types";
 
 /**
  * Transforms the raw data into the X and Y matrices needed for regression,
@@ -9,8 +14,8 @@ import math from "../config";
  * @returns {{ Y: any[], X: any[] }} Matrices ready for mathjs algebra
  */
 export const buildDesignMatrices = (yData, xData, modelType) => {
-  const transformY = modelType === "log-linear" || modelType === "semi-log";
-  const transformX = modelType === "log-linear" || modelType === "lin-log";
+  const transformY = modelType === MODEL_TYPE_LOG_LINEAR || modelType === MODEL_TYPE_SEMI_LOG;
+  const transformX = modelType === MODEL_TYPE_LOG_LINEAR || modelType === MODEL_TYPE_LIN_LOG;
 
   const Y = yData.data.map((val) => {
     let v = math.bignumber(val[0]);

@@ -99,25 +99,25 @@ describe("buildDesignMatrices", () => {
 
     test("throws when Y <= 0 in log-linear", () => {
       expect(() => buildDesignMatrices(negYData, xData, "log-linear")).toThrow(
-        /strict pozitive pentru Y/
+        /strictly positive values for Y/
       );
     });
 
     test("throws when Y <= 0 in semi-log", () => {
       expect(() => buildDesignMatrices(negYData, xData, "semi-log")).toThrow(
-        /strict pozitive pentru Y/
+        /strictly positive values for Y/
       );
     });
 
     test("throws when X <= 0 in log-linear", () => {
       expect(() => buildDesignMatrices(yData, negXData, "log-linear")).toThrow(
-        /strict pozitive pentru variabilele X/
+        /strictly positive values for the X variables/
       );
     });
 
     test("throws when X <= 0 in lin-log", () => {
       expect(() => buildDesignMatrices(yData, negXData, "lin-log")).toThrow(
-        /strict pozitive pentru variabilele X/
+        /strictly positive values for the X variables/
       );
     });
   });

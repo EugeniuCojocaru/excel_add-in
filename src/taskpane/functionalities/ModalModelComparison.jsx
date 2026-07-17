@@ -28,13 +28,7 @@ import ComboboxTags from "../components/ComboboxTags";
 import { comparisonInterpretation } from "@econometrics/use_cases/model_comparison";
 import ActionButton from "../components/ActionButton";
 import { ScalesFilled } from "@fluentui/react-icons";
-
-const MODEL_TYPES = [
-  { key: "linear", label: "Linear" },
-  { key: "log-linear", label: "Log-Linear" },
-  { key: "semi-log", label: "Semi-Log" },
-  { key: "lin-log", label: "Lin-Log" },
-];
+import { MODEL_TYPES } from "@constants/model_types";
 
 const useStyles = makeStyles({
   surface: {
