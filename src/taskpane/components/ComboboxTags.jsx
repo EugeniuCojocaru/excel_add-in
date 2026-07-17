@@ -7,7 +7,7 @@ const useStyles = makeStyles({
   },
 });
 
-const ComboboxTags = ({ data, value, setValue }) => {
+const ComboboxTags = ({ data, value, setValue, label, placeholder }) => {
   const styles = useStyles();
   const onOptionSelect = (_, data) => {
     setValue(data.selectedOptions);
@@ -20,11 +20,11 @@ const ComboboxTags = ({ data, value, setValue }) => {
 
   return (
     <>
-      <Field label="Selectează tipurile de model">
+      <Field label={label}>
         <Combobox
           className={styles.combobox}
           multiselect
-          placeholder="Alege opțiunile..."
+          placeholder={placeholder}
           value={displayValue}
           selectedOptions={value}
           onOptionSelect={onOptionSelect}

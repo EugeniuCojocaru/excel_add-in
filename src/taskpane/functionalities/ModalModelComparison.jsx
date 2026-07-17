@@ -233,7 +233,13 @@ const ModalModelComparison = () => {
 
             <div className={styles.optionsRow}>
               <div className={styles.comboboxField}>
-                <ComboboxTags data={MODEL_TYPES} value={modelKeys} setValue={setModelKeys} />
+                <ComboboxTags
+                  data={MODEL_TYPES}
+                  value={modelKeys}
+                  setValue={setModelKeys}
+                  label={t("modelComparison.combobox__model_type.label")}
+                  placeholder={t("modelComparison.combobox__model_type.placeholder")}
+                />
               </div>
               <Field label={t("modelComparison.input__alpha.label")} className={styles.alphaField}>
                 <Input
