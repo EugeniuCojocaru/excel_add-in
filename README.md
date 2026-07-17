@@ -29,6 +29,13 @@ Each tool opens as a dialog where you point to your data range(s) directly on th
 
 See [`docs/examples/output_examples.xlsx`](docs/examples/output_examples.xlsx) for real generated output: a `compact_mode_output` sheet, a `student_mode_output` sheet, and a `student_mode_dummy_output` sheet.
 
+## Further improvements
+
+If this add-in sees real usage, worth prioritizing next:
+- **User-visible error handling** — surface validation and calculation errors (bad ranges, non-numeric data, singular matrices) in the dialog itself instead of failing silently to the console.
+- **Training section** — a short in-app guide or walkthrough explaining what each tool does and how to read its output, for users unfamiliar with the underlying statistics.
+- **Charts and other visuals** — scatter plots with the fitted regression line, residual plots, and similar visual aids alongside the numeric output.
+
 ---
 
 # dize (Română)
@@ -52,4 +59,13 @@ Un add-in de Excel (task pane) pentru analize statistice și econometrice rapide
 Fiecare instrument se deschide într-un dialog în care alegi intervalul (sau intervalele) de date direct de pe foaie, cu un selector de interval live, bifezi câteva opțiuni și trimiți cererea. Add-in-ul face calculele cu `mathjs`/`jStat` și scrie rezultatul înapoi în Excel, sub forma unui tabel formatat.
  
 În [`docs/examples/output_examples.xlsx`](docs/examples/output_examples.xlsx) găsești exemple reale de rezultate generate: foile `compact_mode_output`, `student_mode_output` și `student_mode_dummy_output`.
+
+## Îmbunătățiri viitoare
  
+Dacă add-in-ul ajunge să fie folosit pe scară mai largă, ar merita prioritizate:
+ 
+- **Mesaje de eroare vizibile pentru utilizator** — erorile de validare și de calcul (intervale selectate greșit, date nenumerice, matrice singulare) să apară direct în dialog, nu doar în consolă.
+- **Secțiune de training** — un ghid scurt, direct în aplicație, care să explice ce face fiecare instrument și cum se citește rezultatul, pentru cei care nu sunt familiarizați cu statistica din spate.
+- **Grafice și alte elemente vizuale** — diagrame de dispersie cu dreapta de regresie, grafice ale reziduurilor și alte ajutoare vizuale, pe lângă rezultatul numeric.
+
+
