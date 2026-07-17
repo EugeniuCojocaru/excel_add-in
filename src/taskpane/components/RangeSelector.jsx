@@ -48,7 +48,7 @@ const RangeSelector = ({
         }
       });
     } catch (error) {
-      console.error("Eroare la preluarea selecției:", error);
+      console.error("Error retrieving selection:", error);
     }
   };
 

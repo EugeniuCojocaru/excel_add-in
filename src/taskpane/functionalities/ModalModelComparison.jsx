@@ -98,6 +98,9 @@ const useStyles = makeStyles({
       borderLeftColor: tokens.colorNeutralStrokeAccessible,
     },
   },
+  beforeIcon: {
+    color: tokens.colorBrandForeground1,
+  },
 });
 
 const ModalModelComparison = () => {
@@ -172,7 +175,7 @@ const ModalModelComparison = () => {
       <DialogTrigger disableButtonEnhancement>
         <ActionButton
           text={t("modelComparison.title")}
-          beforeIcon={<ScalesFilled style={{ color: "green" }} />}
+          beforeIcon={<ScalesFilled className={styles.beforeIcon} />}
           textAlign="left"
         />
       </DialogTrigger>

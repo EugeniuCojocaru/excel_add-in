@@ -62,6 +62,9 @@ const useStyles = makeStyles({
       borderLeftColor: tokens.colorNeutralStrokeAccessible,
     },
   },
+  beforeIcon: {
+    color: tokens.colorBrandForeground1,
+  },
 });
 
 const STAT_FIELDS = [
@@ -124,7 +127,7 @@ const ModalDescriptiveStats = () => {
       <DialogTrigger disableButtonEnhancement>
         <ActionButton
           text={t("descriptiveStats.title")}
-          beforeIcon={<CalculatorRegular style={{ color: "green" }} />}
+          beforeIcon={<CalculatorRegular className={styles.beforeIcon} />}
           textAlign="left"
         />
       </DialogTrigger>

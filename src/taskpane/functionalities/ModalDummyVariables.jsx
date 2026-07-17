@@ -106,6 +106,9 @@ const useStyles = makeStyles({
       borderLeftColor: tokens.colorNeutralStrokeAccessible,
     },
   },
+  beforeIcon: {
+    color: tokens.colorBrandForeground1,
+  },
 });
 
 const ModalDummyVariables = () => {
@@ -160,7 +163,7 @@ const ModalDummyVariables = () => {
       <DialogTrigger disableButtonEnhancement>
         <ActionButton
           text={t("dummyVariables.title")}
-          beforeIcon={<TableAddFilled style={{ color: "green" }} />}
+          beforeIcon={<TableAddFilled className={styles.beforeIcon} />}
           textAlign="left"
         />
       </DialogTrigger>

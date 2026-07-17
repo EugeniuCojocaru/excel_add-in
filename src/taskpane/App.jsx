@@ -8,7 +8,6 @@ import ModalSettings from "./components/ModalSettings";
 import { makeStyles, tokens } from "@fluentui/react-components";
 import { SettingsFilled } from "@fluentui/react-icons";
 import { useLanguage } from "@i18n";
-import ActionButton from "./components/ActionButton";
 
 const useStyles = makeStyles({
   root: {
@@ -63,6 +62,9 @@ const useStyles = makeStyles({
     padding: `${tokens.spacingVerticalS} ${tokens.spacingHorizontalM}`,
     borderTop: "1px solid",
   },
+  settingsIcon: {
+    cursor: "pointer",
+  },
 });
 
 const App = () => {
@@ -86,7 +88,7 @@ const App = () => {
         </div>
 
         <div className={styles.bottomPart} onClick={() => setSettingsOpen(true)}>
-          <SettingsFilled fontSize={32} style={{cursor: "pointer"}} />
+          <SettingsFilled fontSize={32} className={styles.settingsIcon} />
         </div>
 
         <ModalSettings open={settingsOpen} onClose={() => setSettingsOpen(false)} />

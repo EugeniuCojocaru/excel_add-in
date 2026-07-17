@@ -98,6 +98,9 @@ const useStyles = makeStyles({
       borderLeftColor: tokens.colorNeutralStrokeAccessible,
     },
   },
+  beforeIcon: {
+    color: tokens.colorBrandForeground1,
+  },
 });
 
 const ModalRegression = () => {
@@ -147,7 +150,7 @@ const ModalRegression = () => {
       <DialogTrigger disableButtonEnhancement>
         <ActionButton
           text={t("regression.title")}
-          beforeIcon={<DataTrendingFilled style={{ color: "green" }} />}
+          beforeIcon={<DataTrendingFilled className={styles.beforeIcon} />}
           textAlign="left"
         />
       </DialogTrigger>
