@@ -6,8 +6,8 @@ import {
 } from "../helpers/dummy_variable_steps";
 
 /**
- * Transformă fiecare coloană categorială într-un set de variabile dummy (codificare 0/1),
- * excluzând categoria de referință aleasă pentru a evita capcana variabilei dummy (dummy trap).
+ * Transforms each categorical column into a set of dummy variables (0/1 encoding),
+ * excluding the chosen reference category to avoid the dummy variable trap.
  * @param {{ data: any[][], meta?: { name: string, unit?: string }[] }} xData
  * @param {{ referenceCategories?: any[] }} [options] - one reference category override per original column
  * @returns {{ data: number[][], meta: { name: string, isDummy: true, unit?: string, reference: any }[] }}
@@ -23,19 +23,19 @@ export const preprocessDummyVariables = (xData, { referenceCategories = [] } = {
   for (let colIndex = 0; colIndex < k; colIndex++) {
     const originalMeta = meta[colIndex] || { name: `D${colIndex + 1}` };
 
-    // 1. Categoriile unice observate pe această coloană (ex: ["licență", "master"])
+    // 1. Unique categories observed in this column (e.g., ["bachelor's", "master's"])
     const uniqueCategories = getUniqueCategories(rows, colIndex);
 
-    // 2. Categoria de referință (override din partea utilizatorului sau prima alfabetic)
+    // 2. Reference category (user override or first alphabetically)
     const referenceCategory = getReferenceCategory(uniqueCategories, referenceCategories, colIndex);
     const dummyCategories = uniqueCategories.filter((category) => category !== referenceCategory);
 
-    // 3. Metadatele coloanelor dummy nou generate
+    // 3. Metadata for the newly generated dummy columns
     buildDummyMeta(originalMeta, dummyCategories, referenceCategory).forEach((entry) =>
       newMeta.push(entry)
     );
 
-    // 4. Matricea 0/1 pentru categoriile acestei coloane, adăugată rând cu rând
+    // 4. 0/1 matrix for this column's categories, appended row by row
     buildDummyColumns(rows, colIndex, dummyCategories).forEach((values, rowIndex) =>
       newData[rowIndex].push(...values)
     );
@@ -45,8 +45,8 @@ export const preprocessDummyVariables = (xData, { referenceCategories = [] } = {
 };
 
 /**
- * Construiește tabelul (antet + rânduri) gata de scris în Excel dintr-un rezultat de
- * preprocessDummyVariables.
+ * Builds the table (header + rows) ready to write to Excel from a
+ * preprocessDummyVariables result.
  * @param {{ data: number[][], meta: { name: string, unit?: string }[] }} dummyData
  * @returns {any[][]}
  */

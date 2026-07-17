@@ -3,7 +3,7 @@ import { toRawData } from "@excel/helpers/raw_data_steps";
 import { getBestModels, buildComparisonTable, buildComparisonConclusion } from "../helpers/model_comparison_steps";
 
 /**
- * Compară modelele de regresie pe baza R² și RSS, indicând modelul cu cea mai bună potrivire.
+ * Compares regression models based on R² and RSS, indicating the model with the best fit.
  * @param {{ modelType: string, rSquared: number, ssRes: number }[]} modelsStats
  * @param {(key: string, params?: object) => string} t
  * @param {string} [mode]

@@ -8,7 +8,7 @@ import {
 } from "../helpers/regression_interpretation_steps";
 
 /**
- * Construiește interpretarea narativă completă a unei regresii (model, semnificație, interpretare).
+ * Builds the full narrative interpretation of a regression (model, significance, interpretation).
  * @param {object} uiStats - Pre-wrapped uiStats (from toUIStats)
  * @param {number} alpha
  * @param {{name:string,unit:string}[]} yMeta

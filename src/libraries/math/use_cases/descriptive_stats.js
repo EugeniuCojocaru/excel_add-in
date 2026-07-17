@@ -2,7 +2,7 @@ import { jStat } from "jstat";
 import math from "../config";
 
 /**
- * Calculează indicatorii statistici de bază și intervalul de încredere.
+ * Calculates the basic statistical indicators and the confidence interval.
  * @param {number[]} data
  * @param {number} alpha
  * @param {{ toUINumber: (v: BigNumber) => number }} options

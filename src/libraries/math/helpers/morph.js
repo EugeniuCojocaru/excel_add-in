@@ -1,12 +1,12 @@
 import math from "../config";
 
 /**
- * Transformă datele brute în matricele X și Y necesare pentru regresie,
- * aplicând logaritmul natural (ln) în funcție de modelul ales.
+ * Transforms the raw data into the X and Y matrices needed for regression,
+ * applying the natural logarithm (ln) depending on the chosen model.
  * @param {{data: number[][], meta: { name: string, unit: string }[]}} yData
  * @param {{data: number[][], meta: { name: string, unit: string }[]}} xData
  * @param {string} modelType - 'linear', 'log-linear', 'semi-log', 'lin-log'
- * @returns {{ Y: any[], X: any[] }} Matricele gata pentru algebra mathjs
+ * @returns {{ Y: any[], X: any[] }} Matrices ready for mathjs algebra
  */
 export const buildDesignMatrices = (yData, xData, modelType) => {
   const transformY = modelType === "log-linear" || modelType === "semi-log";
@@ -15,7 +15,7 @@ export const buildDesignMatrices = (yData, xData, modelType) => {
   const Y = yData.data.map((val) => {
     let v = math.bignumber(val[0]);
     if (transformY) {
-      if (v <= 0) throw new Error("Logaritmul necesită valori strict pozitive pentru Y.");
+      if (v <= 0) throw new Error("The logarithm requires strictly positive values for Y.");
       v = math.log(v);
     }
     return [math.bignumber(v)];
@@ -26,7 +26,7 @@ export const buildDesignMatrices = (yData, xData, modelType) => {
       let v = math.bignumber(val);
       if (transformX) {
         if (v <= 0)
-          throw new Error("Logaritmul necesită valori strict pozitive pentru variabilele X.");
+          throw new Error("The logarithm requires strictly positive values for the X variables.");
         v = math.log(v);
       }
       return v;

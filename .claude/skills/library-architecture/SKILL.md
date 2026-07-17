@@ -62,12 +62,12 @@ and a **fully written-out inline `@returns` shape**:
  * @returns {{ row: any[], format: (object|null)[] }[]}
  */
 ```
-Orchestrators that face the domain open with a one-line **Romanian** description, then the
+Orchestrators that face the domain open with a one-line **English** description, then the
 typed tags (see `math/use_cases/regression.js`).
 
 ### D. Composition is narrated
 - Numbered step comments (`// 1.`, `// 2.`, ...) walk through the orchestrator's stages.
-- **Romanian** for domain/narrative comments; **English** for technical/statistical notes.
+- All comments — domain/narrative and technical/statistical — are in **English**.
 - Explain *why* wherever there's a subtlety.
 - **No stacked / nested ternaries** — use `if / else if / else`. (See `docs/LEARNING.md`.)
 
@@ -105,7 +105,7 @@ concatenates them in numbered order.
 - [ ] Single internal representation; conversion only at the boundary via an injected fn.
 - [ ] Collaborators injected through a trailing options bag with defaults.
 - [ ] JSDoc with inline `@returns` shape on every export.
-- [ ] Numbered comments; correct comment language; **zero stacked ternaries**.
+- [ ] Numbered comments in English; **zero stacked ternaries**.
 - [ ] New modules added to their `index.js` barrel.
 - [ ] Tests in `src/tests/<module>.test.js` using `@math`/`@utils` aliases, granular
       one-assertion cases with hand-computed fixtures (see existing tests).

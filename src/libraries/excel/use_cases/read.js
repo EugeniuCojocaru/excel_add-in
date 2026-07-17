@@ -1,12 +1,12 @@
 import { getHeaderMeta, getNumericRows, getStringRows } from "../helpers/read_steps";
 
 const logIgnoredRows = (ignored) => {
-  ignored.forEach((i) => console.log(`Rândul ${i + 1} a fost ignorat (conține text sau date lipsă).`));
+  ignored.forEach((i) => console.log(`Row ${i + 1} was ignored (contains text or missing data).`));
 };
 
 /**
- * Citește un interval din foaia activă și îl transformă în coloane numerice, cu
- * anteturi opționale de forma "Nume <unitate>".
+ * Reads a range from the active sheet and transforms it into numeric columns, with
+ * optional headers in the form "Name <unit>".
  * @param {string} addressRange
  * @returns {Promise<{ data: number[][], meta: { name: string, unit: string|null }[] }>}
  */
@@ -21,28 +21,28 @@ export const getColumnMatrix = async (addressRange) => {
 
       const values = range.values;
       if (!values || values.length === 0) {
-        console.warn("Selecția este goală.");
+        console.warn("Selection is empty.");
         return { data: [], meta: [] };
       }
 
-      // 1. Detectăm și eliminăm un eventual rând de antet
+      // 1. Detect and remove an optional header row
       const { meta, rows } = getHeaderMeta(values);
 
-      // 2. Păstrăm doar rândurile pur numerice
+      // 2. Keep only purely numeric rows
       const { data, ignored } = getNumericRows(rows);
       logIgnoredRows(ignored);
 
       return { data, meta };
     });
   } catch (error) {
-    console.error("A apărut o eroare la extragerea datelor:", error);
+    console.error("An error occurred while extracting the data:", error);
     return { data: [], meta: [] };
   }
 };
 
 /**
- * Citește un interval din foaia activă și îl transformă în coloane text, cu
- * anteturi opționale de forma "Nume <unitate>".
+ * Reads a range from the active sheet and transforms it into text columns, with
+ * optional headers in the form "Name <unit>".
  * @param {string} addressRange
  * @returns {Promise<{ data: string[][], meta: { name: string, unit: string|null }[] }>}
  */
@@ -57,21 +57,21 @@ export const getColumnStringMatrix = async (addressRange) => {
 
       const values = range.values;
       if (!values || values.length === 0) {
-        console.warn("Selecția este goală.");
+        console.warn("Selection is empty.");
         return { data: [], meta: [] };
       }
 
-      // 1. Detectăm și eliminăm un eventual rând de antet
+      // 1. Detect and remove an optional header row
       const { meta, rows } = getHeaderMeta(values);
 
-      // 2. Păstrăm doar rândurile pur text
+      // 2. Keep only purely text rows
       const { data, ignored } = getStringRows(rows);
       logIgnoredRows(ignored);
 
       return { data, meta };
     });
   } catch (error) {
-    console.error("A apărut o eroare la extragerea datelor:", error);
+    console.error("An error occurred while extracting the data:", error);
     return { data: [], meta: [] };
   }
 };

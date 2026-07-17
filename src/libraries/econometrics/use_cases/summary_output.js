@@ -10,7 +10,7 @@ import {
 import { toRawData } from "@excel/helpers/raw_data_steps";
 
 /**
- * Generează raportul complet de tip "Excel Summary Output" pentru o regresie.
+ * Generates the complete "Excel Summary Output" style report for a regression.
  * @param {object} stats - Wrapped uiStats (from toUIStats), spread with `interpretation` when extended
  * @param {{name:string,unit:string}[]} _yMeta - unused, kept for call-site parity
  * @param {{name:string,unit:string}[]} xMeta

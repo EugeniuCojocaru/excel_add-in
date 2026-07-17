@@ -32,8 +32,8 @@ const writeRawData = async (context, sheet, array, positions) => {
 };
 
 /**
- * Scrie datele într-o foaie cu un anumit nume, creând foaia dacă nu există deja, și
- * o activează.
+ * Writes the data to a sheet with a given name, creating the sheet if it doesn't
+ * already exist, and activates it.
  * @param {{ maxColumns: number, dataToWrite: { row: any[], format: (object|null)[] }[] }} array
  * @param {string} sheetName
  * @param {string} positions - top-left cell address to start writing from
@@ -53,12 +53,12 @@ export const insertColumnTo = async (array, sheetName, positions) => {
       await writeRawData(context, sheet, array, positions);
     });
   } catch (error) {
-    console.error("Eroare la inserarea datelor în Excel:", error);
+    console.error("Error inserting data into Excel:", error);
   }
 };
 
 /**
- * Scrie datele în foaia activă.
+ * Writes the data to the active sheet.
  * @param {{ maxColumns: number, dataToWrite: { row: any[], format: (object|null)[] }[] }} array
  * @param {string} positions - top-left cell address to start writing from
  * @returns {Promise<void>}
@@ -68,9 +68,9 @@ export const insertColumn = async (array, positions) => {
     await Excel.run(async (context) => {
       const sheet = context.workbook.worksheets.getActiveWorksheet();
       await writeRawData(context, sheet, array, positions);
-      console.log("Datele au fost inserate cu succes în tabel.");
+      console.log("Data was successfully inserted into the table.");
     });
   } catch (error) {
-    console.error("Eroare la inserarea datelor în Excel:", error);
+    console.error("Error inserting data into Excel:", error);
   }
 };
