@@ -18,7 +18,10 @@ import {
 import { TableAddFilled, ChevronRightFilled } from "@fluentui/react-icons";
 import RangeSelector from "../components/RangeSelector";
 import { getColumnStringMatrix, insertColumn, toUIData } from "@excel";
-import { preprocessDummyVariables, buildDummyTableRows } from "@econometrics/use_cases/dummy_variables";
+import {
+  preprocessDummyVariables,
+  buildDummyTableRows,
+} from "@econometrics/use_cases/dummy_variables";
 import { useLanguage } from "@i18n";
 import ActionButton from "../components/ActionButton";
 
@@ -111,27 +114,45 @@ const useStyles = makeStyles({
   },
 });
 
+const DEFAULT_STATE = {
+  step: 1,
+  XColumnAdress: "",
+  DColumnAddress: "",
+  xData: null,
+  uniqueValues: [],
+  columnName: "",
+  baseline: "",
+};
+
 const ModalDummyVariables = () => {
   const styles = useStyles();
   const { t } = useLanguage();
 
   const [open, setOpen] = useState(false);
-  const [step, setStep] = useState(1);
-  const [XColumnAdress, setXColumnAddress] = useState("Sheet1!B1:B23");
-  const [DColumnAddress, setDColumnAddress] = useState("Sheet1!C1");
-  const [xData, setXData] = useState(null);
-  const [uniqueValues, setUniqueValues] = useState([]);
-  const [columnName, setColumnName] = useState("");
-  const [baseline, setBaseline] = useState("");
+  const [step, setStep] = useState(DEFAULT_STATE.step);
+  const [XColumnAdress, setXColumnAddress] = useState(DEFAULT_STATE.XColumnAdress);
+  const [DColumnAddress, setDColumnAddress] = useState(DEFAULT_STATE.DColumnAddress);
+  const [xData, setXData] = useState(DEFAULT_STATE.xData);
+  const [uniqueValues, setUniqueValues] = useState(DEFAULT_STATE.uniqueValues);
+  const [columnName, setColumnName] = useState(DEFAULT_STATE.columnName);
+  const [baseline, setBaseline] = useState(DEFAULT_STATE.baseline);
+
+  const resetState = () => {
+    setOpen(false);
+    setStep(DEFAULT_STATE.step);
+    setDColumnAddress(DEFAULT_STATE.DColumnAddress);
+    setXData(DEFAULT_STATE.xData);
+    setUniqueValues(DEFAULT_STATE.uniqueValues);
+    setColumnName(DEFAULT_STATE.columnName);
+    setBaseline(DEFAULT_STATE.baseline);
+  };
 
   const handleOpenChange = (_, data) => {
-    if (!data.open) {
-      setStep(1);
-      setXData(null);
-      setUniqueValues([]);
-      setBaseline("");
+    if (data.open) {
+      setOpen(true);
+    } else {
+      resetState();
     }
-    setOpen(data.open);
   };
 
   const handleNext = async () => {
@@ -154,8 +175,7 @@ const ModalDummyVariables = () => {
       dataToWrite: rows.map((row) => toUIData(row)),
     };
     await insertColumn(newColumns, DColumnAddress);
-    setOpen(false);
-    setStep(1);
+    resetState();
   };
 
   return (
@@ -254,13 +274,7 @@ const ModalDummyVariables = () => {
                   {t("dummyVariables.button__back")}
                 </Button>
                 {uniqueValues.length === 0 ? (
-                  <Button
-                    appearance="primary"
-                    onClick={() => {
-                      setOpen(false);
-                      setStep(1);
-                    }}
-                  >
+                  <Button appearance="primary" onClick={resetState}>
                     {t("dummyVariables.button__cancel")}
                   </Button>
                 ) : (

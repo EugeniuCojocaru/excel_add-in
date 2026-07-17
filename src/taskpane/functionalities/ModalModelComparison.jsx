@@ -16,7 +16,14 @@ import {
 } from "@fluentui/react-components";
 import RangeSelector from "../components/RangeSelector";
 
-import { getColumnMatrix, insertColumn, insertColumnTo, toUIData, EXCEL_FORMATS, buildRawDataGrid } from "@excel";
+import {
+  getColumnMatrix,
+  insertColumn,
+  insertColumnTo,
+  toUIData,
+  EXCEL_FORMATS,
+  buildRawDataGrid,
+} from "@excel";
 import { regression } from "@math/use_cases/regression";
 import { usePrecision, useInterpretation } from "../hooks";
 import { toUIStats } from "@econometrics";
@@ -97,6 +104,15 @@ const useStyles = makeStyles({
   },
 });
 
+const DEFAULT_STATE = {
+  YColumnAdress: "",
+  XColumnAdress: "",
+  resultDestinationAddress: "",
+  alpha: 0.05,
+  econometricInterpretation: false,
+  modelKeys: [],
+};
+
 const ModalModelComparison = () => {
   const styles = useStyles();
   const { t } = useLanguage();
@@ -104,12 +120,24 @@ const ModalModelComparison = () => {
   const { mode, isCompact, fillFor } = useInterpretation();
 
   const [open, setOpen] = useState(false);
-  const [YColumnAdress, setYColumnAddress] = useState("Sheet1!A1:A23");
-  const [XColumnAdress, setXColumnAddress] = useState("Sheet1!B1:B23");
-  const [resultDestinationAddress, setResultDestinationAddress] = useState("Sheet1!D1");
-  const [alpha, setAlpha] = useState(0.05);
-  const [econometricInterpretation, setEconometricInterpretation] = useState(false);
-  const [modelKeys, setModelKeys] = useState([]);
+  const [YColumnAdress, setYColumnAddress] = useState(DEFAULT_STATE.YColumnAdress);
+  const [XColumnAdress, setXColumnAddress] = useState(DEFAULT_STATE.XColumnAdress);
+  const [resultDestinationAddress, setResultDestinationAddress] = useState(
+    DEFAULT_STATE.resultDestinationAddress
+  );
+  const [alpha, setAlpha] = useState(DEFAULT_STATE.alpha);
+  const [econometricInterpretation, setEconometricInterpretation] = useState(
+    DEFAULT_STATE.econometricInterpretation
+  );
+  const [modelKeys, setModelKeys] = useState(DEFAULT_STATE.modelKeys);
+
+  const resetState = () => {
+    setOpen(false);
+    setResultDestinationAddress(DEFAULT_STATE.resultDestinationAddress);
+    setAlpha(DEFAULT_STATE.alpha);
+    setEconometricInterpretation(DEFAULT_STATE.econometricInterpretation);
+    setModelKeys(DEFAULT_STATE.modelKeys);
+  };
 
   const handleClick = async () => {
     const xData = await getColumnMatrix(XColumnAdress);
@@ -162,10 +190,12 @@ const ModalModelComparison = () => {
     } else {
       await insertColumn(merged, resultDestinationAddress);
     }
+
+    resetState();
   };
 
   return (
-    <Dialog open={open} onOpenChange={(_, data) => setOpen(data.open)}>
+    <Dialog open={open} onOpenChange={(_, data) => (data.open ? setOpen(true) : resetState())}>
       <DialogTrigger disableButtonEnhancement>
         <ActionButton
           text={t("modelComparison.title")}

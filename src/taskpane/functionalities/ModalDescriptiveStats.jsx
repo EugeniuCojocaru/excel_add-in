@@ -94,6 +94,11 @@ export const buildDescriptiveStatsMatrix = (columnMatrix, statLabels, toUINumber
   return [headerRow, ...statRows];
 };
 
+const DEFAULT_STATE = {
+  XColumnAdress: "",
+  resultDestinationAddress: "",
+};
+
 const ModalDescriptiveStats = () => {
   const styles = useStyles();
   const { t } = useLanguage();
@@ -101,11 +106,18 @@ const ModalDescriptiveStats = () => {
   const { isCompact } = useInterpretation();
 
   const [open, setOpen] = useState(false);
-  const [adresaX, setAdresaX] = useState("");
-  const [adresaY, setAdresaY] = useState("");
+  const [XColumnAdress, setXColumnAddress] = useState(DEFAULT_STATE.XColumnAdress);
+  const [resultDestinationAddress, setResultDestinationAddress] = useState(
+    DEFAULT_STATE.resultDestinationAddress
+  );
+
+  const resetState = () => {
+    setOpen(false);
+    setResultDestinationAddress(DEFAULT_STATE.resultDestinationAddress);
+  };
 
   const handleClick = async () => {
-    const columnMatrix = await getColumnMatrix(adresaX);
+    const columnMatrix = await getColumnMatrix(XColumnAdress);
     if (!columnMatrix?.data?.length) return;
 
     const statLabels = STAT_FIELDS.map((key) => t(`descriptiveStats.${key}`));
@@ -118,12 +130,14 @@ const ModalDescriptiveStats = () => {
     if (isCompact) {
       await insertColumnTo(dataToWrite, "Discussion", "A1");
     } else {
-      await insertColumn(dataToWrite, adresaY);
+      await insertColumn(dataToWrite, resultDestinationAddress);
     }
+
+    resetState();
   };
 
   return (
-    <Dialog open={open} onOpenChange={(_, data) => setOpen(data.open)}>
+    <Dialog open={open} onOpenChange={(_, data) => (data.open ? setOpen(true) : resetState())}>
       <DialogTrigger disableButtonEnhancement>
         <ActionButton
           text={t("descriptiveStats.title")}
@@ -139,14 +153,14 @@ const ModalDescriptiveStats = () => {
           <DialogContent className={styles.content}>
             <RangeSelector
               label={t("descriptiveStats.label__x_input")}
-              onRangeChanged={setAdresaX}
+              onRangeChanged={setXColumnAddress}
               size="large"
             />
             <RangeSelector
               label={t("descriptiveStats.label__output")}
               placeholder={isCompact ? t("regression.label__output_compact_disabled") : "Ex: A1"}
-              onRangeChanged={setAdresaY}
-              value={isCompact ? "" : adresaY}
+              onRangeChanged={setResultDestinationAddress}
+              value={isCompact ? "" : resultDestinationAddress}
               size="large"
               input={false}
               disabled={isCompact}

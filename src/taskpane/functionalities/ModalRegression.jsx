@@ -97,6 +97,15 @@ const useStyles = makeStyles({
   },
 });
 
+const DEFAULT_STATE = {
+  YColumnAdress: "",
+  XColumnAdress: "",
+  resultDestinationAddress: "",
+  econometricInterpretation: false,
+  modelType: "Linear",
+  alpha: 0.05,
+};
+
 const ModalRegression = () => {
   const styles = useStyles();
   const { t } = useLanguage();
@@ -104,12 +113,24 @@ const ModalRegression = () => {
   const { mode, isCompact, fillFor } = useInterpretation();
 
   const [open, setOpen] = useState(false);
-  const [YColumnAdress, setYColumnAddress] = useState("Sheet1!A13:A64");
-  const [XColumnAdress, setXColumnAddress] = useState("Sheet1!B13:C64");
-  const [resultDestinationAddress, setResultDestinationAddress] = useState("Sheet1!E13");
-  const [econometricInterpretation, setEconometricInterpretation] = useState(false);
-  const [modelType, setModelType] = useState("Linear");
-  const [alpha, setAlpha] = useState(0.05);
+  const [YColumnAdress, setYColumnAddress] = useState(DEFAULT_STATE.YColumnAdress);
+  const [XColumnAdress, setXColumnAddress] = useState(DEFAULT_STATE.XColumnAdress);
+  const [resultDestinationAddress, setResultDestinationAddress] = useState(
+    DEFAULT_STATE.resultDestinationAddress
+  );
+  const [econometricInterpretation, setEconometricInterpretation] = useState(
+    DEFAULT_STATE.econometricInterpretation
+  );
+  const [modelType, setModelType] = useState(DEFAULT_STATE.modelType);
+  const [alpha, setAlpha] = useState(DEFAULT_STATE.alpha);
+
+  const resetState = () => {
+    setOpen(false);
+    setResultDestinationAddress(DEFAULT_STATE.resultDestinationAddress);
+    setEconometricInterpretation(DEFAULT_STATE.econometricInterpretation);
+    setModelType(DEFAULT_STATE.modelType);
+    setAlpha(DEFAULT_STATE.alpha);
+  };
 
   const handleClick = async () => {
     const xData = await getColumnMatrix(XColumnAdress);
@@ -137,10 +158,12 @@ const ModalRegression = () => {
     } else {
       await insertColumn(rawFullData, resultDestinationAddress);
     }
+
+    resetState();
   };
 
   return (
-    <Dialog open={open} onOpenChange={(_, data) => setOpen(data.open)}>
+    <Dialog open={open} onOpenChange={(_, data) => (data.open ? setOpen(true) : resetState())}>
       <DialogTrigger disableButtonEnhancement>
         <ActionButton
           text={t("regression.title")}
