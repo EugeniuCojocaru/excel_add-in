@@ -7,17 +7,12 @@ const useStyles = makeStyles({
   },
 });
 
-const ComboboxTags = ({ data, value, setValue }) => {
+const ComboboxTags = ({ data, value, setValue, label, placeholder }) => {
   const styles = useStyles();
-  // State-ul reține direct un array cu string-uri (cheile)
-
-  console.log("Selected model types:", value);
-  // Funcția apelată la bifarea/debifarea unei opțiuni din listă
   const onOptionSelect = (_, data) => {
     setValue(data.selectedOptions);
   };
 
-  // Transformă cheile în etichete citibile pentru a le afișa în input-ul combobox-ului
   const displayValue = value
     .map((key) => data.find((m) => m.key === key)?.label)
     .filter(Boolean)
@@ -25,11 +20,11 @@ const ComboboxTags = ({ data, value, setValue }) => {
 
   return (
     <>
-      <Field label="Selectează tipurile de model">
+      <Field label={label}>
         <Combobox
           className={styles.combobox}
           multiselect
-          placeholder="Alege opțiunile..."
+          placeholder={placeholder}
           value={displayValue}
           selectedOptions={value}
           onOptionSelect={onOptionSelect}

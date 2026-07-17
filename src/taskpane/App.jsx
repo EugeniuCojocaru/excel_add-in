@@ -1,14 +1,13 @@
 import React, { useState } from "react";
 import PropTypes from "prop-types";
-import ModalDescriptiveStats from "./descriptive_stats/ModalDescriptiveStats";
-import ModalSimpleRegression from "./regression/ModalSimpleRegression";
-import ModalModelComparison from "./model_comparison/ModalModelComparison";
-import ModalDummyVariables from "./dummy_variables/ModalDummyVariables";
+import ModalDescriptiveStats from "./functionalities/ModalDescriptiveStats";
+import ModalRegression from "./functionalities/ModalRegression";
+import ModalModelComparison from "./functionalities/ModalModelComparison";
+import ModalDummyVariables from "./functionalities/ModalDummyVariables";
 import ModalSettings from "./components/ModalSettings";
 import { makeStyles, tokens } from "@fluentui/react-components";
 import { SettingsFilled } from "@fluentui/react-icons";
 import { useLanguage } from "@i18n";
-import ActionButton from "./components/ActionButton";
 
 const useStyles = makeStyles({
   root: {
@@ -63,6 +62,9 @@ const useStyles = makeStyles({
     padding: `${tokens.spacingVerticalS} ${tokens.spacingHorizontalM}`,
     borderTop: "1px solid",
   },
+  settingsIcon: {
+    cursor: "pointer",
+  },
 });
 
 const App = () => {
@@ -80,13 +82,13 @@ const App = () => {
 
         <div className={styles.middlePart}>
           <ModalDescriptiveStats />
-          <ModalSimpleRegression />
+          <ModalRegression />
           <ModalModelComparison />
           <ModalDummyVariables />
         </div>
 
         <div className={styles.bottomPart} onClick={() => setSettingsOpen(true)}>
-          <SettingsFilled fontSize={32} style={{cursor: "pointer"}} />
+          <SettingsFilled fontSize={32} className={styles.settingsIcon} />
         </div>
 
         <ModalSettings open={settingsOpen} onClose={() => setSettingsOpen(false)} />

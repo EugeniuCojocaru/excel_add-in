@@ -143,6 +143,10 @@
         "label": "Significance level (α):",
         "placeholder": "Ex: 0.05"
       },
+      "combobox__model_type": {
+        "label": "Model types:",
+        "placeholder": "Choose options..."
+      },
       "interpretation": {
         "title": "Model Comparison",
         "bestRSquared": "Best R²:",
@@ -338,6 +342,10 @@
       "input__alpha": {
         "label": "Nivel de semnificație (α):",
         "placeholder": "Ex: 0.05"
+      },
+      "combobox__model_type": {
+        "label": "Tipuri de model:",
+        "placeholder": "Alege opțiunile..."
       },
       "interpretation": {
         "title": "Comparare modele",

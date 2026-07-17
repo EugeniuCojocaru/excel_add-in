@@ -23,7 +23,24 @@
     "start": "office-addin-debugging start manifest.xml",
     "stop": "office-addin-debugging stop manifest.xml",
     "validate": "office-addin-manifest validate manifest.xml",
-    "watch": "webpack --mode development --watch"
+    "watch": "webpack --mode development --watch",
+    "test": "jest",
+    "test:watch": "jest --watch"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "testMatch": ["**/tests/**/*.test.js"],
+    "transform": {
+      "^.+\\.(js|jsx)$": "babel-jest"
+    },
+    "transformIgnorePatterns": [
+      "/node_modules/(?!(mathjs|decimal\\.js)/)"
+    ],
+    "moduleNameMapper": {
+      "^@components/(.*)$": "<rootDir>/src/components/$1",
+      "^@i18n/(.*)$": "<rootDir>/src/libraries/i18n/$1",
+      "^@math/(.*)$": "<rootDir>/src/libraries/math/$1"
+    }
   },
   "dependencies": {
     "@fluentui/react-components": "^9.73.7",
@@ -44,6 +61,7 @@
     "@babel/preset-react": "^7.28.5",
     "@babel/preset-typescript": "^7.24.1",
     "acorn": "^8.11.3",
+    "babel-jest": "^30.4.1",
     "babel-loader": "^10.1.1",
     "babel-plugin-module-resolver": "^5.0.3",
     "babel-polyfill": "^6.26.0",
@@ -59,6 +77,7 @@
     "find-process": "^1.4.4",
     "html-loader": "^5.0.0",
     "html-webpack-plugin": "^5.6.0",
+    "jest": "^30.4.2",
     "less": "^4.2.0",
     "less-loader": "^12.2.0",
     "office-addin-cli": "^2.0.3",

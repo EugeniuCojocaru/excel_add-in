@@ -34,6 +34,9 @@ const useStyles = makeStyles({
     display: "flex",
     flex: "1",
   },
+  defaultAfterIcon: {
+    color: tokens.colorNeutralForeground3,
+  },
 });
 
 const ActionButton = ({
@@ -53,7 +56,7 @@ const ActionButton = ({
     if (!displayAfterIcon) return null;
     return (
       <span className={styles.icon}>
-        {afterIcon || <ChevronRightFilled style={{ color: "grey" }} />}
+        {afterIcon || <ChevronRightFilled className={styles.defaultAfterIcon} />}
       </span>
     );
   };

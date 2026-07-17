@@ -16,9 +16,11 @@
       {
         "root": ["./src"],
         "alias": {
-          "@utils": "./src/libraries/utils",
           "@i18n": "./src/libraries/i18n",
-          "@api": "./src/libraries/api"
+          "@math": "./src/libraries/math",
+          "@econometrics": "./src/libraries/econometrics",
+          "@excel": "./src/libraries/excel",
+          "@constants": "./src/libraries/constants"
         }
       }
     ],
